@@ -21,6 +21,15 @@ npm run codegen      # regenerate src/shared/api/schema.gen.ts from ../docs/open
 npm run check        # type-check, lint, format, test, knip, build-storybook
 ```
 
+The client calls the backend under `/api/v1` (matching the OpenAPI contract). Optional
+`.env` for talking to a real, secured backend:
+
+```dotenv
+VITE_API_BASE_URL=        # empty = same-origin via the dev proxy
+VITE_ORG_SLUG=            # sent as X-Organization-Slug (omit for single-tenant)
+VITE_API_KEY=             # sent as X-NENE2-API-Key on writes (omit when the API is open)
+```
+
 ## Structure
 
 - `src/app/` — providers, router, root error boundary

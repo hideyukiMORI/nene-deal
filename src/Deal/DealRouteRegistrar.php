@@ -34,12 +34,12 @@ final readonly class DealRouteRegistrar
         $stageChange = $this->stageChangeHandler;
         $history = $this->historyHandler;
 
-        $router->get('/deals', static fn (ServerRequestInterface $r): ResponseInterface => $list->handle($r));
-        $router->post('/deals', static fn (ServerRequestInterface $r): ResponseInterface => $create->handle($r));
-        $router->get('/deals/{dealId}', static fn (ServerRequestInterface $r): ResponseInterface => $get->handle($r));
-        $router->patch('/deals/{dealId}', static fn (ServerRequestInterface $r): ResponseInterface => $update->handle($r));
-        $router->delete('/deals/{dealId}', static fn (ServerRequestInterface $r): ResponseInterface => $delete->handle($r));
-        $router->post('/deals/{dealId}/stage-change', static fn (ServerRequestInterface $r): ResponseInterface => $stageChange->handle($r));
-        $router->get('/deals/{dealId}/history', static fn (ServerRequestInterface $r): ResponseInterface => $history->handle($r));
+        $router->get('/api/v1/deals', static fn (ServerRequestInterface $r): ResponseInterface => $list->handle($r));
+        $router->post('/api/v1/deals', static fn (ServerRequestInterface $r): ResponseInterface => $create->handle($r));
+        $router->get('/api/v1/deals/{dealId}', static fn (ServerRequestInterface $r): ResponseInterface => $get->handle($r));
+        $router->patch('/api/v1/deals/{dealId}', static fn (ServerRequestInterface $r): ResponseInterface => $update->handle($r));
+        $router->delete('/api/v1/deals/{dealId}', static fn (ServerRequestInterface $r): ResponseInterface => $delete->handle($r));
+        $router->post('/api/v1/deals/{dealId}/stage-change', static fn (ServerRequestInterface $r): ResponseInterface => $stageChange->handle($r));
+        $router->get('/api/v1/deals/{dealId}/history', static fn (ServerRequestInterface $r): ResponseInterface => $history->handle($r));
     }
 }

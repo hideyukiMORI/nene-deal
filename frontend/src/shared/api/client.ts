@@ -20,6 +20,12 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   if (options.body !== undefined) {
     headers['Content-Type'] = 'application/json'
   }
+  if (env.orgSlug !== '') {
+    headers['X-Organization-Slug'] = env.orgSlug
+  }
+  if (env.apiKey !== '') {
+    headers['X-NENE2-API-Key'] = env.apiKey
+  }
 
   const response = await fetch(`${base}${path}`, {
     method: options.method ?? 'GET',

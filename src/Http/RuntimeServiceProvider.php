@@ -243,9 +243,13 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Request organization middleware service is invalid.');
                     }
 
-                    // Machine API key gates mutating requests when configured;
-                    // unset (dev) leaves the API open. Reads stay public.
+                    // Machine API key gates mutating requests when configured.
+                    // When unset (dev), keep the API open: the framework's
+                    // api-key middleware is always present and fails closed, so
+                    // restrict its allowlist to an unused path rather than the
+                    // "protect all" default. Reads stay public either way.
                     $apiKey = self::env('NENE_DEAL_API_KEY');
+                    $gated = $apiKey !== null;
 
                     return new RuntimeApplicationFactory(
                         responseFactory: $psr17,
@@ -256,8 +260,8 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         authMiddleware: [$orgMiddleware],
                         healthChecks: [$databaseHealthCheck],
                         debug: $config->debug,
-                        machineApiKeyProtectedPaths: [],
-                        machineApiKeyProtectedMethods: ['POST', 'PATCH', 'PUT', 'DELETE'],
+                        machineApiKeyProtectedPaths: $gated ? [] : ['/machine/health'],
+                        machineApiKeyProtectedMethods: $gated ? ['POST', 'PATCH', 'PUT', 'DELETE'] : [],
                     );
                 },
             )
