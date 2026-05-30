@@ -1,0 +1,14 @@
+---
+description: NeNe Deal project rules — pipeline only, not Clear/Invoice domain
+alwaysApply: true
+---
+
+# Project Rules
+
+- Canonical docs: `README.md`, `AGENTS.md`, `docs/explanation/scope-contract.md`, `docs/workflow.md`.
+- **NeNe Deal = pipeline / opportunity SSOT only** — not billing, reconciliation, or archive.
+- **Do NOT** add Clear-style reconciliation, bank matching, dunning, or payment write-back.
+- **Do NOT** duplicate Invoice quote/invoice/tax logic — HTTP handoff to Invoice on won deals only.
+- **Do NOT** paste nene-clear compliance or integration docs into this repo.
+- Terminology SSOT: `docs/explanation/terminology.md` — exact spellings block merge.
+- Issue-driven workflow; English repository docs; no secrets in git.

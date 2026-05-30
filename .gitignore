@@ -1,0 +1,16 @@
+/vendor/
+/node_modules/
+/.env
+/.env.local
+/.env.*.local
+/.phpunit.result.cache
+/.php-cs-fixer.cache
+/.phpstan.cache/
+/composer.phar
+/public_html/assets/
+/dist/
+*.log
+.DS_Store
+.idea/
+.vscode/
+!.vscode/extensions.json

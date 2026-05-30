@@ -1,0 +1,43 @@
+# Agent / AI Guide
+
+Entry point for AI agents working on **NeNe Deal** (public repo `nene-deal`).
+
+## Domain (read first)
+
+| Product | Repository | Domain |
+| --- | --- | --- |
+| **NeNe Deal** | `nene-deal` (this) | B2B deal pipeline (kanban, forecast) |
+| **NeNe Invoice** | `nene-invoice` | Billing SSOT — clients, quotes, invoices |
+| **NeNe Clear** | `nene-clear` | Reconciliation & dunning — **not Deal** |
+
+See [ADR 0002](docs/adr/0002-deal-is-pipeline-ssot-not-billing.md).
+
+## Read First
+
+- **Scope contract (binding):** `docs/explanation/scope-contract.md`
+- **Terminology (binding):** `docs/explanation/terminology.md` — check before any identifier
+- **Product vision:** `docs/explanation/product-vision.md`
+- **Domain model:** `docs/explanation/domain-model.md`
+- **Invoice handoff (binding):** `docs/integrations/invoice-handoff-contract.md`
+- **NENE2 inheritance:** `docs/inheritance-from-nene2.md`
+- **Coding standards index:** `docs/development/coding-standards.md`
+- **Workflow:** `docs/workflow.md`
+- **Current work:** `docs/todo/current.md`
+
+## Operating Rules
+
+- **Issue-driven** — create or reuse a GitHub Issue before substantive edits
+- **No direct commits to `main`** — branch `type/issue-number-summary`
+- **Do not** implement invoice line items, tax, qualified invoice PDFs — **Invoice**
+- **Do not** implement bank reconciliation, payment matching, or dunning — **Clear**
+- **Do not** copy Clear integration patterns into Deal docs or code (wrong upstream/downstream)
+- **Do not** write to Invoice or Clear databases — HTTP handoff only
+- **Namespace:** `NeneDeal\`; amounts: **integer cents** in API and DB
+- **Repository docs: English**; Issues/PRs/commits may use Japanese in description/body
+- **No secrets** in git
+
+## Framework
+
+[NENE2](https://github.com/hideyukiMORI/NENE2) via Composer when runtime lands.
+Reference consumer: [nene-invoice](https://github.com/hideyukiMORI/nene-invoice),
+[nene-records](https://github.com/hideyukiMORI/nene-records).
