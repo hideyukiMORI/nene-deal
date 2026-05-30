@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace NeneDeal;
 
+use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use NeneDeal\Deal\DealNotFoundExceptionHandler;
+use NeneDeal\Deal\DealRouteRegistrar;
+use NeneDeal\Deal\UnknownStageExceptionHandler;
+use NeneDeal\Pipeline\PipelineStageRouteRegistrar;
 use Psr\Container\ContainerInterface;
 
 /**
- * Aggregates the application's route registrars and domain exception handlers.
- *
- * `GET /` and `GET /health` are provided by the framework runtime. Per-domain
- * providers (Deal, Pipeline, …) will register their route registrars in the
- * container in later issues; this provider collects them into the lists the
- * runtime consumes. The scaffold ships with empty lists.
+ * Aggregates the application's route registrars and domain exception handlers
+ * into the lists the runtime consumes. `GET /` and `GET /health` are provided
+ * by the framework runtime.
  */
 final readonly class ApplicationServiceProvider implements ServiceProviderInterface
 {
@@ -24,7 +26,31 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
     public function register(ContainerBuilder $builder): void
     {
         $builder
-            ->set(self::ROUTE_REGISTRARS, static fn (ContainerInterface $container): array => [])
-            ->set(self::EXCEPTION_HANDLERS, static fn (ContainerInterface $container): array => []);
+            ->set(
+                self::ROUTE_REGISTRARS,
+                static function (ContainerInterface $container): array {
+                    $stages = $container->get(PipelineStageRouteRegistrar::class);
+                    $deals = $container->get(DealRouteRegistrar::class);
+
+                    if (!$stages instanceof PipelineStageRouteRegistrar || !$deals instanceof DealRouteRegistrar) {
+                        throw new LogicException('Route registrar services are invalid.');
+                    }
+
+                    return [$stages, $deals];
+                },
+            )
+            ->set(
+                self::EXCEPTION_HANDLERS,
+                static function (ContainerInterface $container): array {
+                    $dealNotFound = $container->get(DealNotFoundExceptionHandler::class);
+                    $unknownStage = $container->get(UnknownStageExceptionHandler::class);
+
+                    if (!$dealNotFound instanceof DealNotFoundExceptionHandler || !$unknownStage instanceof UnknownStageExceptionHandler) {
+                        throw new LogicException('Exception handler services are invalid.');
+                    }
+
+                    return [$dealNotFound, $unknownStage];
+                },
+            );
     }
 }

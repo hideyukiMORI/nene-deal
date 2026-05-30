@@ -7,24 +7,34 @@ namespace NeneDeal\Http;
 use LogicException;
 use Nene2\Config\AppConfig;
 use Nene2\Config\ConfigLoader;
+use Nene2\Database\DatabaseConnectionFactoryInterface;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\PdoConnectionFactory;
+use Nene2\Database\PdoDatabaseQueryExecutor;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
+use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\ResponseEmitter;
 use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Routing\Router;
 use NeneDeal\ApplicationServiceProvider;
+use NeneDeal\Deal\DealServiceProvider;
+use NeneDeal\Pipeline\PipelineServiceProvider;
+use NeneDeal\Tenancy\CurrentOrganization;
+use NeneDeal\Tenancy\PdoCurrentOrganization;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * Wires the NENE2 HTTP runtime for NeNe Deal: configuration and the request
- * handler. This is the minimal consumer scaffold — no database, tenant
- * resolution, or authentication yet. Those are added in later issues by
- * extending the {@see RuntimeApplicationFactory} construction here (database
- * health checks, auth middleware) and by populating the route registrar /
- * exception handler lists in {@see ApplicationServiceProvider}.
+ * Wires the NENE2 HTTP runtime for NeNe Deal: configuration, database
+ * connectivity, the response factories, the (single-organization) tenancy
+ * resolver, the domain providers, and the request handler.
+ *
+ * Authentication and multi-tenant resolution middleware are added in later
+ * issues by extending the {@see RuntimeApplicationFactory} construction here.
  */
 final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 {
@@ -33,6 +43,8 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
     public function register(ContainerBuilder $builder): void
     {
         $builder->addProvider(new ApplicationServiceProvider());
+        $builder->addProvider(new PipelineServiceProvider());
+        $builder->addProvider(new DealServiceProvider());
 
         $builder
             ->set(Psr17Factory::class, static fn (ContainerInterface $container): Psr17Factory => new Psr17Factory())
@@ -61,6 +73,83 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                DatabaseConnectionFactoryInterface::class,
+                static function (ContainerInterface $container): DatabaseConnectionFactoryInterface {
+                    $config = $container->get(AppConfig::class);
+
+                    if (!$config instanceof AppConfig) {
+                        throw new LogicException('Application config service is invalid.');
+                    }
+
+                    return new PdoConnectionFactory($config->database);
+                },
+            )
+            ->set(
+                DatabaseQueryExecutorInterface::class,
+                static function (ContainerInterface $container): DatabaseQueryExecutorInterface {
+                    $connectionFactory = $container->get(DatabaseConnectionFactoryInterface::class);
+
+                    if (!$connectionFactory instanceof DatabaseConnectionFactoryInterface) {
+                        throw new LogicException('Database connection factory service is invalid.');
+                    }
+
+                    return new PdoDatabaseQueryExecutor($connectionFactory);
+                },
+            )
+            ->set(
+                CurrentOrganization::class,
+                static function (ContainerInterface $container): CurrentOrganization {
+                    $query = $container->get(DatabaseQueryExecutorInterface::class);
+
+                    if (!$query instanceof DatabaseQueryExecutorInterface) {
+                        throw new LogicException('Database query executor service is invalid.');
+                    }
+
+                    return new PdoCurrentOrganization($query);
+                },
+            )
+            ->set(
+                DatabaseHealthCheck::class,
+                static function (ContainerInterface $container): DatabaseHealthCheck {
+                    $connectionFactory = $container->get(DatabaseConnectionFactoryInterface::class);
+
+                    if (!$connectionFactory instanceof DatabaseConnectionFactoryInterface) {
+                        throw new LogicException('Database connection factory service is invalid.');
+                    }
+
+                    return new DatabaseHealthCheck($connectionFactory);
+                },
+            )
+            ->set(
+                JsonResponseFactory::class,
+                static function (ContainerInterface $container): JsonResponseFactory {
+                    $psr17 = $container->get(Psr17Factory::class);
+
+                    if (!$psr17 instanceof Psr17Factory) {
+                        throw new LogicException('PSR-17 factory service is invalid.');
+                    }
+
+                    return new JsonResponseFactory($psr17, $psr17);
+                },
+            )
+            ->set(
+                ProblemDetailsResponseFactory::class,
+                static function (ContainerInterface $container): ProblemDetailsResponseFactory {
+                    $psr17 = $container->get(Psr17Factory::class);
+                    $config = $container->get(AppConfig::class);
+
+                    if (!$psr17 instanceof Psr17Factory) {
+                        throw new LogicException('PSR-17 factory service is invalid.');
+                    }
+
+                    if (!$config instanceof AppConfig) {
+                        throw new LogicException('Application config service is invalid.');
+                    }
+
+                    return new ProblemDetailsResponseFactory($psr17, $psr17, $config->problemDetailsBaseUrl);
+                },
+            )
+            ->set(
                 RuntimeApplicationFactory::class,
                 static function (ContainerInterface $container): RuntimeApplicationFactory {
                     $psr17 = $container->get(Psr17Factory::class);
@@ -73,6 +162,12 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 
                     if (!$config instanceof AppConfig) {
                         throw new LogicException('Application config service is invalid.');
+                    }
+
+                    $databaseHealthCheck = $container->get(DatabaseHealthCheck::class);
+
+                    if (!$databaseHealthCheck instanceof DatabaseHealthCheck) {
+                        throw new LogicException('Database health check service is invalid.');
                     }
 
                     $routeRegistrars = $container->get(ApplicationServiceProvider::ROUTE_REGISTRARS);
@@ -95,6 +190,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         streamFactory: $psr17,
                         domainExceptionHandlers: $exceptionHandlers,
                         routeRegistrars: $routeRegistrars,
+                        healthChecks: [$databaseHealthCheck],
                         debug: $config->debug,
                     );
                 },

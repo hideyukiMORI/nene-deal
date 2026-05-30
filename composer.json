@@ -5,7 +5,8 @@
     "license": "MIT",
     "require": {
         "php": ">=8.4.1 <9.0",
-        "hideyukimori/nene2": "^1.5"
+        "hideyukimori/nene2": "^1.5",
+        "symfony/uid": "^8.1"
     },
     "autoload": {
         "psr-4": {
@@ -23,6 +24,9 @@
         "cs": "php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.php",
         "cs:fix": "php-cs-fixer fix --config=.php-cs-fixer.php",
         "openapi": "php tools/validate-openapi.php",
+        "migrations:status": "phinx status -c phinx.php",
+        "migrations:migrate": "phinx migrate -c phinx.php",
+        "migrations:rollback": "phinx rollback -c phinx.php",
         "check": [
             "@test",
             "@analyse",
@@ -37,6 +41,7 @@
         "friendsofphp/php-cs-fixer": "^3.95",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^13.1",
+        "robmorgan/phinx": "^0.16.11",
         "symfony/yaml": "^8.1"
     }
 }
