@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mapCreateInputToDto, mapDealDtoToModel } from './mapper'
+import { mapCreateInputToDto, mapDealDtoToModel, mapHandoffResultDtoToModel } from './mapper'
 import { toDealId } from './ids'
 
 describe('deal mapper', () => {
@@ -12,6 +12,10 @@ describe('deal mapper', () => {
       stage_id: '01STAGELEAD0000000000000AA',
       stage_slug: 'lead',
       probability_percent: 40,
+      note: 'first deal',
+      invoice_client_id: null,
+      invoice_quote_id: null,
+      handoff_at: null,
       created_at: '2026-05-30 00:00:00',
       updated_at: '2026-05-30 00:00:00',
     })
@@ -23,6 +27,27 @@ describe('deal mapper', () => {
       stageId: '01STAGELEAD0000000000000AA',
       stageSlug: 'lead',
       probabilityPercent: 40,
+      expectedCloseDate: null,
+      note: 'first deal',
+      invoiceClientId: null,
+      invoiceQuoteId: null,
+      handoffAt: null,
+    })
+  })
+
+  it('maps a handoff result dto to model', () => {
+    expect(
+      mapHandoffResultDtoToModel({
+        deal_id: '01DEAL0000000000000000000A',
+        invoice_client_id: 4821,
+        invoice_quote_id: 9930,
+        handoff_at: '2026-05-31 00:00:00',
+      }),
+    ).toEqual({
+      dealId: '01DEAL0000000000000000000A',
+      invoiceClientId: 4821,
+      invoiceQuoteId: 9930,
+      handoffAt: '2026-05-31 00:00:00',
     })
   })
 

@@ -38,9 +38,29 @@ export const en: MessageCatalog = {
   'deal.field.amount': 'Amount (JPY)',
   'deal.field.stage': 'Stage',
   'deal.field.probability': 'Probability (%)',
+  'deal.field.note': 'Note',
   'deal.validation.accountLabelRequired': 'Please enter an account name.',
   'deal.validation.amountPositive': 'Amount must be 0 or greater.',
   'deal.validation.probabilityRange': 'Probability must be between 0 and 100.',
+
+  'common.actions.back': 'Back',
+  'common.actions.save': 'Save',
+
+  'deal.open.detail': 'Details',
+  'detail.loading': 'Loading the deal…',
+  'detail.error.title': 'Could not load the deal',
+  'detail.notFound': 'Deal not found.',
+  'detail.edit.title': 'Edit deal',
+  'detail.edit.error': 'Could not update the deal.',
+  'detail.note.empty': '(no note)',
+
+  'handoff.title': 'Hand off to NeNe Invoice',
+  'handoff.description': 'Send this won deal to Invoice as a draft client and quote.',
+  'handoff.send': 'Send to Invoice',
+  'handoff.error': 'Handoff to Invoice failed.',
+  'handoff.linked': 'Linked to Invoice',
+  'handoff.clientId': 'Invoice client ID',
+  'handoff.quoteId': 'Invoice quote ID',
 
   'locale.label': 'Language',
 }

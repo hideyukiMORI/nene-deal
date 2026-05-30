@@ -1,6 +1,6 @@
-import type { CreateDealDto, DealDto } from './api-types'
+import type { CreateDealDto, DealDto, InvoiceHandoffResultDto, UpdateDealDto } from './api-types'
 import { toDealId } from './ids'
-import type { CreateDealInput, Deal } from './model'
+import type { CreateDealInput, Deal, InvoiceHandoffResult, UpdateDealInput } from './model'
 
 export function mapDealDtoToModel(dto: DealDto): Deal {
   return {
@@ -10,6 +10,11 @@ export function mapDealDtoToModel(dto: DealDto): Deal {
     stageId: dto.stage_id,
     stageSlug: dto.stage_slug ?? null,
     probabilityPercent: dto.probability_percent,
+    expectedCloseDate: dto.expected_close_date ?? null,
+    note: dto.note ?? null,
+    invoiceClientId: dto.invoice_client_id ?? null,
+    invoiceQuoteId: dto.invoice_quote_id ?? null,
+    handoffAt: dto.handoff_at ?? null,
   }
 }
 
@@ -19,5 +24,23 @@ export function mapCreateInputToDto(input: CreateDealInput): CreateDealDto {
     amount_cents: input.amountCents,
     stage_id: input.stageRef,
     probability_percent: input.probabilityPercent,
+  }
+}
+
+export function mapUpdateInputToDto(input: UpdateDealInput): UpdateDealDto {
+  return {
+    account_label: input.accountLabel,
+    amount_cents: input.amountCents,
+    probability_percent: input.probabilityPercent,
+    note: input.note,
+  }
+}
+
+export function mapHandoffResultDtoToModel(dto: InvoiceHandoffResultDto): InvoiceHandoffResult {
+  return {
+    dealId: dto.deal_id,
+    invoiceClientId: dto.invoice_client_id,
+    invoiceQuoteId: dto.invoice_quote_id,
+    handoffAt: dto.handoff_at,
   }
 }

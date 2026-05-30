@@ -19,6 +19,7 @@ function baseProps(overrides: Partial<KanbanBoardViewProps> = {}): KanbanBoardVi
     createPending: false,
     createErrorKey: null,
     moveDeal: () => Promise.resolve(),
+    onOpenDeal: vi.fn(),
     ...overrides,
   }
 }
@@ -62,5 +63,16 @@ describe('KanbanBoardView', () => {
     expect(screen.queryByLabelText('Account')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Add deal' }))
     expect(screen.getByLabelText('Account')).toBeInTheDocument()
+  })
+
+  it('invokes onOpenDeal from a card details action', async () => {
+    const user = userEvent.setup()
+    const onOpenDeal = vi.fn()
+    renderWithProviders(
+      <KanbanBoardView {...baseProps({ columns: [buildKanbanColumn()], onOpenDeal })} />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Details' }))
+    expect(onOpenDeal).toHaveBeenCalledWith('01DEALACME000000000000000A')
   })
 })
