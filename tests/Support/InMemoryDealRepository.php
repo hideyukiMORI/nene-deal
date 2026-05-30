@@ -76,6 +76,33 @@ final class InMemoryDealRepository implements DealRepositoryInterface
         ));
     }
 
+    public function markHandedOff(string $id, int $invoiceClientId, int $invoiceQuoteId, string $handoffAt): void
+    {
+        $deal = $this->deals[$id] ?? null;
+
+        if ($deal === null) {
+            throw new DealNotFoundException($id);
+        }
+
+        $this->deals[$id] = new Deal(
+            id: $deal->id,
+            accountLabel: $deal->accountLabel,
+            amountCents: $deal->amountCents,
+            stageId: $deal->stageId,
+            probabilityPercent: $deal->probabilityPercent,
+            expectedCloseDate: $deal->expectedCloseDate,
+            ownerUserId: $deal->ownerUserId,
+            note: $deal->note,
+            invoiceClientId: $invoiceClientId,
+            invoiceQuoteId: $invoiceQuoteId,
+            handoffAt: $handoffAt,
+            organizationId: $deal->organizationId,
+            stageSlug: $deal->stageSlug,
+            createdAt: $deal->createdAt,
+            updatedAt: $deal->updatedAt,
+        );
+    }
+
     public function appendHistory(StageHistoryEntry $entry): void
     {
         $this->history[] = $entry;

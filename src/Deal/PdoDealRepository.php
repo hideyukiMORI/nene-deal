@@ -143,6 +143,19 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
         );
     }
 
+    public function markHandedOff(string $id, int $invoiceClientId, int $invoiceQuoteId, string $handoffAt): void
+    {
+        $affected = $this->query->execute(
+            'UPDATE deals SET invoice_client_id = ?, invoice_quote_id = ?, handoff_at = ?, updated_at = ?
+             WHERE id = ? AND organization_id = ?',
+            [$invoiceClientId, $invoiceQuoteId, $handoffAt, date('Y-m-d H:i:s'), $id, $this->organization->id()],
+        );
+
+        if ($affected === 0 && $this->findById($id) === null) {
+            throw new DealNotFoundException($id);
+        }
+    }
+
     public function appendHistory(StageHistoryEntry $entry): void
     {
         $this->query->execute(
