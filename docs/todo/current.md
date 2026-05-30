@@ -1,6 +1,6 @@
 # Current TODO
 
-**Phase 1 — MVP pipeline (backend underway)**
+**Phase 1 — MVP pipeline (backend complete; frontend underway)**
 
 ## Done
 
@@ -12,11 +12,13 @@
 - [x] Issue #12: Deal & Pipeline domain API — CRUD, stage move, history, `GET /stages`
 - [x] Issue #14: Read models — `GET /board` (kanban) + `GET /forecast`
 - [x] Issue #16: Won → Invoice handoff (`POST /deals/{id}/invoice-handoff`)
+- [x] Issue #5 / #18: Kanban board frontend (React, JA/EN i18n) — `frontend/` per nene-records standards
 
 ## Next
 
 - [ ] Authentication + multi-tenant resolution (replace single-org resolver)
-- [ ] Issue #5: Kanban UI scaffold + JA/EN i18n message catalogs (ADR 0004 — `ja`/`en` only)
+- [ ] Frontend: won → Invoice handoff action + deal edit/detail screens
+- [ ] Docker Compose dev stack
 
 ## Handoff
 
