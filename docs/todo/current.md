@@ -14,11 +14,13 @@
 - [x] Issue #16: Won → Invoice handoff (`POST /deals/{id}/invoice-handoff`)
 - [x] Issue #5 / #18: Kanban board frontend (React, JA/EN i18n) — `frontend/` per nene-records standards
 - [x] Issue #20: Docker Compose dev stack (PHP app + MySQL)
+- [x] Issue #22: Auth (machine API key) + multi-tenant resolution (request-scoped org)
 
 ## Next
 
-- [ ] Authentication + multi-tenant resolution (replace single-org resolver)
 - [ ] Frontend: won → Invoice handoff action + deal edit/detail screens
+- [ ] Align route prefix with OpenAPI (`/api/v1`) + frontend org/api-key headers
+- [ ] Operator login (JWT) + RBAC (future epic)
 
 ## Handoff
 
