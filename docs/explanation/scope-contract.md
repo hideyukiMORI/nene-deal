@@ -27,6 +27,7 @@ Invoice answers: *what is the legal quote/invoice and tax treatment?*
 | D8 | Multi-tenant `organization_id` (same pattern as sibling products) |
 | D9 | OpenAPI-first JSON API; optional MCP read tools Phase 2+ |
 | D10 | Standalone install + optional NeNe Suite catalog entry (when suite documents it) |
+| D11 | **Bilingual UI (JA/EN)** — Japanese default, English peer for foreign operators in Japan ([ADR 0004](../adr/0004-bilingual-ja-en-only.md)) |
 
 ## DON'T
 
@@ -42,6 +43,7 @@ Invoice answers: *what is the legal quote/invoice and tax treatment?*
 | X8 | Share database with Invoice or Clear | HTTP only |
 | X9 | Auto-handoff to Invoice without operator confirmation | Product rule |
 | X10 | Claim tax or statutory billing compliance | Operator + Invoice + professionals |
+| X11 | Ship UI locales beyond Japanese and English | Product rule ([ADR 0004](../adr/0004-bilingual-ja-en-only.md)) |
 
 ## Won-deal handoff (summary)
 
@@ -53,6 +55,7 @@ Deal sends **draft** resources only. Invoice remains billing SSOT after handoff.
 
 - [ADR 0002](../adr/0002-deal-is-pipeline-ssot-not-billing.md)
 - [ADR 0003](../adr/0003-invoice-http-handoff-on-won-deal.md)
+- [ADR 0004](../adr/0004-bilingual-ja-en-only.md)
 - [`domain-model.md`](./domain-model.md)
 
 Last updated: 2026-05-30

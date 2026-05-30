@@ -33,6 +33,7 @@ See [ADR 0002](docs/adr/0002-deal-is-pipeline-ssot-not-billing.md).
 - **Do not** copy Clear integration patterns into Deal docs or code (wrong upstream/downstream)
 - **Do not** write to Invoice or Clear databases — HTTP handoff only
 - **Namespace:** `NeneDeal\`; amounts: **integer cents** in API and DB
+- **Product UI locales:** `ja`/`en` only (ADR 0004) — broader localization is a non-goal
 - **Repository docs: English**; Issues/PRs/commits may use Japanese in description/body
 - **No secrets** in git
 

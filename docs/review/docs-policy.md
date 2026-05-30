@@ -7,6 +7,7 @@ Use before merging documentation PRs.
 - [ ] Invoice handoff references HTTP + link ids, not duplicated billing logic
 - [ ] English in repo Markdown (Issue/PR bodies may be Japanese)
 - [ ] ADR added if boundary or integration decision changed
+- [ ] Locale policy respected — product UI strings target `ja`/`en` only (ADR 0004)
 - [ ] `docs/todo/current.md` updated when phase milestones shift
 
 Last updated: 2026-05-30

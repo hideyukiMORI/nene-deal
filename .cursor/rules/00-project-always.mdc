@@ -11,4 +11,5 @@ alwaysApply: true
 - **Do NOT** duplicate Invoice quote/invoice/tax logic — HTTP handoff to Invoice on won deals only.
 - **Do NOT** paste nene-clear compliance or integration docs into this repo.
 - Terminology SSOT: `docs/explanation/terminology.md` — exact spellings block merge.
+- Product UI locales: `ja`/`en` only (Japan-market product; ADR 0004) — no broader localization.
 - Issue-driven workflow; English repository docs; no secrets in git.

@@ -11,6 +11,7 @@ NENE2 `docs/development/coding-standards.md` after `composer install`.
 | Money | Integer minor units on deal cards; no float amounts in DB |
 | Links | Store Invoice ids as opaque strings; no cached quote JSON |
 | Boundaries | No Clear/reconciliation code paths in this repo |
+| i18n | UI strings in `ja`/`en` message catalogs only ([ADR 0004](../adr/0004-bilingual-ja-en-only.md)); no hardcoded display text |
 
 ## Quality gates (when scaffold exists)
 
