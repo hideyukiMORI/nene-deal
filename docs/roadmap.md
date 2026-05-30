@@ -12,8 +12,8 @@
 - [x] Monthly forecast endpoint — `GET /forecast` (#14)
 - [x] Won → Invoice handoff (draft client + quote) — `POST /deals/{id}/invoice-handoff` (#16)
 - [ ] Docker Compose dev stack
-- [ ] Admin kanban UI
-- [ ] Bilingual (JA/EN) UI + `ja`/`en` message catalogs (ADR 0004)
+- [x] Admin kanban UI — `frontend/` React SPA (#18)
+- [x] Bilingual (JA/EN) UI + `ja`/`en` message catalogs (ADR 0004) — `frontend/src/shared/i18n` (#18)
 
 ## Phase 2 — Polish
 

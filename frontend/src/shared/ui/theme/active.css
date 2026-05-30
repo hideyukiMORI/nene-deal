@@ -1,0 +1,3 @@
+/* The single theme-swap point. Change this import (or swap this file in the
+   build) to restyle the entire app without editing any component. */
+@import './themes/default.css';

@@ -1,0 +1,5 @@
+export type { DealId } from './ids'
+export { toDealId } from './ids'
+export type { CreateDealInput, Deal } from './model'
+export { useCreateDeal, useChangeDealStage } from './mutations'
+export type { ChangeDealStageVars } from './mutations'
