@@ -1,4 +1,5 @@
 import { env } from '@/shared/config/env'
+import { authStore } from '@/shared/auth'
 import { AppError, parseProblemDetails } from '@/shared/api/errors'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -26,6 +27,10 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   if (env.apiKey !== '') {
     headers['X-NENE2-API-Key'] = env.apiKey
   }
+  const token = authStore.getToken()
+  if (token !== null) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
 
   const response = await fetch(`${base}${path}`, {
     method: options.method ?? 'GET',
@@ -36,6 +41,11 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   })
 
   if (!response.ok) {
+    // An expired/invalid session clears the token; the auth gate reacts and
+    // routes back to login. The login request itself is exempt.
+    if (response.status === 401 && !path.includes('/auth/login')) {
+      authStore.clear()
+    }
     throw await parseProblemDetails(response)
   }
 

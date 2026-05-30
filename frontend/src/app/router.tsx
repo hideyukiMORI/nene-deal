@@ -1,11 +1,30 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { BoardPage } from '@/pages/board/BoardPage'
 import { DealDetailPage } from '@/pages/deal-detail/DealDetailPage'
+import { LoginPage } from '@/pages/login/LoginPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
+import { RequireAuth } from './auth-gate'
 
 const router = createBrowserRouter([
-  { path: '/', element: <BoardPage />, errorElement: <NotFoundPage /> },
-  { path: '/deals/:dealId', element: <DealDetailPage />, errorElement: <NotFoundPage /> },
+  { path: '/login', element: <LoginPage /> },
+  {
+    path: '/',
+    element: (
+      <RequireAuth>
+        <BoardPage />
+      </RequireAuth>
+    ),
+    errorElement: <NotFoundPage />,
+  },
+  {
+    path: '/deals/:dealId',
+    element: (
+      <RequireAuth>
+        <DealDetailPage />
+      </RequireAuth>
+    ),
+    errorElement: <NotFoundPage />,
+  },
   { path: '*', element: <NotFoundPage /> },
 ])
 

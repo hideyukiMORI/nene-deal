@@ -28,7 +28,11 @@ The client calls the backend under `/api/v1` (matching the OpenAPI contract). Op
 VITE_API_BASE_URL=        # empty = same-origin via the dev proxy
 VITE_ORG_SLUG=            # sent as X-Organization-Slug (omit for single-tenant)
 VITE_API_KEY=             # sent as X-NENE2-API-Key on writes (omit when the API is open)
+VITE_REQUIRE_LOGIN=       # 'true' gates the app behind /login (set when the backend enforces JWT)
 ```
+
+Operator login: `/login`. The bearer token is held in memory only (lost on reload — log
+in again); a future ADR may move to an httpOnly cookie.
 
 ## Structure
 
