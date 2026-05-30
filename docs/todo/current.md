@@ -10,8 +10,8 @@
 ## Next
 
 - [ ] Issue #2: OpenAPI contract (deals, stages, forecast, invoice-handoff)
-- [ ] NENE2 consumer scaffold (`composer.json`, Hello health)
-- [ ] Kanban UI scaffold + JA/EN i18n message catalogs (ADR 0004 — `ja`/`en` only)
+- [ ] Issue #6: NENE2 consumer scaffold (`composer.json`, Hello health)
+- [ ] Issue #5: Kanban UI scaffold + JA/EN i18n message catalogs (ADR 0004 — `ja`/`en` only)
 
 ## Handoff
 
