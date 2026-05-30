@@ -7,6 +7,8 @@ namespace NeneDeal;
 use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use NeneDeal\Auth\AuthRouteRegistrar;
+use NeneDeal\Auth\InvalidCredentialsExceptionHandler;
 use NeneDeal\Deal\DealNotFoundExceptionHandler;
 use NeneDeal\Deal\DealRouteRegistrar;
 use NeneDeal\Deal\UnknownStageExceptionHandler;
@@ -38,16 +40,18 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $deals = $container->get(DealRouteRegistrar::class);
                     $forecast = $container->get(ForecastRouteRegistrar::class);
                     $handoff = $container->get(InvoiceHandoffRouteRegistrar::class);
+                    $auth = $container->get(AuthRouteRegistrar::class);
 
                     if (!$stages instanceof PipelineStageRouteRegistrar
                         || !$deals instanceof DealRouteRegistrar
                         || !$forecast instanceof ForecastRouteRegistrar
                         || !$handoff instanceof InvoiceHandoffRouteRegistrar
+                        || !$auth instanceof AuthRouteRegistrar
                     ) {
                         throw new LogicException('Route registrar services are invalid.');
                     }
 
-                    return [$stages, $deals, $forecast, $handoff];
+                    return [$stages, $deals, $forecast, $handoff, $auth];
                 },
             )
             ->set(
@@ -58,17 +62,26 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $alreadyHandedOff = $container->get(AlreadyHandedOffExceptionHandler::class);
                     $handoffPrecondition = $container->get(HandoffPreconditionExceptionHandler::class);
                     $invoiceUpstream = $container->get(InvoiceHandoffExceptionHandler::class);
+                    $invalidCredentials = $container->get(InvalidCredentialsExceptionHandler::class);
 
                     if (!$dealNotFound instanceof DealNotFoundExceptionHandler
                         || !$unknownStage instanceof UnknownStageExceptionHandler
                         || !$alreadyHandedOff instanceof AlreadyHandedOffExceptionHandler
                         || !$handoffPrecondition instanceof HandoffPreconditionExceptionHandler
                         || !$invoiceUpstream instanceof InvoiceHandoffExceptionHandler
+                        || !$invalidCredentials instanceof InvalidCredentialsExceptionHandler
                     ) {
                         throw new LogicException('Exception handler services are invalid.');
                     }
 
-                    return [$dealNotFound, $unknownStage, $alreadyHandedOff, $handoffPrecondition, $invoiceUpstream];
+                    return [
+                        $dealNotFound,
+                        $unknownStage,
+                        $alreadyHandedOff,
+                        $handoffPrecondition,
+                        $invoiceUpstream,
+                        $invalidCredentials,
+                    ];
                 },
             );
     }
