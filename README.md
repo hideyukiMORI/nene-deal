@@ -45,6 +45,7 @@ Built on [NENE2](https://github.com/hideyukiMORI/NENE2).
 | Terminology (binding) | [`docs/explanation/terminology.md`](./docs/explanation/terminology.md) |
 | Product vision | [`docs/explanation/product-vision.md`](./docs/explanation/product-vision.md) |
 | Domain model | [`docs/explanation/domain-model.md`](./docs/explanation/domain-model.md) |
+| API contract (SSOT) | [`docs/openapi/openapi.yaml`](./docs/openapi/openapi.yaml) |
 | Invoice handoff contract | [`docs/integrations/invoice-handoff-contract.md`](./docs/integrations/invoice-handoff-contract.md) |
 | Sibling products | [`docs/integrations/sibling-products.md`](./docs/integrations/sibling-products.md) |
 | NENE2 inheritance | [`docs/inheritance-from-nene2.md`](./docs/inheritance-from-nene2.md) |
