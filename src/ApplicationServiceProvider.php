@@ -11,6 +11,10 @@ use NeneDeal\Deal\DealNotFoundExceptionHandler;
 use NeneDeal\Deal\DealRouteRegistrar;
 use NeneDeal\Deal\UnknownStageExceptionHandler;
 use NeneDeal\Forecast\ForecastRouteRegistrar;
+use NeneDeal\Handoff\AlreadyHandedOffExceptionHandler;
+use NeneDeal\Handoff\HandoffPreconditionExceptionHandler;
+use NeneDeal\Handoff\InvoiceHandoffExceptionHandler;
+use NeneDeal\Handoff\InvoiceHandoffRouteRegistrar;
 use NeneDeal\Pipeline\PipelineStageRouteRegistrar;
 use Psr\Container\ContainerInterface;
 
@@ -33,15 +37,17 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $stages = $container->get(PipelineStageRouteRegistrar::class);
                     $deals = $container->get(DealRouteRegistrar::class);
                     $forecast = $container->get(ForecastRouteRegistrar::class);
+                    $handoff = $container->get(InvoiceHandoffRouteRegistrar::class);
 
                     if (!$stages instanceof PipelineStageRouteRegistrar
                         || !$deals instanceof DealRouteRegistrar
                         || !$forecast instanceof ForecastRouteRegistrar
+                        || !$handoff instanceof InvoiceHandoffRouteRegistrar
                     ) {
                         throw new LogicException('Route registrar services are invalid.');
                     }
 
-                    return [$stages, $deals, $forecast];
+                    return [$stages, $deals, $forecast, $handoff];
                 },
             )
             ->set(
@@ -49,12 +55,20 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 static function (ContainerInterface $container): array {
                     $dealNotFound = $container->get(DealNotFoundExceptionHandler::class);
                     $unknownStage = $container->get(UnknownStageExceptionHandler::class);
+                    $alreadyHandedOff = $container->get(AlreadyHandedOffExceptionHandler::class);
+                    $handoffPrecondition = $container->get(HandoffPreconditionExceptionHandler::class);
+                    $invoiceUpstream = $container->get(InvoiceHandoffExceptionHandler::class);
 
-                    if (!$dealNotFound instanceof DealNotFoundExceptionHandler || !$unknownStage instanceof UnknownStageExceptionHandler) {
+                    if (!$dealNotFound instanceof DealNotFoundExceptionHandler
+                        || !$unknownStage instanceof UnknownStageExceptionHandler
+                        || !$alreadyHandedOff instanceof AlreadyHandedOffExceptionHandler
+                        || !$handoffPrecondition instanceof HandoffPreconditionExceptionHandler
+                        || !$invoiceUpstream instanceof InvoiceHandoffExceptionHandler
+                    ) {
                         throw new LogicException('Exception handler services are invalid.');
                     }
 
-                    return [$dealNotFound, $unknownStage];
+                    return [$dealNotFound, $unknownStage, $alreadyHandedOff, $handoffPrecondition, $invoiceUpstream];
                 },
             );
     }

@@ -10,7 +10,7 @@
 
 - [x] Deal CRUD + stage move + kanban API — CRUD / stage move / history / `GET /stages` (#12) + `GET /board` (#14)
 - [x] Monthly forecast endpoint — `GET /forecast` (#14)
-- [ ] Won → Invoice handoff (draft client + quote)
+- [x] Won → Invoice handoff (draft client + quote) — `POST /deals/{id}/invoice-handoff` (#16)
 - [ ] Docker Compose dev stack
 - [ ] Admin kanban UI
 - [ ] Bilingual (JA/EN) UI + `ja`/`en` message catalogs (ADR 0004)

@@ -11,10 +11,10 @@
 - [x] Issue #6: NENE2 consumer scaffold (`composer.json`, health)
 - [x] Issue #12: Deal & Pipeline domain API — CRUD, stage move, history, `GET /stages`
 - [x] Issue #14: Read models — `GET /board` (kanban) + `GET /forecast`
+- [x] Issue #16: Won → Invoice handoff (`POST /deals/{id}/invoice-handoff`)
 
 ## Next
 
-- [ ] Won → Invoice handoff (`POST /deals/{id}/invoice-handoff`)
 - [ ] Authentication + multi-tenant resolution (replace single-org resolver)
 - [ ] Issue #5: Kanban UI scaffold + JA/EN i18n message catalogs (ADR 0004 — `ja`/`en` only)
 

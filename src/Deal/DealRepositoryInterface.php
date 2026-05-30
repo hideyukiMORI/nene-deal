@@ -27,6 +27,14 @@ interface DealRepositoryInterface
     /** @throws DealNotFoundException */
     public function delete(string $id): void;
 
+    /**
+     * Persists the Invoice link ids and handoff timestamp after a successful
+     * won-deal handoff.
+     *
+     * @throws DealNotFoundException
+     */
+    public function markHandedOff(string $id, int $invoiceClientId, int $invoiceQuoteId, string $handoffAt): void;
+
     public function appendHistory(StageHistoryEntry $entry): void;
 
     /** @return list<StageHistoryEntry> Newest first. */
