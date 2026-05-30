@@ -10,6 +10,18 @@ CREATE TABLE organizations (
 );
 CREATE UNIQUE INDEX uniq_organizations_slug ON organizations (slug);
 
+CREATE TABLE users (
+    id TEXT PRIMARY KEY NOT NULL,
+    organization_id TEXT NOT NULL,
+    email TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'operator',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+CREATE UNIQUE INDEX uniq_users_email ON users (email);
+CREATE INDEX idx_users_organization_id ON users (organization_id);
+
 CREATE TABLE pipeline_stages (
     id TEXT PRIMARY KEY NOT NULL,
     organization_id TEXT NOT NULL,

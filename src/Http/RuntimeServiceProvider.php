@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace NeneDeal\Http;
 
 use LogicException;
+use Nene2\Auth\BearerTokenMiddleware;
+use Nene2\Auth\LocalBearerTokenVerifier;
+use Nene2\Auth\TokenIssuerInterface;
+use Nene2\Auth\TokenVerifierInterface;
 use Nene2\Config\AppConfig;
 use Nene2\Config\ConfigLoader;
 use Nene2\Database\DatabaseConnectionFactoryInterface;
@@ -21,6 +25,7 @@ use Nene2\Http\ResponseEmitter;
 use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Routing\Router;
 use NeneDeal\ApplicationServiceProvider;
+use NeneDeal\Auth\AuthServiceProvider;
 use NeneDeal\Deal\DealServiceProvider;
 use NeneDeal\Forecast\ForecastServiceProvider;
 use NeneDeal\Handoff\HandoffServiceProvider;
@@ -57,6 +62,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
         $builder->addProvider(new DealServiceProvider());
         $builder->addProvider(new ForecastServiceProvider());
         $builder->addProvider(new HandoffServiceProvider());
+        $builder->addProvider(new AuthServiceProvider());
 
         $builder
             ->set(Psr17Factory::class, static fn (ContainerInterface $container): Psr17Factory => new Psr17Factory())
@@ -202,6 +208,47 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                LocalBearerTokenVerifier::class,
+                static function (ContainerInterface $container): LocalBearerTokenVerifier {
+                    $config = $container->get(AppConfig::class);
+
+                    if (!$config instanceof AppConfig) {
+                        throw new LogicException('Application config service is invalid.');
+                    }
+
+                    // A dev fallback secret keeps login working without configuration;
+                    // bearer protection of routes is only enabled when a real
+                    // NENE2_LOCAL_JWT_SECRET is set (see the runtime factory below).
+                    return new LocalBearerTokenVerifier(
+                        $config->localJwtSecret ?? 'nene-deal-local-dev-insecure-secret',
+                    );
+                },
+            )
+            ->set(
+                TokenIssuerInterface::class,
+                static function (ContainerInterface $container): TokenIssuerInterface {
+                    $verifier = $container->get(LocalBearerTokenVerifier::class);
+
+                    if (!$verifier instanceof LocalBearerTokenVerifier) {
+                        throw new LogicException('Local bearer token verifier service is invalid.');
+                    }
+
+                    return $verifier;
+                },
+            )
+            ->set(
+                TokenVerifierInterface::class,
+                static function (ContainerInterface $container): TokenVerifierInterface {
+                    $verifier = $container->get(LocalBearerTokenVerifier::class);
+
+                    if (!$verifier instanceof LocalBearerTokenVerifier) {
+                        throw new LogicException('Local bearer token verifier service is invalid.');
+                    }
+
+                    return $verifier;
+                },
+            )
+            ->set(
                 RuntimeApplicationFactory::class,
                 static function (ContainerInterface $container): RuntimeApplicationFactory {
                     $psr17 = $container->get(Psr17Factory::class);
@@ -243,6 +290,29 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Request organization middleware service is invalid.');
                     }
 
+                    // Operator JWT: when NENE2_LOCAL_JWT_SECRET is set, protect
+                    // every route except /health, / and the public login endpoint
+                    // with the bearer middleware. Unset → no operator gating (dev).
+                    $authMiddlewares = [$orgMiddleware];
+                    if ($config->localJwtSecret !== null) {
+                        $verifier = $container->get(TokenVerifierInterface::class);
+                        $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
+
+                        if (!$verifier instanceof TokenVerifierInterface) {
+                            throw new LogicException('Token verifier service is invalid.');
+                        }
+
+                        if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                            throw new LogicException('Problem details response factory service is invalid.');
+                        }
+
+                        $authMiddlewares[] = new BearerTokenMiddleware(
+                            $problemDetails,
+                            $verifier,
+                            excludedPaths: ['/', '/health', '/api/v1/auth/login'],
+                        );
+                    }
+
                     // Machine API key gates mutating requests when configured.
                     // When unset (dev), keep the API open: the framework's
                     // api-key middleware is always present and fails closed, so
@@ -257,7 +327,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         machineApiKey: $apiKey,
                         domainExceptionHandlers: $exceptionHandlers,
                         routeRegistrars: $routeRegistrars,
-                        authMiddleware: [$orgMiddleware],
+                        authMiddleware: $authMiddlewares,
                         healthChecks: [$databaseHealthCheck],
                         debug: $config->debug,
                         machineApiKeyProtectedPaths: $gated ? [] : ['/machine/health'],
