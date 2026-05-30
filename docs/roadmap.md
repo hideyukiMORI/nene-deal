@@ -8,8 +8,8 @@
 
 ## Phase 1 — MVP pipeline
 
-- [ ] Deal CRUD + stage move + kanban API — CRUD / stage move / history / `GET /stages` done (#12); `GET /board` pending
-- [ ] Monthly forecast endpoint
+- [x] Deal CRUD + stage move + kanban API — CRUD / stage move / history / `GET /stages` (#12) + `GET /board` (#14)
+- [x] Monthly forecast endpoint — `GET /forecast` (#14)
 - [ ] Won → Invoice handoff (draft client + quote)
 - [ ] Docker Compose dev stack
 - [ ] Admin kanban UI

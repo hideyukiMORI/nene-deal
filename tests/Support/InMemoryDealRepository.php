@@ -81,6 +81,34 @@ final class InMemoryDealRepository implements DealRepositoryInterface
         $this->history[] = $entry;
     }
 
+    /** @return list<Deal> */
+    public function findForBoard(?string $ownerUserId): array
+    {
+        $all = array_values(array_filter(
+            array_values($this->deals),
+            static fn (Deal $deal): bool => $ownerUserId === null || $deal->ownerUserId === $ownerUserId,
+        ));
+
+        usort($all, static fn (Deal $a, Deal $b): int => strcmp($a->id, $b->id));
+
+        return $all;
+    }
+
+    /** @return list<Deal> */
+    public function findInMonth(string $startDate, string $endDate): array
+    {
+        $all = array_values(array_filter(
+            array_values($this->deals),
+            static fn (Deal $deal): bool => $deal->expectedCloseDate !== null
+                && $deal->expectedCloseDate >= $startDate
+                && $deal->expectedCloseDate <= $endDate,
+        ));
+
+        usort($all, static fn (Deal $a, Deal $b): int => strcmp($a->id, $b->id));
+
+        return $all;
+    }
+
     /** @return list<StageHistoryEntry> */
     public function findHistory(string $dealId): array
     {

@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\JsonResponseFactory;
+use NeneDeal\Deal\DealRepositoryInterface;
 use NeneDeal\Tenancy\CurrentOrganization;
 use Psr\Container\ContainerInterface;
 
@@ -69,15 +70,54 @@ final readonly class PipelineServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                BuildBoardUseCase::class,
+                static function (ContainerInterface $c): BuildBoardUseCase {
+                    $stages = $c->get(PipelineStageRepositoryInterface::class);
+                    $deals = $c->get(DealRepositoryInterface::class);
+
+                    if (!$stages instanceof PipelineStageRepositoryInterface) {
+                        throw new LogicException('Pipeline stage repository service is invalid.');
+                    }
+
+                    if (!$deals instanceof DealRepositoryInterface) {
+                        throw new LogicException('Deal repository service is invalid.');
+                    }
+
+                    return new BuildBoardUseCase($stages, $deals);
+                },
+            )
+            ->set(
+                GetBoardHandler::class,
+                static function (ContainerInterface $c): GetBoardHandler {
+                    $useCase = $c->get(BuildBoardUseCase::class);
+                    $json = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof BuildBoardUseCase) {
+                        throw new LogicException('Build board use case service is invalid.');
+                    }
+
+                    if (!$json instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
+                    }
+
+                    return new GetBoardHandler($useCase, $json);
+                },
+            )
+            ->set(
                 PipelineStageRouteRegistrar::class,
                 static function (ContainerInterface $c): PipelineStageRouteRegistrar {
                     $list = $c->get(ListStagesHandler::class);
+                    $board = $c->get(GetBoardHandler::class);
 
                     if (!$list instanceof ListStagesHandler) {
                         throw new LogicException('List stages handler service is invalid.');
                     }
 
-                    return new PipelineStageRouteRegistrar($list);
+                    if (!$board instanceof GetBoardHandler) {
+                        throw new LogicException('Get board handler service is invalid.');
+                    }
+
+                    return new PipelineStageRouteRegistrar($list, $board);
                 },
             );
     }

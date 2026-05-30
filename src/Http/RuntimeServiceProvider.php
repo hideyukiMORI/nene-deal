@@ -21,6 +21,7 @@ use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Routing\Router;
 use NeneDeal\ApplicationServiceProvider;
 use NeneDeal\Deal\DealServiceProvider;
+use NeneDeal\Forecast\ForecastServiceProvider;
 use NeneDeal\Pipeline\PipelineServiceProvider;
 use NeneDeal\Tenancy\CurrentOrganization;
 use NeneDeal\Tenancy\PdoCurrentOrganization;
@@ -45,6 +46,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
         $builder->addProvider(new ApplicationServiceProvider());
         $builder->addProvider(new PipelineServiceProvider());
         $builder->addProvider(new DealServiceProvider());
+        $builder->addProvider(new ForecastServiceProvider());
 
         $builder
             ->set(Psr17Factory::class, static fn (ContainerInterface $container): Psr17Factory => new Psr17Factory())

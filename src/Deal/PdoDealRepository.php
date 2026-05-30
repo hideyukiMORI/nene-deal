@@ -159,6 +159,41 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
         );
     }
 
+    /** @return list<Deal> */
+    public function findForBoard(?string $ownerUserId): array
+    {
+        $conditions = ['d.organization_id = ?'];
+        $params = [$this->organization->id()];
+
+        if ($ownerUserId !== null) {
+            $conditions[] = 'd.owner_user_id = ?';
+            $params[] = $ownerUserId;
+        }
+
+        $rows = $this->query->fetchAll(
+            'SELECT ' . self::SELECT . self::FROM
+            . ' WHERE ' . implode(' AND ', $conditions)
+            . ' ORDER BY d.id ASC',
+            $params,
+        );
+
+        return array_map(fn (array $row): Deal => $this->mapRow($row), $rows);
+    }
+
+    /** @return list<Deal> */
+    public function findInMonth(string $startDate, string $endDate): array
+    {
+        $rows = $this->query->fetchAll(
+            'SELECT ' . self::SELECT . self::FROM
+            . ' WHERE d.organization_id = ? AND d.expected_close_date IS NOT NULL'
+            . ' AND d.expected_close_date BETWEEN ? AND ?'
+            . ' ORDER BY d.id ASC',
+            [$this->organization->id(), $startDate, $endDate],
+        );
+
+        return array_map(fn (array $row): Deal => $this->mapRow($row), $rows);
+    }
+
     /** @return list<StageHistoryEntry> */
     public function findHistory(string $dealId): array
     {
