@@ -31,4 +31,20 @@ interface DealRepositoryInterface
 
     /** @return list<StageHistoryEntry> Newest first. */
     public function findHistory(string $dealId): array;
+
+    /**
+     * All deals for the kanban board (no pagination), optionally for one owner.
+     * Terminal-stage exclusion is decided by the caller using stage metadata.
+     *
+     * @return list<Deal>
+     */
+    public function findForBoard(?string $ownerUserId): array;
+
+    /**
+     * Deals whose expected_close_date falls within the inclusive [start, end]
+     * date range (YYYY-MM-DD). Terminal-stage exclusion is decided by the caller.
+     *
+     * @return list<Deal>
+     */
+    public function findInMonth(string $startDate, string $endDate): array;
 }

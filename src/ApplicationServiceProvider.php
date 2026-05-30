@@ -10,6 +10,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use NeneDeal\Deal\DealNotFoundExceptionHandler;
 use NeneDeal\Deal\DealRouteRegistrar;
 use NeneDeal\Deal\UnknownStageExceptionHandler;
+use NeneDeal\Forecast\ForecastRouteRegistrar;
 use NeneDeal\Pipeline\PipelineStageRouteRegistrar;
 use Psr\Container\ContainerInterface;
 
@@ -31,12 +32,16 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 static function (ContainerInterface $container): array {
                     $stages = $container->get(PipelineStageRouteRegistrar::class);
                     $deals = $container->get(DealRouteRegistrar::class);
+                    $forecast = $container->get(ForecastRouteRegistrar::class);
 
-                    if (!$stages instanceof PipelineStageRouteRegistrar || !$deals instanceof DealRouteRegistrar) {
+                    if (!$stages instanceof PipelineStageRouteRegistrar
+                        || !$deals instanceof DealRouteRegistrar
+                        || !$forecast instanceof ForecastRouteRegistrar
+                    ) {
                         throw new LogicException('Route registrar services are invalid.');
                     }
 
-                    return [$stages, $deals];
+                    return [$stages, $deals, $forecast];
                 },
             )
             ->set(
