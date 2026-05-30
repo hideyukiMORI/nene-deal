@@ -13,12 +13,12 @@
 - [x] Issue #14: Read models — `GET /board` (kanban) + `GET /forecast`
 - [x] Issue #16: Won → Invoice handoff (`POST /deals/{id}/invoice-handoff`)
 - [x] Issue #5 / #18: Kanban board frontend (React, JA/EN i18n) — `frontend/` per nene-records standards
+- [x] Issue #20: Docker Compose dev stack (PHP app + MySQL)
 
 ## Next
 
 - [ ] Authentication + multi-tenant resolution (replace single-org resolver)
 - [ ] Frontend: won → Invoice handoff action + deal edit/detail screens
-- [ ] Docker Compose dev stack
 
 ## Handoff
 

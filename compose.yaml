@@ -1,0 +1,52 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    ports:
+      - '${NENE_DEAL_PORT:-8080}:80'
+    volumes:
+      - .:/var/www/html
+      - composer-cache:/tmp/composer-cache
+    environment:
+      COMPOSER_CACHE_DIR: /tmp/composer-cache
+      APP_ENV: local
+      APP_DEBUG: 'true'
+      APP_NAME: 'NeNe Deal'
+      PROBLEM_DETAILS_BASE_URL: 'https://nene-deal.dev/problems/'
+      # DB values are fixed for the in-compose MySQL service. They are set
+      # literally (not interpolated) so a host-mounted `.env` used for sqlite
+      # `php -S` development cannot break the container's database wiring.
+      DB_ADAPTER: mysql
+      DB_HOST: mysql
+      DB_PORT: '3306'
+      DB_NAME: nene_deal
+      DB_USER: nene_deal
+      DB_PASSWORD: nene_deal
+      # Won → Invoice handoff (optional passthrough; leave empty to disable).
+      NENE_DEAL_INVOICE_BASE_URL: ${NENE_DEAL_INVOICE_BASE_URL:-}
+      NENE_DEAL_INVOICE_BEARER_TOKEN: ${NENE_DEAL_INVOICE_BEARER_TOKEN:-}
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.4
+    ports:
+      - '${NENE_DEAL_DB_PORT:-3306}:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: nene_deal_root
+      MYSQL_DATABASE: nene_deal
+      MYSQL_USER: nene_deal
+      MYSQL_PASSWORD: nene_deal
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  composer-cache:
+  mysql-data:
