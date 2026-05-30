@@ -64,9 +64,31 @@ Built on [NENE2](https://github.com/hideyukiMORI/NENE2).
 [ NeNe Clear ]    reconciliation (separate product; not implemented here)
 ```
 
-## Status
+## Local development
 
-**Phase 0 — Governance and product design.** Runtime scaffold follows OpenAPI + Issue #2+.
+### Docker (API + MySQL)
+
+```bash
+docker compose build
+docker compose up -d
+docker compose exec app composer install        # first run only
+docker compose exec app composer migrations:migrate
+curl -i http://localhost:8080/health            # {"status":"ok","checks":{"database":"ok"}}
+```
+
+The stack runs the PHP app (Apache, docroot `public_html/`) against a MySQL 8.4
+service. DB settings are fixed in `compose.yaml` for the in-compose database, so a
+host `.env` used for sqlite `php -S` development does not affect the container.
+Override the host port with `NENE_DEAL_PORT`.
+
+### Frontend
+
+```bash
+npm install --prefix frontend
+npm run dev --prefix frontend     # Vite dev server, proxies /api to the app
+npm run mock --prefix frontend    # MSW-backed dev server (no PHP needed)
+npm run check --prefix frontend   # type-check, lint, format, test, knip, storybook
+```
 
 ## License
 

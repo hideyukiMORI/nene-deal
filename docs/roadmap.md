@@ -11,7 +11,7 @@
 - [x] Deal CRUD + stage move + kanban API — CRUD / stage move / history / `GET /stages` (#12) + `GET /board` (#14)
 - [x] Monthly forecast endpoint — `GET /forecast` (#14)
 - [x] Won → Invoice handoff (draft client + quote) — `POST /deals/{id}/invoice-handoff` (#16)
-- [ ] Docker Compose dev stack
+- [x] Docker Compose dev stack — `compose.yaml` (PHP app + MySQL) (#20)
 - [x] Admin kanban UI — `frontend/` React SPA (#18)
 - [x] Bilingual (JA/EN) UI + `ja`/`en` message catalogs (ADR 0004) — `frontend/src/shared/i18n` (#18)
 

@@ -1,0 +1,21 @@
+FROM php:8.4-apache
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip \
+    && docker-php-ext-install pdo_mysql \
+    && rm -rf /var/lib/apt/lists/* \
+    # Expose the real container environment to $_ENV so compose `environment:`
+    # wins over a host-mounted .env (NENE2 ConfigLoader reads $_ENV/$_SERVER and
+    # an immutable .env never overrides values already present there).
+    && printf 'variables_order=EGPCS\n' > /usr/local/etc/php/conf.d/zz-nene-deal.ini \
+    && a2enmod rewrite \
+    && printf '<Directory /var/www/html/public_html>\n    AllowOverride All\n    Require all granted\n</Directory>\n' > /etc/apache2/conf-available/nene-deal.conf \
+    && a2enconf nene-deal \
+    && sed -ri -e 's!/var/www/html!/var/www/html/public_html!g' /etc/apache2/sites-available/*.conf \
+    && sed -ri -e 's!/var/www/!/var/www/html/public_html!g' /etc/apache2/apache2.conf
+
+WORKDIR /var/www/html
