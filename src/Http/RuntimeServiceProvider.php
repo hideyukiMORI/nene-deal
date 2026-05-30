@@ -16,6 +16,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\RequestScopedHolder;
 use Nene2\Http\ResponseEmitter;
 use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Routing\Router;
@@ -25,7 +26,10 @@ use NeneDeal\Forecast\ForecastServiceProvider;
 use NeneDeal\Handoff\HandoffServiceProvider;
 use NeneDeal\Pipeline\PipelineServiceProvider;
 use NeneDeal\Tenancy\CurrentOrganization;
-use NeneDeal\Tenancy\PdoCurrentOrganization;
+use NeneDeal\Tenancy\HolderCurrentOrganization;
+use NeneDeal\Tenancy\OrganizationResolver;
+use NeneDeal\Tenancy\PdoOrganizationResolver;
+use NeneDeal\Tenancy\RequestOrganizationMiddleware;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -35,12 +39,16 @@ use Psr\Http\Server\RequestHandlerInterface;
  * connectivity, the response factories, the (single-organization) tenancy
  * resolver, the domain providers, and the request handler.
  *
- * Authentication and multi-tenant resolution middleware are added in later
- * issues by extending the {@see RuntimeApplicationFactory} construction here.
+ * Tenant resolution runs as request middleware ({@see RequestOrganizationMiddleware})
+ * that populates the request-scoped organization holder; mutating requests are
+ * gated by the machine API key when `NENE_DEAL_API_KEY` is configured.
  */
 final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 {
     public const PROJECT_ROOT = 'nene-deal.project_root';
+
+    /** Container id for the request-scoped organization-id holder (string). */
+    public const ORG_ID_HOLDER = 'nene-deal.org_id_holder';
 
     public function register(ContainerBuilder $builder): void
     {
@@ -101,15 +109,55 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
-                CurrentOrganization::class,
-                static function (ContainerInterface $container): CurrentOrganization {
+                self::ORG_ID_HOLDER,
+                static fn (ContainerInterface $container): RequestScopedHolder => new RequestScopedHolder(),
+            )
+            ->set(
+                OrganizationResolver::class,
+                static function (ContainerInterface $container): OrganizationResolver {
                     $query = $container->get(DatabaseQueryExecutorInterface::class);
 
                     if (!$query instanceof DatabaseQueryExecutorInterface) {
                         throw new LogicException('Database query executor service is invalid.');
                     }
 
-                    return new PdoCurrentOrganization($query);
+                    return new PdoOrganizationResolver($query);
+                },
+            )
+            ->set(
+                CurrentOrganization::class,
+                static function (ContainerInterface $container): CurrentOrganization {
+                    $holder = $container->get(self::ORG_ID_HOLDER);
+
+                    if (!$holder instanceof RequestScopedHolder) {
+                        throw new LogicException('Organization id holder service is invalid.');
+                    }
+
+                    /** @var RequestScopedHolder<string> $holder */
+                    return new HolderCurrentOrganization($holder);
+                },
+            )
+            ->set(
+                RequestOrganizationMiddleware::class,
+                static function (ContainerInterface $container): RequestOrganizationMiddleware {
+                    $holder = $container->get(self::ORG_ID_HOLDER);
+                    $resolver = $container->get(OrganizationResolver::class);
+                    $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$holder instanceof RequestScopedHolder) {
+                        throw new LogicException('Organization id holder service is invalid.');
+                    }
+
+                    if (!$resolver instanceof OrganizationResolver) {
+                        throw new LogicException('Organization resolver service is invalid.');
+                    }
+
+                    if (!$problemDetails instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('Problem details response factory service is invalid.');
+                    }
+
+                    /** @var RequestScopedHolder<string> $holder */
+                    return new RequestOrganizationMiddleware($holder, $resolver, $problemDetails);
                 },
             )
             ->set(
@@ -189,13 +237,27 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 
                     /** @var list<DomainExceptionHandlerInterface> $exceptionHandlers */
 
+                    $orgMiddleware = $container->get(RequestOrganizationMiddleware::class);
+
+                    if (!$orgMiddleware instanceof RequestOrganizationMiddleware) {
+                        throw new LogicException('Request organization middleware service is invalid.');
+                    }
+
+                    // Machine API key gates mutating requests when configured;
+                    // unset (dev) leaves the API open. Reads stay public.
+                    $apiKey = self::env('NENE_DEAL_API_KEY');
+
                     return new RuntimeApplicationFactory(
                         responseFactory: $psr17,
                         streamFactory: $psr17,
+                        machineApiKey: $apiKey,
                         domainExceptionHandlers: $exceptionHandlers,
                         routeRegistrars: $routeRegistrars,
+                        authMiddleware: [$orgMiddleware],
                         healthChecks: [$databaseHealthCheck],
                         debug: $config->debug,
+                        machineApiKeyProtectedPaths: [],
+                        machineApiKeyProtectedMethods: ['POST', 'PATCH', 'PUT', 'DELETE'],
                     );
                 },
             )
@@ -212,5 +274,13 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(ResponseEmitter::class, static fn (ContainerInterface $container): ResponseEmitter => new ResponseEmitter());
+    }
+
+    /** Reads an environment variable, returning null when unset or empty. */
+    private static function env(string $key): ?string
+    {
+        $value = $_SERVER[$key] ?? $_ENV[$key] ?? getenv($key);
+
+        return is_string($value) && $value !== '' ? $value : null;
     }
 }
