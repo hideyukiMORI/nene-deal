@@ -18,10 +18,12 @@
 - [x] Issue #24: Frontend deal detail/edit + won → Invoice handoff action
 
 - [x] Issue #26: Wire frontend↔backend — `/api/v1` route prefix + frontend org/API-key headers
+- [x] Issue #28: Operator JWT login (backend) — users + login + `/me` + bearer middleware
+- [x] Issue #30: Operator login UI + auth gate (frontend)
 
 ## Next
 
-- [ ] Operator login (JWT) + RBAC (future epic)
+- [ ] RBAC (roles/capabilities) + user management (future epic)
 - [ ] Phase 2: Suite catalog entry, MCP read tools, stage customization UI
 
 ## Handoff

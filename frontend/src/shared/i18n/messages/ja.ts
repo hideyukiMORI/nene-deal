@@ -63,6 +63,15 @@ export interface MessageCatalog {
   'handoff.clientId': string
   'handoff.quoteId': string
 
+  'login.title': string
+  'login.subtitle': string
+  'login.email': string
+  'login.password': string
+  'login.submit': string
+  'login.failed': string
+  'login.validation.emailRequired': string
+  'login.validation.passwordRequired': string
+
   'locale.label': string
 }
 
@@ -126,6 +135,15 @@ export const ja: MessageCatalog = {
   'handoff.linked': 'Invoice 連携済み',
   'handoff.clientId': 'Invoice 顧客ID',
   'handoff.quoteId': 'Invoice 見積ID',
+
+  'login.title': 'ログイン',
+  'login.subtitle': 'NeNe Deal にサインインしてください。',
+  'login.email': 'メールアドレス',
+  'login.password': 'パスワード',
+  'login.submit': 'ログイン',
+  'login.failed': 'メールアドレスまたはパスワードが正しくありません。',
+  'login.validation.emailRequired': 'メールアドレスを入力してください。',
+  'login.validation.passwordRequired': 'パスワードを入力してください。',
 
   'locale.label': '言語',
 }

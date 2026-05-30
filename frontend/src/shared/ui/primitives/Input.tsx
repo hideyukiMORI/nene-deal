@@ -3,7 +3,7 @@ import { forwardRef } from 'react'
 export interface InputProps {
   id: string
   label: string
-  type?: 'text' | 'number' | 'date'
+  type?: 'text' | 'number' | 'date' | 'email' | 'password'
   name?: string
   defaultValue?: string | number
   onChange?: React.ChangeEventHandler<HTMLInputElement>

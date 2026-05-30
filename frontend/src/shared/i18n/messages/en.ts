@@ -62,5 +62,14 @@ export const en: MessageCatalog = {
   'handoff.clientId': 'Invoice client ID',
   'handoff.quoteId': 'Invoice quote ID',
 
+  'login.title': 'Sign in',
+  'login.subtitle': 'Sign in to NeNe Deal.',
+  'login.email': 'Email',
+  'login.password': 'Password',
+  'login.submit': 'Sign in',
+  'login.failed': 'Invalid email or password.',
+  'login.validation.emailRequired': 'Please enter your email.',
+  'login.validation.passwordRequired': 'Please enter your password.',
+
   'locale.label': 'Language',
 }
