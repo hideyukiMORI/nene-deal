@@ -3,7 +3,7 @@
 ## Phase 0 — Governance (current)
 
 - [x] Repository bootstrap, scope, terminology, Invoice handoff contract
-- [ ] OpenAPI contract (Issue #2)
+- [x] OpenAPI contract (Issue #2) — `docs/openapi/openapi.yaml`
 - [ ] Backend + frontend standards (inherit NENE2)
 
 ## Phase 1 — MVP pipeline
