@@ -22,6 +22,6 @@ final readonly class InvoiceHandoffRouteRegistrar
     {
         $handoff = $this->handler;
 
-        $router->post('/deals/{dealId}/invoice-handoff', static fn (ServerRequestInterface $r): ResponseInterface => $handoff->handle($r));
+        $router->post('/api/v1/deals/{dealId}/invoice-handoff', static fn (ServerRequestInterface $r): ResponseInterface => $handoff->handle($r));
     }
 }

@@ -22,6 +22,6 @@ final readonly class ForecastRouteRegistrar
     {
         $forecast = $this->handler;
 
-        $router->get('/forecast', static fn (ServerRequestInterface $r): ResponseInterface => $forecast->handle($r));
+        $router->get('/api/v1/forecast', static fn (ServerRequestInterface $r): ResponseInterface => $forecast->handle($r));
     }
 }

@@ -24,7 +24,7 @@ final readonly class PipelineStageRouteRegistrar
         $list = $this->listHandler;
         $board = $this->boardHandler;
 
-        $router->get('/stages', static fn (ServerRequestInterface $r): ResponseInterface => $list->handle($r));
-        $router->get('/board', static fn (ServerRequestInterface $r): ResponseInterface => $board->handle($r));
+        $router->get('/api/v1/stages', static fn (ServerRequestInterface $r): ResponseInterface => $list->handle($r));
+        $router->get('/api/v1/board', static fn (ServerRequestInterface $r): ResponseInterface => $board->handle($r));
     }
 }

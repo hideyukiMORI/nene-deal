@@ -17,10 +17,12 @@
 - [x] Issue #22: Auth (machine API key) + multi-tenant resolution (request-scoped org)
 - [x] Issue #24: Frontend deal detail/edit + won → Invoice handoff action
 
+- [x] Issue #26: Wire frontend↔backend — `/api/v1` route prefix + frontend org/API-key headers
+
 ## Next
 
-- [ ] Align route prefix with OpenAPI (`/api/v1`) + frontend org/api-key headers (backend↔frontend wiring)
 - [ ] Operator login (JWT) + RBAC (future epic)
+- [ ] Phase 2: Suite catalog entry, MCP read tools, stage customization UI
 
 ## Handoff
 
