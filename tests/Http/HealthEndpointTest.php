@@ -13,13 +13,12 @@ use Psr\Http\Server\RequestHandlerInterface;
  * End-to-end smoke test of the consumer bootstrap: building the container
  * resolves the application handler, and `GET /health` returns an OK payload.
  *
- * The scaffold registers no health checks, so the framework returns the basic
- * `{status, service}` shape. Dependency checks (database) arrive in a later
- * issue and will extend this assertion.
+ * phpunit.xml.dist configures a SQLite :memory: database, so the
+ * DatabaseHealthCheck connects and the overall status is "ok".
  */
 final class HealthEndpointTest extends TestCase
 {
-    public function test_health_reports_ok_when_booted(): void
+    public function test_health_reports_ok_with_database_check_when_booted(): void
     {
         $container = (new RuntimeContainerFactory(dirname(__DIR__, 2)))->create();
 
@@ -35,5 +34,10 @@ final class HealthEndpointTest extends TestCase
         self::assertIsArray($payload);
         self::assertSame('ok', $payload['status'] ?? null);
         self::assertArrayHasKey('service', $payload);
+
+        self::assertArrayHasKey('checks', $payload);
+        $checks = $payload['checks'];
+        self::assertIsArray($checks);
+        self::assertSame('ok', $checks['database'] ?? null);
     }
 }
