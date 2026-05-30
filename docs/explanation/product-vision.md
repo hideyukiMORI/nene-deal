@@ -31,6 +31,7 @@ Operators can:
 - Full CRM (contacts graph, activities timeline, call logging) in MVP
 - Reconciliation, bank import, or dunning (**NeNe Clear**)
 - Being billing or tax SSOT (**NeNe Invoice**)
+- UI localization beyond Japanese and English — Japan-market product ([ADR 0004](../adr/0004-bilingual-ja-en-only.md))
 
 ## Primary persona
 
@@ -39,6 +40,16 @@ Operators can:
 > stage and ¥ landing. When a project is won, they click **Send to Invoice**,
 > tweak the quote in Invoice, and send the PDF — without re-typing the client name
 > and headline amount.
+
+## Languages
+
+NeNe Deal is a **Japan-market** product with **first-class English access**. Its audience
+includes foreign-founded or foreign-staffed teams doing business in Japan who need an English
+UI, while the won-deal handoff feeds NeNe Invoice and Japanese accounting conventions.
+
+The product binds to **Japanese (`ja`, default) and English (`en`) only**. Broader localization
+is a deliberate non-goal: it would imply a fit with non-Japanese billing rules that does not
+exist. See [ADR 0004](../adr/0004-bilingual-ja-en-only.md).
 
 ## Ecosystem fit
 

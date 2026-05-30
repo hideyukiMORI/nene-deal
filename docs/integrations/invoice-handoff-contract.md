@@ -4,8 +4,8 @@ NeNe Deal **won** stage triggers an **optional, operator-confirmed** HTTP integr
 with [NeNe Invoice](https://github.com/hideyukiMORI/nene-invoice). This document is
 the Deal-side contract. Invoice SSOT rules remain in Invoice docs.
 
-> **Not NeNe Clear.** Clear consumes Invoice/payment state for reconciliation.
-> Deal does **not** call Clear and does **not** document Clear write APIs here.
+> **Handoff target is Invoice only.** Deal does not call NeNe Clear — reconciliation is
+> downstream of Invoice and out of scope here (see [sibling products](sibling-products.md)).
 
 ## Principles
 

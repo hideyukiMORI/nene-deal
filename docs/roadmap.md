@@ -13,6 +13,7 @@
 - [ ] Won → Invoice handoff (draft client + quote)
 - [ ] Docker Compose dev stack
 - [ ] Admin kanban UI
+- [ ] Bilingual (JA/EN) UI + `ja`/`en` message catalogs (ADR 0004)
 
 ## Phase 2 — Polish
 
@@ -24,5 +25,6 @@
 
 - Clear reconciliation features
 - Full HubSpot parity
+- UI locales beyond Japanese and English (ADR 0004)
 
 Last updated: 2026-05-30

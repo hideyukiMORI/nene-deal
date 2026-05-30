@@ -5,12 +5,13 @@
 ## Done
 
 - [x] Issue #1: Repository bootstrap — initial commit
+- [x] Issue #3: Bilingual JA/EN policy (ADR 0004) + nene-clear leftover cleanup
 
 ## Next
 
 - [ ] Issue #2: OpenAPI contract (deals, stages, forecast, invoice-handoff)
-- [ ] Issue #3: NENE2 consumer scaffold (`composer.json`, Hello health)
-- [ ] Issue #4: Kanban UI scaffold + i18n message catalogs
+- [ ] NENE2 consumer scaffold (`composer.json`, Hello health)
+- [ ] Kanban UI scaffold + JA/EN i18n message catalogs (ADR 0004 — `ja`/`en` only)
 
 ## Handoff
 

@@ -56,6 +56,17 @@ Do **not** use these as **Deal-owned** concepts:
 
 Cross-references to siblings are allowed in integration docs **only** to state boundaries.
 
+## Localization (binding)
+
+| Locale | Role |
+| --- | --- |
+| `ja` | Primary / default |
+| `en` | First-class peer (foreign operators in Japan) |
+
+Product UI ships **`ja` and `en` only**. Other locales are out of scope — the domain follows
+Japanese business and accounting conventions ([ADR 0004](../adr/0004-bilingual-ja-en-only.md)).
+This binds **product UI/runtime strings**, not repository docs (English; see `AGENTS.md`).
+
 ## Stage defaults (Phase 1 seed)
 
 Register in migrations as `lead`, `qualified`, `proposal`, `negotiation`, `won`, `lost`

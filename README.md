@@ -33,6 +33,7 @@ Built on [NENE2](https://github.com/hideyukiMORI/NENE2).
 - **Kanban + monthly landing** — executive-friendly pipeline view
 - **Won → Invoice** — explicit HTTP handoff to draft client / quote (operator confirms)
 - **Separate database** — no shared tables with Invoice or Clear
+- **Bilingual (JA/EN)** — Japanese default, English for foreign operators in Japan ([ADR 0004](./docs/adr/0004-bilingual-ja-en-only.md))
 - **NENE2 consumer** — OpenAPI-first, Handler → UseCase → Repository
 
 ## Documentation (read first)
