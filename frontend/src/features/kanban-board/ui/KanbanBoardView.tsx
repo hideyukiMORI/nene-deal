@@ -19,6 +19,7 @@ export interface KanbanBoardViewProps {
   createPending: boolean
   createErrorKey: MessageKey | null
   moveDeal: (dealId: string, toStageRef: string) => Promise<void>
+  onOpenDeal: (dealId: string) => void
 }
 
 export function KanbanBoardView({
@@ -32,6 +33,7 @@ export function KanbanBoardView({
   createPending,
   createErrorKey,
   moveDeal,
+  onOpenDeal,
 }: KanbanBoardViewProps) {
   const { t, locale, setLocale } = useTranslation()
   const [formOpen, setFormOpen] = useState(false)
@@ -147,9 +149,11 @@ export function KanbanBoardView({
               })}
               emptyLabel={t('board.column.empty')}
               moveLabel={t('deal.field.stage')}
+              detailLabel={t('deal.open.detail')}
               onMove={(dealId, toStageRef) => {
                 void moveDeal(dealId, toStageRef)
               }}
+              onOpenDeal={onOpenDeal}
             />
           ))}
         </div>
@@ -181,7 +185,9 @@ interface BoardColumnCardProps {
   summaryLabel: string
   emptyLabel: string
   moveLabel: string
+  detailLabel: string
   onMove: (dealId: string, toStageRef: string) => void
+  onOpenDeal: (dealId: string) => void
 }
 
 function BoardColumnCard({
@@ -191,7 +197,9 @@ function BoardColumnCard({
   summaryLabel,
   emptyLabel,
   moveLabel,
+  detailLabel,
   onMove,
+  onOpenDeal,
 }: BoardColumnCardProps) {
   return (
     <section
@@ -234,6 +242,17 @@ function BoardColumnCard({
                   onMove(deal.id, event.target.value)
                 }}
               />
+              <Stack direction="horizontal" gap="xs">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    onOpenDeal(deal.id)
+                  }}
+                >
+                  {detailLabel}
+                </Button>
+              </Stack>
             </li>
           ))}
         </ul>

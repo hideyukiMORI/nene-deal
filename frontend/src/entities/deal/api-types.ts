@@ -26,3 +26,18 @@ export interface CreateDealDto {
 export interface StageChangeDto {
   to_stage_id: string
 }
+
+export interface UpdateDealDto {
+  account_label: string
+  amount_cents: number
+  probability_percent: number
+  note: string | null
+}
+
+export interface InvoiceHandoffResultDto {
+  deal_id: string
+  invoice_client_id: number
+  invoice_quote_id: number
+  handoff_at: string
+  handoff_actor_user_id?: string | null
+}

@@ -15,11 +15,11 @@
 - [x] Issue #5 / #18: Kanban board frontend (React, JA/EN i18n) — `frontend/` per nene-records standards
 - [x] Issue #20: Docker Compose dev stack (PHP app + MySQL)
 - [x] Issue #22: Auth (machine API key) + multi-tenant resolution (request-scoped org)
+- [x] Issue #24: Frontend deal detail/edit + won → Invoice handoff action
 
 ## Next
 
-- [ ] Frontend: won → Invoice handoff action + deal edit/detail screens
-- [ ] Align route prefix with OpenAPI (`/api/v1`) + frontend org/api-key headers
+- [ ] Align route prefix with OpenAPI (`/api/v1`) + frontend org/api-key headers (backend↔frontend wiring)
 - [ ] Operator login (JWT) + RBAC (future epic)
 
 ## Handoff

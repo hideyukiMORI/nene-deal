@@ -39,9 +39,29 @@ export interface MessageCatalog {
   'deal.field.amount': string
   'deal.field.stage': string
   'deal.field.probability': string
+  'deal.field.note': string
   'deal.validation.accountLabelRequired': string
   'deal.validation.amountPositive': string
   'deal.validation.probabilityRange': string
+
+  'common.actions.back': string
+  'common.actions.save': string
+
+  'deal.open.detail': string
+  'detail.loading': string
+  'detail.error.title': string
+  'detail.notFound': string
+  'detail.edit.title': string
+  'detail.edit.error': string
+  'detail.note.empty': string
+
+  'handoff.title': string
+  'handoff.description': string
+  'handoff.send': string
+  'handoff.error': string
+  'handoff.linked': string
+  'handoff.clientId': string
+  'handoff.quoteId': string
 
   'locale.label': string
 }
@@ -83,9 +103,29 @@ export const ja: MessageCatalog = {
   'deal.field.amount': '金額（円）',
   'deal.field.stage': 'ステージ',
   'deal.field.probability': '確度（％）',
+  'deal.field.note': 'メモ',
   'deal.validation.accountLabelRequired': '取引先名を入力してください。',
   'deal.validation.amountPositive': '金額は0以上で入力してください。',
   'deal.validation.probabilityRange': '確度は0〜100で入力してください。',
+
+  'common.actions.back': '戻る',
+  'common.actions.save': '保存',
+
+  'deal.open.detail': '詳細',
+  'detail.loading': 'ディールを読み込んでいます…',
+  'detail.error.title': 'ディールを読み込めませんでした',
+  'detail.notFound': 'ディールが見つかりませんでした。',
+  'detail.edit.title': 'ディールを編集',
+  'detail.edit.error': 'ディールを更新できませんでした。',
+  'detail.note.empty': '（メモなし）',
+
+  'handoff.title': 'NeNe Invoice へ引き渡し',
+  'handoff.description': '受注したディールを Invoice に下書きの顧客・見積として送ります。',
+  'handoff.send': 'Invoice へ送信',
+  'handoff.error': 'Invoice への引き渡しに失敗しました。',
+  'handoff.linked': 'Invoice 連携済み',
+  'handoff.clientId': 'Invoice 顧客ID',
+  'handoff.quoteId': 'Invoice 見積ID',
 
   'locale.label': '言語',
 }

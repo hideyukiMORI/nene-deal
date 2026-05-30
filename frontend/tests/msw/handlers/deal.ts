@@ -56,4 +56,46 @@ export const dealHandlers = [
       ),
     )
   }),
+
+  http.get('/api/v1/deals/:id', ({ params }) => {
+    const id = typeof params.id === 'string' ? params.id : 'unknown'
+    return HttpResponse.json(
+      dealResponse(
+        id,
+        { account_label: 'Acme Corp', amount_cents: 150_000_000, probability_percent: 100 },
+        'won',
+      ),
+    )
+  }),
+
+  http.patch('/api/v1/deals/:id', async ({ params, request }) => {
+    const body = (await request.json()) as CreateDealBody
+    const id = typeof params.id === 'string' ? params.id : 'unknown'
+
+    if (typeof body.account_label !== 'string' || body.account_label.trim() === '') {
+      return HttpResponse.json(
+        {
+          type: 'https://nene-deal.dev/problems/validation-failed',
+          title: 'Validation Failed',
+          status: 422,
+          instance: `/api/v1/deals/${id}`,
+          detail: '"account_label" must be a non-empty string.',
+        },
+        { status: 422 },
+      )
+    }
+
+    return HttpResponse.json(dealResponse(id, body, 'won'))
+  }),
+
+  http.post('/api/v1/deals/:id/invoice-handoff', ({ params }) => {
+    const id = typeof params.id === 'string' ? params.id : 'unknown'
+    return HttpResponse.json({
+      deal_id: id,
+      invoice_client_id: 4821,
+      invoice_quote_id: 9930,
+      handoff_at: '2026-05-31 00:00:00',
+      handoff_actor_user_id: null,
+    })
+  }),
 ]
