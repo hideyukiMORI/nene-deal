@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: 3.1.0
 
 # NeNe Deal — public JSON API (SSOT).
 #
@@ -478,34 +478,28 @@ components:
           maximum: 100
           description: Win likelihood (0–100).
         expected_close_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
           description: Optional forecast hint.
         owner_user_id:
-          type: string
-          nullable: true
+          type: [string, 'null']
         note:
-          type: string
-          nullable: true
+          type: [string, 'null']
           maxLength: 2000
           description: Short note; not a CRM activity feed.
         invoice_client_id:
-          type: integer
+          type: [integer, 'null']
           format: int64
-          nullable: true
           readOnly: true
           description: NeNe Invoice client PK; set only after handoff.
         invoice_quote_id:
-          type: integer
+          type: [integer, 'null']
           format: int64
-          nullable: true
           readOnly: true
           description: NeNe Invoice quote PK; set only after handoff.
         handoff_at:
-          type: string
+          type: [string, 'null']
           format: date-time
-          nullable: true
           readOnly: true
         created_at:
           type: string
@@ -537,15 +531,12 @@ components:
           maximum: 100
           description: Defaults to the stage's default probability if omitted.
         expected_close_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         owner_user_id:
-          type: string
-          nullable: true
+          type: [string, 'null']
         note:
-          type: string
-          nullable: true
+          type: [string, 'null']
           maxLength: 2000
 
     DealUpdate:
@@ -563,15 +554,12 @@ components:
           minimum: 0
           maximum: 100
         expected_close_date:
-          type: string
+          type: [string, 'null']
           format: date
-          nullable: true
         owner_user_id:
-          type: string
-          nullable: true
+          type: [string, 'null']
         note:
-          type: string
-          nullable: true
+          type: [string, 'null']
           maxLength: 2000
 
     DealList:
@@ -583,8 +571,7 @@ components:
           items:
             $ref: '#/components/schemas/Deal'
         next_cursor:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Cursor for the next page; null when no more results.
 
     StageChangeRequest:
@@ -646,15 +633,13 @@ components:
         deal_id:
           $ref: '#/components/schemas/Ulid'
         from_stage_id:
-          type: string
+          type: [string, 'null']
           pattern: '^[0-9A-HJKMNP-TV-Z]{26}$'
-          nullable: true
           description: ULID; null when the deal was created at this stage.
         to_stage_id:
           $ref: '#/components/schemas/Ulid'
         actor_user_id:
-          type: string
-          nullable: true
+          type: [string, 'null']
         created_at:
           type: string
           format: date-time
@@ -772,8 +757,7 @@ components:
           type: string
           format: date-time
         handoff_actor_user_id:
-          type: string
-          nullable: true
+          type: [string, 'null']
 
     Problem:
       type: object
