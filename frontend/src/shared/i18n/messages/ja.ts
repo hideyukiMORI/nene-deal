@@ -73,6 +73,30 @@ export interface MessageCatalog {
   'login.validation.passwordRequired': string
 
   'locale.label': string
+
+  'users.title': string
+  'users.subtitle': string
+  'users.loading': string
+  'users.error.title': string
+  'users.empty.title': string
+  'users.empty.description': string
+  'users.create.open': string
+  'users.create.title': string
+  'users.create.submit': string
+  'users.create.error': string
+  'users.create.success': string
+  'users.field.email': string
+  'users.field.password': string
+  'users.field.role': string
+  'users.role.admin': string
+  'users.role.operator': string
+  'users.delete.confirm': string
+  'users.delete.error': string
+  'users.edit.title': string
+  'users.edit.error': string
+  'users.validation.emailRequired': string
+  'users.validation.passwordMin': string
+  'users.validation.roleRequired': string
 }
 
 export const ja: MessageCatalog = {
@@ -146,4 +170,28 @@ export const ja: MessageCatalog = {
   'login.validation.passwordRequired': 'パスワードを入力してください。',
 
   'locale.label': '言語',
+
+  'users.title': 'ユーザー管理',
+  'users.subtitle': 'オペレーターアカウントを管理します。',
+  'users.loading': 'ユーザーを読み込んでいます…',
+  'users.error.title': 'ユーザーを読み込めませんでした',
+  'users.empty.title': 'ユーザーがいません',
+  'users.empty.description': '最初のオペレーターを作成してください。',
+  'users.create.open': 'ユーザーを追加',
+  'users.create.title': '新しいユーザー',
+  'users.create.submit': '作成',
+  'users.create.error': 'ユーザーを作成できませんでした。',
+  'users.create.success': 'ユーザーを作成しました。',
+  'users.field.email': 'メールアドレス',
+  'users.field.password': 'パスワード',
+  'users.field.role': 'ロール',
+  'users.role.admin': '管理者',
+  'users.role.operator': 'オペレーター',
+  'users.delete.confirm': 'このユーザーを削除しますか？',
+  'users.delete.error': 'ユーザーを削除できませんでした。',
+  'users.edit.title': 'ロールを変更',
+  'users.edit.error': 'ユーザーを更新できませんでした。',
+  'users.validation.emailRequired': 'メールアドレスを入力してください。',
+  'users.validation.passwordMin': 'パスワードは8文字以上で入力してください。',
+  'users.validation.roleRequired': 'ロールを選択してください。',
 }

@@ -7,6 +7,7 @@ namespace NeneDeal\Tests\User;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use NeneDeal\User\OperatorRole;
 use NeneDeal\User\PdoUserRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
@@ -60,7 +61,7 @@ final class PdoUserRepositoryTest extends TestCase
         $user = $this->repository->findByEmail('operator@nene-deal.test');
         self::assertNotNull($user);
         self::assertSame($this->userId, $user->id);
-        self::assertSame('operator', $user->role);
+        self::assertSame(OperatorRole::Operator, $user->role);
         self::assertTrue(password_verify('password', $user->passwordHash));
     }
 

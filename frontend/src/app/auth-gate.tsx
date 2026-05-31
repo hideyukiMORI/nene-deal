@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react'
 import { Navigate } from 'react-router-dom'
+import { useCurrentUser } from '@/entities/auth'
 import { env } from '@/shared/config/env'
 import { useAuthToken } from '@/shared/auth'
 
@@ -13,6 +14,21 @@ export function RequireAuth({ children }: { children: ReactElement }): ReactElem
 
   if (env.requireLogin && token === null) {
     return <Navigate to="/login" replace />
+  }
+
+  return children
+}
+
+/**
+ * Redirects non-admin users to `/` when accessed.
+ * Renders children only when the current user has the `admin` role.
+ * Falls through while the current-user query is loading.
+ */
+export function RequireAdmin({ children }: { children: ReactElement }): ReactElement {
+  const currentUser = useCurrentUser()
+
+  if (currentUser.data !== undefined && currentUser.data.role !== 'admin') {
+    return <Navigate to="/" replace />
   }
 
   return children

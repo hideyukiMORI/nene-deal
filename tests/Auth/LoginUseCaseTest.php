@@ -9,6 +9,7 @@ use NeneDeal\Auth\InvalidCredentialsException;
 use NeneDeal\Auth\LoginInput;
 use NeneDeal\Auth\LoginUseCase;
 use NeneDeal\Tests\Support\InMemoryUserRepository;
+use NeneDeal\User\OperatorRole;
 use NeneDeal\User\User;
 use PHPUnit\Framework\TestCase;
 
@@ -26,7 +27,7 @@ final class LoginUseCaseTest extends TestCase
             organizationId: '01ORG00000000000000000000A',
             email: 'operator@nene-deal.test',
             passwordHash: password_hash('password', PASSWORD_DEFAULT),
-            role: 'operator',
+            role: OperatorRole::Operator,
         ));
 
         $this->tokens = new LocalBearerTokenVerifier('test-secret');

@@ -18,6 +18,10 @@ use NeneDeal\Handoff\HandoffPreconditionExceptionHandler;
 use NeneDeal\Handoff\InvoiceHandoffExceptionHandler;
 use NeneDeal\Handoff\InvoiceHandoffRouteRegistrar;
 use NeneDeal\Pipeline\PipelineStageRouteRegistrar;
+use NeneDeal\User\CannotModifySelfExceptionHandler;
+use NeneDeal\User\EmailAlreadyTakenExceptionHandler;
+use NeneDeal\User\UserNotFoundExceptionHandler;
+use NeneDeal\User\UserRouteRegistrar;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -41,17 +45,19 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $forecast = $container->get(ForecastRouteRegistrar::class);
                     $handoff = $container->get(InvoiceHandoffRouteRegistrar::class);
                     $auth = $container->get(AuthRouteRegistrar::class);
+                    $users = $container->get(UserRouteRegistrar::class);
 
                     if (!$stages instanceof PipelineStageRouteRegistrar
                         || !$deals instanceof DealRouteRegistrar
                         || !$forecast instanceof ForecastRouteRegistrar
                         || !$handoff instanceof InvoiceHandoffRouteRegistrar
                         || !$auth instanceof AuthRouteRegistrar
+                        || !$users instanceof UserRouteRegistrar
                     ) {
                         throw new LogicException('Route registrar services are invalid.');
                     }
 
-                    return [$stages, $deals, $forecast, $handoff, $auth];
+                    return [$stages, $deals, $forecast, $handoff, $auth, $users];
                 },
             )
             ->set(
@@ -63,6 +69,9 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $handoffPrecondition = $container->get(HandoffPreconditionExceptionHandler::class);
                     $invoiceUpstream = $container->get(InvoiceHandoffExceptionHandler::class);
                     $invalidCredentials = $container->get(InvalidCredentialsExceptionHandler::class);
+                    $userNotFound = $container->get(UserNotFoundExceptionHandler::class);
+                    $emailTaken = $container->get(EmailAlreadyTakenExceptionHandler::class);
+                    $cannotModifySelf = $container->get(CannotModifySelfExceptionHandler::class);
 
                     if (!$dealNotFound instanceof DealNotFoundExceptionHandler
                         || !$unknownStage instanceof UnknownStageExceptionHandler
@@ -70,6 +79,9 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$handoffPrecondition instanceof HandoffPreconditionExceptionHandler
                         || !$invoiceUpstream instanceof InvoiceHandoffExceptionHandler
                         || !$invalidCredentials instanceof InvalidCredentialsExceptionHandler
+                        || !$userNotFound instanceof UserNotFoundExceptionHandler
+                        || !$emailTaken instanceof EmailAlreadyTakenExceptionHandler
+                        || !$cannotModifySelf instanceof CannotModifySelfExceptionHandler
                     ) {
                         throw new LogicException('Exception handler services are invalid.');
                     }
@@ -81,6 +93,9 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $handoffPrecondition,
                         $invoiceUpstream,
                         $invalidCredentials,
+                        $userNotFound,
+                        $emailTaken,
+                        $cannotModifySelf,
                     ];
                 },
             );

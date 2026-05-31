@@ -20,6 +20,8 @@ export interface KanbanBoardViewProps {
   createErrorKey: MessageKey | null
   moveDeal: (dealId: string, toStageRef: string) => Promise<void>
   onOpenDeal: (dealId: string) => void
+  onOpenUsers?: () => void
+  isAdmin?: boolean
 }
 
 export function KanbanBoardView({
@@ -34,6 +36,8 @@ export function KanbanBoardView({
   createErrorKey,
   moveDeal,
   onOpenDeal,
+  onOpenUsers,
+  isAdmin = false,
 }: KanbanBoardViewProps) {
   const { t, locale, setLocale } = useTranslation()
   const [formOpen, setFormOpen] = useState(false)
@@ -49,6 +53,11 @@ export function KanbanBoardView({
             <Text muted>{t('app.subtitle')}</Text>
           </div>
           <Stack direction="horizontal" gap="xs">
+            {isAdmin && onOpenUsers !== undefined ? (
+              <Button size="sm" variant="secondary" onClick={onOpenUsers}>
+                {t('users.title')}
+              </Button>
+            ) : null}
             {SUPPORTED_LOCALE_IDS.map((id) => (
               <Button
                 key={id}
