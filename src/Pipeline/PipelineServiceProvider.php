@@ -11,9 +11,9 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeneDeal\Auth\RequireRoleMiddleware;
-use NeneDeal\User\OperatorRole;
 use NeneDeal\Deal\DealRepositoryInterface;
 use NeneDeal\Tenancy\CurrentOrganization;
+use NeneDeal\User\OperatorRole;
 use Psr\Container\ContainerInterface;
 
 /**

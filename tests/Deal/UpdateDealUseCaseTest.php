@@ -40,6 +40,82 @@ final class UpdateDealUseCaseTest extends TestCase
         self::assertSame(5000, $cleared->amountCents);
     }
 
+    public function test_clear_owner_user_id(): void
+    {
+        $deals = new InMemoryDealRepository();
+        $deals->save(new Deal(
+            id: '01DEALAAAAAAAAAAAAAAAAAAAAA',
+            accountLabel: 'Acme',
+            amountCents: 1000,
+            stageId: '01STAGE000000000000000000A',
+            probabilityPercent: 10,
+            ownerUserId: '01OWNER000000000000000000A',
+        ));
+
+        $useCase = new UpdateDealUseCase($deals);
+        $cleared = $useCase->execute(
+            '01DEALAAAAAAAAAAAAAAAAAAAAA',
+            new UpdateDealInput(hasOwnerUserId: true, ownerUserId: null),
+        );
+
+        self::assertNull($cleared->ownerUserId);
+    }
+
+    public function test_clear_expected_close_date(): void
+    {
+        $deals = new InMemoryDealRepository();
+        $deals->save(new Deal(
+            id: '01DEALAAAAAAAAAAAAAAAAAAAAA',
+            accountLabel: 'Acme',
+            amountCents: 1000,
+            stageId: '01STAGE000000000000000000A',
+            probabilityPercent: 10,
+            expectedCloseDate: '2026-12-31',
+        ));
+
+        $useCase = new UpdateDealUseCase($deals);
+        $cleared = $useCase->execute(
+            '01DEALAAAAAAAAAAAAAAAAAAAAA',
+            new UpdateDealInput(hasExpectedCloseDate: true, expectedCloseDate: null),
+        );
+
+        self::assertNull($cleared->expectedCloseDate);
+    }
+
+    public function test_set_probability_to_boundary_values(): void
+    {
+        $deals = new InMemoryDealRepository();
+        $deals->save(new Deal('01DEALAAAAAAAAAAAAAAAAAAAAA', 'A', 1000, '01STAGE000000000000000000A', 50));
+
+        $useCase = new UpdateDealUseCase($deals);
+
+        $zero = $useCase->execute('01DEALAAAAAAAAAAAAAAAAAAAAA', new UpdateDealInput(probabilityPercent: 0));
+        self::assertSame(0, $zero->probabilityPercent);
+
+        $hundred = $useCase->execute('01DEALAAAAAAAAAAAAAAAAAAAAA', new UpdateDealInput(probabilityPercent: 100));
+        self::assertSame(100, $hundred->probabilityPercent);
+    }
+
+    public function test_invoice_link_ids_are_never_overwritten(): void
+    {
+        $deals = new InMemoryDealRepository();
+        $deals->save(new Deal(
+            id: '01DEALAAAAAAAAAAAAAAAAAAAAA',
+            accountLabel: 'Acme',
+            amountCents: 1000,
+            stageId: '01STAGE000000000000000000A',
+            probabilityPercent: 100,
+            invoiceClientId: 42,
+            invoiceQuoteId: 77,
+        ));
+
+        $useCase = new UpdateDealUseCase($deals);
+        $updated = $useCase->execute('01DEALAAAAAAAAAAAAAAAAAAAAA', new UpdateDealInput(accountLabel: 'Acme Updated'));
+
+        self::assertSame(42, $updated->invoiceClientId);
+        self::assertSame(77, $updated->invoiceQuoteId);
+    }
+
     public function test_unknown_deal_throws(): void
     {
         $useCase = new UpdateDealUseCase(new InMemoryDealRepository());

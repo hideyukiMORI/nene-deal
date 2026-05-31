@@ -48,4 +48,67 @@ final class ListDealsUseCaseTest extends TestCase
         self::assertCount(1, $page->items);
         self::assertSame('Acme Corp', $page->items[0]->accountLabel);
     }
+
+    public function test_stage_filter_returns_only_matching_stage(): void
+    {
+        $deals = new InMemoryDealRepository();
+        $deals->save(new Deal('01DEALAAAAAAAAAAAAAAAAAAAAA', 'Lead deal', 1000, '01STAGELEAD0000000000000AA', 10));
+        $deals->save(new Deal('01DEALBBBBBBBBBBBBBBBBBBBBB', 'Prop deal', 2000, '01STAGEPROP0000000000000AA', 30));
+
+        $useCase = new ListDealsUseCase($deals);
+        $page = $useCase->execute(new DealFilter(stageRef: '01STAGELEAD0000000000000AA'), 50, 0);
+
+        self::assertCount(1, $page->items);
+        self::assertSame('Lead deal', $page->items[0]->accountLabel);
+    }
+
+    public function test_owner_filter_returns_only_matching_owner(): void
+    {
+        $deals = new InMemoryDealRepository();
+        $deals->save(new Deal('01DEALAAAAAAAAAAAAAAAAAAAAA', 'Alice deal', 1000, '01STAGE000000000000000000A', 10, ownerUserId: 'alice'));
+        $deals->save(new Deal('01DEALBBBBBBBBBBBBBBBBBBBBB', 'Bob deal', 2000, '01STAGE000000000000000000A', 10, ownerUserId: 'bob'));
+
+        $useCase = new ListDealsUseCase($deals);
+        $page = $useCase->execute(new DealFilter(ownerUserId: 'alice'), 50, 0);
+
+        self::assertCount(1, $page->items);
+        self::assertSame('Alice deal', $page->items[0]->accountLabel);
+    }
+
+    public function test_empty_result_returns_no_items_and_has_more_false(): void
+    {
+        $deals = new InMemoryDealRepository();
+        $useCase = new ListDealsUseCase($deals);
+
+        $page = $useCase->execute(new DealFilter(), 50, 0);
+
+        self::assertCount(0, $page->items);
+        self::assertFalse($page->hasMore);
+    }
+
+    public function test_limit_one_on_multiple_deals(): void
+    {
+        $deals = new InMemoryDealRepository();
+        $deals->save(new Deal('01DEALAAAAAAAAAAAAAAAAAAAAA', 'A', 1000, '01STAGE000000000000000000A', 10));
+        $deals->save(new Deal('01DEALBBBBBBBBBBBBBBBBBBBBB', 'B', 2000, '01STAGE000000000000000000A', 10));
+        $deals->save(new Deal('01DEALCCCCCCCCCCCCCCCCCCCCC', 'C', 3000, '01STAGE000000000000000000A', 10));
+
+        $useCase = new ListDealsUseCase($deals);
+        $page = $useCase->execute(new DealFilter(), 1, 0);
+
+        self::assertCount(1, $page->items);
+        self::assertTrue($page->hasMore);
+    }
+
+    public function test_offset_past_last_item_returns_empty_without_has_more(): void
+    {
+        $deals = new InMemoryDealRepository();
+        $deals->save(new Deal('01DEALAAAAAAAAAAAAAAAAAAAAA', 'Only', 1000, '01STAGE000000000000000000A', 10));
+
+        $useCase = new ListDealsUseCase($deals);
+        $page = $useCase->execute(new DealFilter(), 50, 99);
+
+        self::assertCount(0, $page->items);
+        self::assertFalse($page->hasMore);
+    }
 }
