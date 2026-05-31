@@ -9,6 +9,7 @@ use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
 use NeneDeal\User\OperatorRole;
 use NeneDeal\User\PdoUserRepository;
+use NeneDeal\User\User;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -70,5 +71,47 @@ final class PdoUserRepositoryTest extends TestCase
         self::assertNotNull($this->repository->findById($this->userId));
         self::assertNull($this->repository->findByEmail('nobody@nene-deal.test'));
         self::assertNull($this->repository->findById('01MISSINGUSER0000000000AA'));
+    }
+
+    public function test_save_inserts_new_user(): void
+    {
+        $id = (string) new Ulid();
+        $orgId = (string) new Ulid();
+        $user = new User(
+            id: $id,
+            organizationId: $orgId,
+            email: 'new@nene-deal.test',
+            passwordHash: password_hash('secret', PASSWORD_DEFAULT),
+            role: OperatorRole::Admin,
+        );
+
+        $this->repository->save($user);
+
+        $found = $this->repository->findById($id);
+        self::assertNotNull($found);
+        self::assertSame('new@nene-deal.test', $found->email);
+        self::assertSame(OperatorRole::Admin, $found->role);
+    }
+
+    public function test_save_updates_existing_user_email_and_role(): void
+    {
+        $existing = $this->repository->findById($this->userId);
+        self::assertNotNull($existing);
+
+        $updated = new User(
+            id: $existing->id,
+            organizationId: $existing->organizationId,
+            email: 'updated@nene-deal.test',
+            passwordHash: $existing->passwordHash,
+            role: OperatorRole::Admin,
+            createdAt: $existing->createdAt,
+        );
+
+        $this->repository->save($updated);
+
+        $found = $this->repository->findById($this->userId);
+        self::assertNotNull($found);
+        self::assertSame('updated@nene-deal.test', $found->email);
+        self::assertSame(OperatorRole::Admin, $found->role);
     }
 }
