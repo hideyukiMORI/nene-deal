@@ -7,13 +7,22 @@ namespace NeneDeal\User;
 /**
  * Persistence for operator accounts.
  *
- * Identity lookups run on holder-less paths — login (pre-auth) and "current
- * user" resolution from the token `sub` — so they are deliberately NOT scoped
- * to the request organization. Email is globally unique.
+ * Identity lookups (findById, findByEmail) are NOT scoped to the request
+ * organization — they run on pre-auth paths (login, token resolution).
+ * Management operations (findAllByOrg, save, delete) ARE org-scoped.
  */
 interface UserRepositoryInterface
 {
     public function findById(string $id): ?User;
 
     public function findByEmail(string $email): ?User;
+
+    /** @return list<User> */
+    public function findAllByOrganization(string $organizationId): array;
+
+    public function save(User $user): void;
+
+    public function delete(string $id): void;
+
+    public function emailExistsExcluding(string $email, string $excludeId): bool;
 }

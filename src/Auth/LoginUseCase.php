@@ -33,7 +33,7 @@ final readonly class LoginUseCase
         $now = time();
         $token = $this->tokenIssuer->issue([
             'sub' => $user->id,
-            'role' => $user->role,
+            'role' => $user->role->value,
             'org' => $user->organizationId,
             'iat' => $now,
             'exp' => $now + self::TOKEN_TTL_SECONDS,

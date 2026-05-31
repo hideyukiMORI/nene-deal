@@ -48,6 +48,8 @@ tags:
     description: Stages, kanban board, forecast (read models)
   - name: Auth
     description: Operator login and current-user
+  - name: Users
+    description: Operator user management (admin role required)
 
 paths:
   /deals:
@@ -411,6 +413,117 @@ paths:
                 $ref: '#/components/schemas/CurrentUser'
         '401': { $ref: '#/components/responses/Unauthorized' }
 
+  /users:
+    get:
+      tags: [Users]
+      summary: List operators in the organization
+      description: Returns all operator accounts in the authenticated organization. **Admin role required.**
+      operationId: listUsers
+      responses:
+        '200':
+          description: Operator list.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OperatorUser'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Users]
+      summary: Create an operator account
+      description: Creates a new operator in the organization. **Admin role required.**
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: Operator created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperatorUser'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409':
+          description: Email already taken.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422': { $ref: '#/components/responses/UnprocessableEntity' }
+
+  /users/{userId}:
+    parameters:
+      - $ref: '#/components/parameters/UserId'
+    get:
+      tags: [Users]
+      summary: Get an operator account
+      description: Returns a single operator. **Admin role required.**
+      operationId: getUser
+      responses:
+        '200':
+          description: The operator.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperatorUser'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Users]
+      summary: Update an operator account
+      description: |
+        Updates role or email for an operator. **Admin role required.**
+        An admin cannot demote their own role.
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: Updated operator.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperatorUser'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Email already taken.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422': { $ref: '#/components/responses/UnprocessableEntity' }
+    delete:
+      tags: [Users]
+      summary: Delete an operator account
+      description: |
+        Deletes an operator from the organization. **Admin role required.**
+        An admin cannot delete their own account.
+      operationId: deleteUser
+      responses:
+        '204':
+          description: Deleted.
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
 components:
   securitySchemes:
     bearerAuth:
@@ -424,6 +537,13 @@ components:
       in: path
       required: true
       description: Deal ULID.
+      schema:
+        $ref: '#/components/schemas/Ulid'
+    UserId:
+      name: userId
+      in: path
+      required: true
+      description: User ULID.
       schema:
         $ref: '#/components/schemas/Ulid'
     Limit:
@@ -459,6 +579,12 @@ components:
             $ref: '#/components/schemas/Problem'
     Unauthorized:
       description: Missing or invalid credentials.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Forbidden:
+      description: Authenticated but insufficient role.
       content:
         application/problem+json:
           schema:
@@ -853,7 +979,63 @@ components:
           type: string
           format: email
         role:
-          type: string
-          description: Operator role (MVP ships a single `operator` role).
+          $ref: '#/components/schemas/OperatorRole'
         organization_id:
           type: string
+
+    OperatorRole:
+      type: string
+      enum: [admin, operator]
+      description: |
+        `admin` — can manage users and perform all deal operations.
+        `operator` — deal and pipeline operations only.
+
+    OperatorUser:
+      type: object
+      required: [id, organization_id, email, role, created_at, updated_at]
+      properties:
+        id:
+          $ref: '#/components/schemas/Ulid'
+        organization_id:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/OperatorRole'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    UserCreate:
+      type: object
+      required: [email, password, role]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        password:
+          type: string
+          minLength: 8
+          description: Initial password for the new operator.
+        role:
+          $ref: '#/components/schemas/OperatorRole'
+
+    UserUpdate:
+      type: object
+      minProperties: 1
+      description: Partial update. Organization is not changeable.
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        role:
+          $ref: '#/components/schemas/OperatorRole'

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace NeneDeal\User;
 
 /**
- * An operator account. MVP uses a single role (`operator`); RBAC is a later
- * epic. `organizationId` is the tenant the user belongs to.
+ * An operator account scoped to one organization.
+ * `role` controls access: `admin` can manage users; `operator` is deal-only.
  */
 final readonly class User
 {
@@ -15,7 +15,7 @@ final readonly class User
         public string $organizationId,
         public string $email,
         public string $passwordHash,
-        public string $role = 'operator',
+        public OperatorRole $role = OperatorRole::Operator,
         public ?string $createdAt = null,
         public ?string $updatedAt = null,
     ) {

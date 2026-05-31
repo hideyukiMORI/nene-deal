@@ -247,6 +247,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List operators in the organization
+         * @description Returns all operator accounts in the authenticated organization. **Admin role required.**
+         */
+        get: operations["listUsers"];
+        put?: never;
+        /**
+         * Create an operator account
+         * @description Creates a new operator in the organization. **Admin role required.**
+         */
+        post: operations["createUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User ULID. */
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Get an operator account
+         * @description Returns a single operator. **Admin role required.**
+         */
+        get: operations["getUser"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete an operator account
+         * @description Deletes an operator from the organization. **Admin role required.**
+         *     An admin cannot delete their own account.
+         */
+        delete: operations["deleteUser"];
+        options?: never;
+        head?: never;
+        /**
+         * Update an operator account
+         * @description Updates role or email for an operator. **Admin role required.**
+         *     An admin cannot demote their own role.
+         */
+        patch: operations["updateUser"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -441,9 +498,38 @@ export interface components {
             id: components["schemas"]["Ulid"];
             /** Format: email */
             email: string;
-            /** @description Operator role (MVP ships a single `operator` role). */
-            role: string;
+            role: components["schemas"]["OperatorRole"];
             organization_id: string;
+        };
+        /**
+         * @description `admin` — can manage users and perform all deal operations.
+         *     `operator` — deal and pipeline operations only.
+         * @enum {string}
+         */
+        OperatorRole: "admin" | "operator";
+        OperatorUser: {
+            id: components["schemas"]["Ulid"];
+            readonly organization_id: string;
+            /** Format: email */
+            email: string;
+            role: components["schemas"]["OperatorRole"];
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
+        };
+        UserCreate: {
+            /** Format: email */
+            email: string;
+            /** @description Initial password for the new operator. */
+            password: string;
+            role: components["schemas"]["OperatorRole"];
+        };
+        /** @description Partial update. Organization is not changeable. */
+        UserUpdate: {
+            /** Format: email */
+            email?: string;
+            role?: components["schemas"]["OperatorRole"];
         };
     };
     responses: {
@@ -458,6 +544,15 @@ export interface components {
         };
         /** @description Missing or invalid credentials. */
         Unauthorized: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description Authenticated but insufficient role. */
+        Forbidden: {
             headers: {
                 [name: string]: unknown;
             };
@@ -487,6 +582,8 @@ export interface components {
     parameters: {
         /** @description Deal ULID. */
         DealId: components["schemas"]["Ulid"];
+        /** @description User ULID. */
+        UserId: components["schemas"]["Ulid"];
         /** @description Max items per page. */
         Limit: number;
         /** @description Opaque pagination cursor from a previous response. */
@@ -884,6 +981,156 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+        };
+    };
+    listUsers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Operator list. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["OperatorUser"][];
+                    };
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    createUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserCreate"];
+            };
+        };
+        responses: {
+            /** @description Operator created. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorUser"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description Email already taken. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            422: components["responses"]["UnprocessableEntity"];
+        };
+    };
+    getUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User ULID. */
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The operator. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorUser"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    deleteUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User ULID. */
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    updateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description User ULID. */
+                userId: components["parameters"]["UserId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserUpdate"];
+            };
+        };
+        responses: {
+            /** @description Updated operator. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorUser"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Email already taken. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            422: components["responses"]["UnprocessableEntity"];
         };
     };
 }

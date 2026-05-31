@@ -35,6 +35,7 @@ use NeneDeal\Tenancy\HolderCurrentOrganization;
 use NeneDeal\Tenancy\OrganizationResolver;
 use NeneDeal\Tenancy\PdoOrganizationResolver;
 use NeneDeal\Tenancy\RequestOrganizationMiddleware;
+use NeneDeal\User\UserServiceProvider;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -62,6 +63,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
         $builder->addProvider(new DealServiceProvider());
         $builder->addProvider(new ForecastServiceProvider());
         $builder->addProvider(new HandoffServiceProvider());
+        $builder->addProvider(new UserServiceProvider());
         $builder->addProvider(new AuthServiceProvider());
 
         $builder

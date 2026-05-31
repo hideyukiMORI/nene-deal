@@ -20,14 +20,14 @@
 - [x] Issue #26: Wire frontend↔backend — `/api/v1` route prefix + frontend org/API-key headers
 - [x] Issue #28: Operator JWT login (backend) — users + login + `/me` + bearer middleware
 - [x] Issue #30: Operator login UI + auth gate (frontend)
+- [x] Issue #32: RBAC roles (`admin`/`operator`) + user management API + UI
 
 ## Next
 
-- [ ] RBAC (roles/capabilities) + user management (future epic)
 - [ ] Phase 2: Suite catalog entry, MCP read tools, stage customization UI
 
 ## Handoff
 
 Public repo `hideyukiMORI/nene-deal`. Pipeline SSOT only — Clear docs must not be copied here.
 
-Last updated: 2026-05-30
+Last updated: 2026-05-31

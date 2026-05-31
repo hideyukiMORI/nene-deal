@@ -35,7 +35,7 @@ final readonly class MeHandler implements RequestHandlerInterface
         return $this->json->create([
             'id' => $user->id,
             'email' => $user->email,
-            'role' => $user->role,
+            'role' => $user->role->value,
             'organization_id' => $user->organizationId,
         ]);
     }

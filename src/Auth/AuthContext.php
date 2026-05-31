@@ -22,6 +22,13 @@ final class AuthContext
         return is_string($value) && $value !== '' ? $value : null;
     }
 
+    public static function role(ServerRequestInterface $request): ?string
+    {
+        $value = self::claim($request, 'role');
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
     private static function claim(ServerRequestInterface $request, string $key): mixed
     {
         $claims = $request->getAttribute(self::CLAIMS_ATTRIBUTE);
