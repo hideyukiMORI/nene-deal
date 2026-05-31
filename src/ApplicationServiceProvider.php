@@ -18,6 +18,10 @@ use NeneDeal\Handoff\HandoffPreconditionExceptionHandler;
 use NeneDeal\Handoff\InvoiceHandoffExceptionHandler;
 use NeneDeal\Handoff\InvoiceHandoffRouteRegistrar;
 use NeneDeal\Pipeline\PipelineStageRouteRegistrar;
+use NeneDeal\Pipeline\SlugAlreadyTakenExceptionHandler;
+use NeneDeal\Pipeline\StageDeletionForbiddenExceptionHandler;
+use NeneDeal\Pipeline\StageHasDealsExceptionHandler;
+use NeneDeal\Pipeline\StageNotFoundExceptionHandler;
 use NeneDeal\User\CannotModifySelfExceptionHandler;
 use NeneDeal\User\EmailAlreadyTakenExceptionHandler;
 use NeneDeal\User\UserNotFoundExceptionHandler;
@@ -72,6 +76,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $userNotFound = $container->get(UserNotFoundExceptionHandler::class);
                     $emailTaken = $container->get(EmailAlreadyTakenExceptionHandler::class);
                     $cannotModifySelf = $container->get(CannotModifySelfExceptionHandler::class);
+                    $stageNotFound = $container->get(StageNotFoundExceptionHandler::class);
+                    $stageHasDeals = $container->get(StageHasDealsExceptionHandler::class);
+                    $stageDeletionForbidden = $container->get(StageDeletionForbiddenExceptionHandler::class);
+                    $slugTaken = $container->get(SlugAlreadyTakenExceptionHandler::class);
 
                     if (!$dealNotFound instanceof DealNotFoundExceptionHandler
                         || !$unknownStage instanceof UnknownStageExceptionHandler
@@ -82,6 +90,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$userNotFound instanceof UserNotFoundExceptionHandler
                         || !$emailTaken instanceof EmailAlreadyTakenExceptionHandler
                         || !$cannotModifySelf instanceof CannotModifySelfExceptionHandler
+                        || !$stageNotFound instanceof StageNotFoundExceptionHandler
+                        || !$stageHasDeals instanceof StageHasDealsExceptionHandler
+                        || !$stageDeletionForbidden instanceof StageDeletionForbiddenExceptionHandler
+                        || !$slugTaken instanceof SlugAlreadyTakenExceptionHandler
                     ) {
                         throw new LogicException('Exception handler services are invalid.');
                     }
@@ -96,6 +108,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $userNotFound,
                         $emailTaken,
                         $cannotModifySelf,
+                        $stageNotFound,
+                        $stageHasDeals,
+                        $stageDeletionForbidden,
+                        $slugTaken,
                     ];
                 },
             );

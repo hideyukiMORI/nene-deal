@@ -47,6 +47,59 @@ final class CreateDealUseCaseTest extends TestCase
         self::assertSame('01STAGELEAD0000000000000AA', $history[0]->toStageId);
     }
 
+    public function test_resolves_stage_by_ulid(): void
+    {
+        $deal = $this->useCase->execute(new CreateDealInput(
+            accountLabel: 'Acme',
+            amountCents: 1000,
+            stageRef: '01STAGELEAD0000000000000AA',
+        ));
+
+        self::assertSame('01STAGELEAD0000000000000AA', $deal->stageId);
+    }
+
+    public function test_all_optional_fields_are_preserved(): void
+    {
+        $deal = $this->useCase->execute(new CreateDealInput(
+            accountLabel: 'Globex',
+            amountCents: 500,
+            stageRef: 'lead',
+            probabilityPercent: 75,
+            expectedCloseDate: '2026-12-31',
+            ownerUserId: '01OWNER000000000000000000A',
+            note: 'Important client',
+        ));
+
+        self::assertSame('2026-12-31', $deal->expectedCloseDate);
+        self::assertSame('01OWNER000000000000000000A', $deal->ownerUserId);
+        self::assertSame('Important client', $deal->note);
+    }
+
+    #[\PHPUnit\Framework\Attributes\TestWith([0])]
+    #[\PHPUnit\Framework\Attributes\TestWith([100])]
+    public function test_probability_boundary_values_are_stored(int $probability): void
+    {
+        $deal = $this->useCase->execute(new CreateDealInput(
+            accountLabel: 'Boundary',
+            amountCents: 1000,
+            stageRef: 'lead',
+            probabilityPercent: $probability,
+        ));
+
+        self::assertSame($probability, $deal->probabilityPercent);
+    }
+
+    public function test_amount_zero_is_valid(): void
+    {
+        $deal = $this->useCase->execute(new CreateDealInput(
+            accountLabel: 'Zero',
+            amountCents: 0,
+            stageRef: 'lead',
+        ));
+
+        self::assertSame(0, $deal->amountCents);
+    }
+
     public function test_rejects_unknown_stage(): void
     {
         $this->expectException(UnknownStageException::class);

@@ -149,15 +149,49 @@ export interface paths {
          * List pipeline stages
          * @description Ordered pipeline stages for the organization (kanban column order).
          *     Seeded defaults: lead, qualified, proposal, negotiation, won, lost.
-         *     Stage customization UI is Phase 2. (terminology.md, roadmap.md)
          */
         get: operations["listStages"];
         put?: never;
-        post?: never;
+        /**
+         * Create a pipeline stage
+         * @description Creates a new non-terminal pipeline stage. **Admin role required.**
+         *     `slug` is derived from `label` (kebab-case) and is immutable after creation.
+         *     `is_terminal` and `is_won` default to `false` and cannot be changed after creation.
+         */
+        post: operations["createStage"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/stages/{stageId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stage ULID. */
+                stageId: components["parameters"]["StageId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete a pipeline stage
+         * @description Deletes a stage. **Admin role required.**
+         *     Forbidden when: the stage is terminal (won/lost), or the stage has any deals.
+         */
+        delete: operations["deleteStage"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a pipeline stage
+         * @description Updates `label` and/or `sort_order`. **Admin role required.**
+         *     `slug`, `is_terminal`, and `is_won` are immutable.
+         */
+        patch: operations["updateStage"];
         trace?: never;
     };
     "/board": {
@@ -406,6 +440,17 @@ export interface components {
             /** @description True only for the won stage. */
             is_won: boolean;
         };
+        StageCreate: {
+            /** @description Display label; slug is derived from this value (kebab-case). */
+            label: string;
+            /** @description Kanban column order (ascending). Gaps are allowed. */
+            sort_order: number;
+        };
+        /** @description Partial update. Slug, is_terminal, and is_won are immutable. */
+        StageUpdate: {
+            label?: string;
+            sort_order?: number;
+        };
         StageHistoryEntry: {
             id: components["schemas"]["Ulid"];
             deal_id: components["schemas"]["Ulid"];
@@ -588,6 +633,8 @@ export interface components {
         Limit: number;
         /** @description Opaque pagination cursor from a previous response. */
         Cursor: string;
+        /** @description Stage ULID. */
+        StageId: components["schemas"]["Ulid"];
         /** @description Client-generated key making the handoff retry-safe. */
         IdempotencyKey: string;
     };
@@ -876,6 +923,106 @@ export interface operations {
                 };
             };
             401: components["responses"]["Unauthorized"];
+        };
+    };
+    createStage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StageCreate"];
+            };
+        };
+        responses: {
+            /** @description Stage created. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PipelineStage"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            /** @description A stage with the same derived slug already exists. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+            422: components["responses"]["UnprocessableEntity"];
+        };
+    };
+    deleteStage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stage ULID. */
+                stageId: components["parameters"]["StageId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            /** @description Stage cannot be deleted (terminal or has deals). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    updateStage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Stage ULID. */
+                stageId: components["parameters"]["StageId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StageUpdate"];
+            };
+        };
+        responses: {
+            /** @description Updated stage. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PipelineStage"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["NotFound"];
+            422: components["responses"]["UnprocessableEntity"];
         };
     };
     getBoard: {

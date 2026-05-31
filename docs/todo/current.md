@@ -22,10 +22,10 @@
 - [x] Issue #30: Operator login UI + auth gate (frontend)
 - [x] Issue #32: RBAC roles (`admin`/`operator`) + user management API + UI
 - [x] Issue #34: MCP read-only tool catalog (7 tools) + `composer mcp` validator + local server docs
+- [x] Issue #36: Stage customization — create, rename, reorder, delete (admin)
 
 ## Next (Phase 2)
 
-- [ ] Stage customization UI — PR #37 open
 - [ ] Suite catalog entry
 
 ## Handoff

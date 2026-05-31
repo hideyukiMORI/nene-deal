@@ -16,4 +16,14 @@ interface PipelineStageRepositoryInterface
 
     /** Resolves a stage by ULID or slug within the organization. */
     public function findByIdOrSlug(string $idOrSlug): ?PipelineStage;
+
+    public function findById(string $id): ?PipelineStage;
+
+    public function save(PipelineStage $stage): void;
+
+    public function delete(string $id): void;
+
+    public function slugExists(string $slug): bool;
+
+    public function hasDeals(string $stageId): bool;
 }

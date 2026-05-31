@@ -19,7 +19,7 @@
 
 - [ ] Suite catalog entry
 - [x] MCP read tools — `docs/mcp/tools.json` (7 read tools, `composer mcp` validator) (#34)
-- [ ] Stage customization UI
+- [x] Stage customization UI — create/rename/reorder/delete stages (#36)
 
 ## Non-goals
 

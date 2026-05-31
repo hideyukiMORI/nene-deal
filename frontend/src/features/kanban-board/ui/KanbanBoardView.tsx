@@ -21,6 +21,7 @@ export interface KanbanBoardViewProps {
   moveDeal: (dealId: string, toStageRef: string) => Promise<void>
   onOpenDeal: (dealId: string) => void
   onOpenUsers?: () => void
+  onOpenStages?: () => void
   isAdmin?: boolean
 }
 
@@ -37,6 +38,7 @@ export function KanbanBoardView({
   moveDeal,
   onOpenDeal,
   onOpenUsers,
+  onOpenStages,
   isAdmin = false,
 }: KanbanBoardViewProps) {
   const { t, locale, setLocale } = useTranslation()
@@ -53,6 +55,11 @@ export function KanbanBoardView({
             <Text muted>{t('app.subtitle')}</Text>
           </div>
           <Stack direction="horizontal" gap="xs">
+            {isAdmin && onOpenStages !== undefined ? (
+              <Button size="sm" variant="secondary" onClick={onOpenStages}>
+                {t('stages.title')}
+              </Button>
+            ) : null}
             {isAdmin && onOpenUsers !== undefined ? (
               <Button size="sm" variant="secondary" onClick={onOpenUsers}>
                 {t('users.title')}
