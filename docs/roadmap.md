@@ -18,7 +18,7 @@
 ## Phase 2 — Polish
 
 - [ ] Suite catalog entry
-- [ ] MCP read tools
+- [x] MCP read tools — `docs/mcp/tools.json` (7 read tools, `composer mcp` validator) (#34)
 - [ ] Stage customization UI
 
 ## Non-goals
@@ -27,4 +27,4 @@
 - Full HubSpot parity
 - UI locales beyond Japanese and English (ADR 0004)
 
-Last updated: 2026-05-30
+Last updated: 2026-05-31

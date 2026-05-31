@@ -21,10 +21,12 @@
 - [x] Issue #28: Operator JWT login (backend) — users + login + `/me` + bearer middleware
 - [x] Issue #30: Operator login UI + auth gate (frontend)
 - [x] Issue #32: RBAC roles (`admin`/`operator`) + user management API + UI
+- [x] Issue #34: MCP read-only tool catalog (7 tools) + `composer mcp` validator + local server docs
 
-## Next
+## Next (Phase 2)
 
-- [ ] Phase 2: Suite catalog entry, MCP read tools, stage customization UI
+- [ ] Stage customization UI — PR #37 open
+- [ ] Suite catalog entry
 
 ## Handoff
 

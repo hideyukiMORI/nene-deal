@@ -48,6 +48,8 @@ Built on [NENE2](https://github.com/hideyukiMORI/NENE2).
 | API contract (SSOT) | [`docs/openapi/openapi.yaml`](./docs/openapi/openapi.yaml) |
 | Invoice handoff contract | [`docs/integrations/invoice-handoff-contract.md`](./docs/integrations/invoice-handoff-contract.md) |
 | Sibling products | [`docs/integrations/sibling-products.md`](./docs/integrations/sibling-products.md) |
+| MCP local server | [`docs/integrations/mcp-local-server.md`](./docs/integrations/mcp-local-server.md) |
+| MCP tool catalog | [`docs/mcp/tools.json`](./docs/mcp/tools.json) |
 | NENE2 inheritance | [`docs/inheritance-from-nene2.md`](./docs/inheritance-from-nene2.md) |
 | Workflow | [`docs/workflow.md`](./docs/workflow.md) |
 | Current work | [`docs/todo/current.md`](./docs/todo/current.md) |

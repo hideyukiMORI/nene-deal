@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "source": "docs/openapi/openapi.yaml",
+  "tools": [
+    {
+      "name": "listDeals",
+      "title": "List Deals",
+      "description": "List deal cards for the authenticated organization. Open deals only by default; pass include_terminal=true to include won/lost.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "listDeals",
+        "method": "GET",
+        "path": "/deals"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "stage_id": {
+            "type": "string",
+            "description": "Filter by current stage (ULID or slug, e.g. 'lead', 'proposal')."
+          },
+          "owner_user_id": {
+            "type": "string",
+            "description": "Filter by deal owner (ULID)."
+          },
+          "q": {
+            "type": "string",
+            "description": "Case-insensitive substring match on account_label."
+          },
+          "include_terminal": {
+            "type": "boolean",
+            "description": "Include deals in terminal stages (won/lost). Defaults to false.",
+            "default": false
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "default": 50,
+            "description": "Max items per page."
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque pagination cursor from a previous response."
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/DealList"
+    },
+    {
+      "name": "getDeal",
+      "title": "Get Deal",
+      "description": "Get a single deal card by ULID.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "getDeal",
+        "method": "GET",
+        "path": "/deals/{dealId}"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dealId"],
+        "properties": {
+          "dealId": {
+            "type": "string",
+            "description": "Deal ULID (26 chars, Crockford base32).",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/Deal"
+    },
+    {
+      "name": "listDealStageHistory",
+      "title": "List Deal Stage History",
+      "description": "List the stage-change audit trail for a deal, newest first.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "listDealStageHistory",
+        "method": "GET",
+        "path": "/deals/{dealId}/history"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dealId"],
+        "properties": {
+          "dealId": {
+            "type": "string",
+            "description": "Deal ULID.",
+            "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+          }
+        }
+      },
+      "responseSchemaRef": null
+    },
+    {
+      "name": "listStages",
+      "title": "List Pipeline Stages",
+      "description": "List ordered pipeline stages for the organization (kanban column order). Seeded defaults: lead, qualified, proposal, negotiation, won, lost.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "listStages",
+        "method": "GET",
+        "path": "/stages"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "responseSchemaRef": null
+    },
+    {
+      "name": "getBoard",
+      "title": "Get Kanban Board",
+      "description": "Get the kanban board read model: one column per open stage with its deals and per-column totals.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "getBoard",
+        "method": "GET",
+        "path": "/board"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "owner_user_id": {
+            "type": "string",
+            "description": "Limit cards to a single owner (ULID)."
+          },
+          "include_terminal": {
+            "type": "boolean",
+            "description": "Include terminal stages (won/lost). Defaults to false.",
+            "default": false
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/KanbanBoard"
+    },
+    {
+      "name": "getForecast",
+      "title": "Get Monthly Forecast",
+      "description": "Get the weighted pipeline forecast for a calendar month. Approximate — not a billing or revenue figure.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "getForecast",
+        "method": "GET",
+        "path": "/forecast"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["month"],
+        "properties": {
+          "month": {
+            "type": "string",
+            "description": "Target calendar month in YYYY-MM format.",
+            "pattern": "^\\d{4}-\\d{2}$",
+            "examples": ["2026-06"]
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/ForecastSummary"
+    },
+    {
+      "name": "getCurrentUser",
+      "title": "Get Current User",
+      "description": "Return the operator identified by the current bearer token.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "getCurrentUser",
+        "method": "GET",
+        "path": "/auth/me"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {}
+      },
+      "responseSchemaRef": "#/components/schemas/CurrentUser"
+    }
+  ]
+}
