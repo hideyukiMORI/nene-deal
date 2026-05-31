@@ -38,6 +38,66 @@ final readonly class PdoPipelineStageRepository implements PipelineStageReposito
         return $row !== null ? $this->mapRow($row) : null;
     }
 
+    public function findById(string $id): ?PipelineStage
+    {
+        $row = $this->query->fetchOne(
+            'SELECT ' . self::COLUMNS . ' FROM pipeline_stages WHERE organization_id = ? AND id = ? LIMIT 1',
+            [$this->organization->id(), $id],
+        );
+
+        return $row !== null ? $this->mapRow($row) : null;
+    }
+
+    public function save(PipelineStage $stage): void
+    {
+        $now = date('Y-m-d H:i:s');
+
+        $this->query->execute(
+            'INSERT INTO pipeline_stages (id, organization_id, slug, label, sort_order, is_terminal, is_won, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE label = VALUES(label), sort_order = VALUES(sort_order), updated_at = VALUES(updated_at)',
+            [
+                $stage->id,
+                $stage->organizationId,
+                $stage->slug,
+                $stage->label,
+                $stage->sortOrder,
+                $stage->isTerminal ? 1 : 0,
+                $stage->isWon ? 1 : 0,
+                $stage->createdAt ?? $now,
+                $now,
+            ],
+        );
+    }
+
+    public function delete(string $id): void
+    {
+        $this->query->execute(
+            'DELETE FROM pipeline_stages WHERE organization_id = ? AND id = ?',
+            [$this->organization->id(), $id],
+        );
+    }
+
+    public function slugExists(string $slug): bool
+    {
+        $row = $this->query->fetchOne(
+            'SELECT 1 FROM pipeline_stages WHERE organization_id = ? AND slug = ? LIMIT 1',
+            [$this->organization->id(), $slug],
+        );
+
+        return $row !== null;
+    }
+
+    public function hasDeals(string $stageId): bool
+    {
+        $row = $this->query->fetchOne(
+            'SELECT 1 FROM deals WHERE organization_id = ? AND stage_id = ? LIMIT 1',
+            [$this->organization->id(), $stageId],
+        );
+
+        return $row !== null;
+    }
+
     /** @param array<string, mixed> $row */
     private function mapRow(array $row): PipelineStage
     {

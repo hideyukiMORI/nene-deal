@@ -11,3 +11,13 @@ export interface PipelineStageDto {
 export interface PipelineStageListDto {
   data: PipelineStageDto[]
 }
+
+export interface StageCreateDto {
+  label: string
+  sort_order: number
+}
+
+export interface StageUpdateDto {
+  label?: string
+  sort_order?: number
+}

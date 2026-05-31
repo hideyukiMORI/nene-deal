@@ -46,6 +46,7 @@ export interface MessageCatalog {
 
   'common.actions.back': string
   'common.actions.save': string
+  'common.actions.edit': string
 
   'deal.open.detail': string
   'detail.loading': string
@@ -97,6 +98,30 @@ export interface MessageCatalog {
   'users.validation.emailRequired': string
   'users.validation.passwordMin': string
   'users.validation.roleRequired': string
+
+  'common.actions.edit': string
+
+  'stages.title': string
+  'stages.subtitle': string
+  'stages.loading': string
+  'stages.error.title': string
+  'stages.empty.title': string
+  'stages.empty.description': string
+  'stages.create.open': string
+  'stages.create.title': string
+  'stages.create.submit': string
+  'stages.create.error': string
+  'stages.field.label': string
+  'stages.field.sortOrder': string
+  'stages.badge.terminal': string
+  'stages.badge.won': string
+  'stages.delete.confirm': string
+  'stages.delete.error': string
+  'stages.delete.forbidden': string
+  'stages.edit.save': string
+  'stages.edit.error': string
+  'stages.validation.labelRequired': string
+  'stages.validation.sortOrderNonNeg': string
 }
 
 export const ja: MessageCatalog = {
@@ -143,6 +168,7 @@ export const ja: MessageCatalog = {
 
   'common.actions.back': '戻る',
   'common.actions.save': '保存',
+  'common.actions.edit': '編集',
 
   'deal.open.detail': '詳細',
   'detail.loading': 'ディールを読み込んでいます…',
@@ -194,4 +220,26 @@ export const ja: MessageCatalog = {
   'users.validation.emailRequired': 'メールアドレスを入力してください。',
   'users.validation.passwordMin': 'パスワードは8文字以上で入力してください。',
   'users.validation.roleRequired': 'ロールを選択してください。',
+
+  'stages.title': 'ステージ管理',
+  'stages.subtitle': 'パイプラインのステージを設定します。',
+  'stages.loading': 'ステージを読み込んでいます…',
+  'stages.error.title': 'ステージを読み込めませんでした',
+  'stages.empty.title': 'ステージがありません',
+  'stages.empty.description': '最初のステージを作成してください。',
+  'stages.create.open': 'ステージを追加',
+  'stages.create.title': '新しいステージ',
+  'stages.create.submit': '作成',
+  'stages.create.error': 'ステージを作成できませんでした。',
+  'stages.field.label': 'ラベル',
+  'stages.field.sortOrder': '表示順',
+  'stages.badge.terminal': '終了',
+  'stages.badge.won': '受注',
+  'stages.delete.confirm': 'このステージを削除しますか？',
+  'stages.delete.error': 'ステージを削除できませんでした。',
+  'stages.delete.forbidden': '終了ステージまたはディールのあるステージは削除できません。',
+  'stages.edit.save': '保存',
+  'stages.edit.error': 'ステージを更新できませんでした。',
+  'stages.validation.labelRequired': 'ラベルを入力してください。',
+  'stages.validation.sortOrderNonNeg': '表示順は0以上で入力してください。',
 }

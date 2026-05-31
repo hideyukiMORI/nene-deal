@@ -18,6 +18,9 @@ export function BoardPage() {
       onOpenUsers={() => {
         void navigate('/users')
       }}
+      onOpenStages={() => {
+        void navigate('/stages')
+      }}
     />
   )
 }

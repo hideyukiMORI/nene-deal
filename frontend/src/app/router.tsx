@@ -3,6 +3,7 @@ import { BoardPage } from '@/pages/board/BoardPage'
 import { DealDetailPage } from '@/pages/deal-detail/DealDetailPage'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
+import { StagesPage } from '@/pages/stages/StagesPage'
 import { UsersPage } from '@/pages/users/UsersPage'
 import { RequireAdmin, RequireAuth } from './auth-gate'
 
@@ -32,6 +33,17 @@ const router = createBrowserRouter([
       <RequireAuth>
         <RequireAdmin>
           <UsersPage />
+        </RequireAdmin>
+      </RequireAuth>
+    ),
+    errorElement: <NotFoundPage />,
+  },
+  {
+    path: '/stages',
+    element: (
+      <RequireAuth>
+        <RequireAdmin>
+          <StagesPage />
         </RequireAdmin>
       </RequireAuth>
     ),

@@ -292,7 +292,6 @@ paths:
       description: |
         Ordered pipeline stages for the organization (kanban column order).
         Seeded defaults: lead, qualified, proposal, negotiation, won, lost.
-        Stage customization UI is Phase 2. (terminology.md, roadmap.md)
       operationId: listStages
       responses:
         '200':
@@ -308,6 +307,83 @@ paths:
                     items:
                       $ref: '#/components/schemas/PipelineStage'
         '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [Pipeline]
+      summary: Create a pipeline stage
+      description: |
+        Creates a new non-terminal pipeline stage. **Admin role required.**
+        `slug` is derived from `label` (kebab-case) and is immutable after creation.
+        `is_terminal` and `is_won` default to `false` and cannot be changed after creation.
+      operationId: createStage
+      responses:
+        '201':
+          description: Stage created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineStage'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409':
+          description: A stage with the same derived slug already exists.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '422': { $ref: '#/components/responses/UnprocessableEntity' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StageCreate'
+
+  /stages/{stageId}:
+    parameters:
+      - $ref: '#/components/parameters/StageId'
+    patch:
+      tags: [Pipeline]
+      summary: Update a pipeline stage
+      description: |
+        Updates `label` and/or `sort_order`. **Admin role required.**
+        `slug`, `is_terminal`, and `is_won` are immutable.
+      operationId: updateStage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StageUpdate'
+      responses:
+        '200':
+          description: Updated stage.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PipelineStage'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/UnprocessableEntity' }
+    delete:
+      tags: [Pipeline]
+      summary: Delete a pipeline stage
+      description: |
+        Deletes a stage. **Admin role required.**
+        Forbidden when: the stage is terminal (won/lost), or the stage has any deals.
+      operationId: deleteStage
+      responses:
+        '204':
+          description: Deleted.
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422':
+          description: Stage cannot be deleted (terminal or has deals).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
 
   /board:
     get:
@@ -561,6 +637,13 @@ components:
       description: Opaque pagination cursor from a previous response.
       schema:
         type: string
+    StageId:
+      name: stageId
+      in: path
+      required: true
+      description: Stage ULID.
+      schema:
+        $ref: '#/components/schemas/Ulid'
     IdempotencyKey:
       name: Idempotency-Key
       in: header
@@ -793,6 +876,31 @@ components:
         is_won:
           type: boolean
           description: True only for the won stage.
+
+    StageCreate:
+      type: object
+      required: [label, sort_order]
+      properties:
+        label:
+          type: string
+          maxLength: 64
+          description: Display label; slug is derived from this value (kebab-case).
+        sort_order:
+          type: integer
+          minimum: 0
+          description: Kanban column order (ascending). Gaps are allowed.
+
+    StageUpdate:
+      type: object
+      minProperties: 1
+      description: Partial update. Slug, is_terminal, and is_won are immutable.
+      properties:
+        label:
+          type: string
+          maxLength: 64
+        sort_order:
+          type: integer
+          minimum: 0
 
     StageHistoryEntry:
       type: object
