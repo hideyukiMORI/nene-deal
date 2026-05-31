@@ -44,21 +44,28 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     {
         $now = date('Y-m-d H:i:s');
 
-        $this->query->execute(
-            'INSERT INTO users (id, organization_id, email, password_hash, role, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE email = VALUES(email), password_hash = VALUES(password_hash),
-             role = VALUES(role), updated_at = VALUES(updated_at)',
-            [
-                $user->id,
-                $user->organizationId,
-                $user->email,
-                $user->passwordHash,
-                $user->role->value,
-                $user->createdAt ?? $now,
-                $now,
-            ],
-        );
+        $exists = $this->findById($user->id) !== null;
+
+        if (!$exists) {
+            $this->query->execute(
+                'INSERT INTO users (id, organization_id, email, password_hash, role, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)',
+                [
+                    $user->id,
+                    $user->organizationId,
+                    $user->email,
+                    $user->passwordHash,
+                    $user->role->value,
+                    $user->createdAt ?? $now,
+                    $now,
+                ],
+            );
+        } else {
+            $this->query->execute(
+                'UPDATE users SET email = ?, password_hash = ?, role = ?, updated_at = ? WHERE id = ?',
+                [$user->email, $user->passwordHash, $user->role->value, $now, $user->id],
+            );
+        }
     }
 
     public function delete(string $id): void
