@@ -11,10 +11,10 @@ export interface TextProps {
 }
 
 const variantClasses: Record<TextVariant, string> = {
-  body: 'font-sans text-body leading-body font-normal',
-  caption: 'font-sans text-caption leading-body font-normal',
-  'heading-sm': 'font-display text-heading-sm leading-heading font-semibold tracking-tight',
-  'heading-md': 'font-display text-heading-md leading-heading font-semibold tracking-tight',
+  body: 't-body',
+  caption: 't-cap',
+  'heading-sm': 't-h2',
+  'heading-md': 't-h1',
 }
 
 export function Text({
@@ -25,11 +25,7 @@ export function Text({
   className,
   id,
 }: TextProps) {
-  const classes = [
-    variantClasses[variant],
-    muted ? 'text-text-muted' : 'text-text-primary',
-    className,
-  ]
+  const classes = [variantClasses[variant], muted ? 'muted' : '', className]
     .filter(Boolean)
     .join(' ')
 

@@ -65,7 +65,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
       onSubmit={(event) => {
         void submit(event)
       }}
-      className="rounded-md border border-border bg-surface-raised px-inline-lg py-stack-lg shadow-sm"
+      className="card card-pad"
     >
       <Stack gap="md">
         <Text as="h2" variant="heading-sm">
@@ -73,7 +73,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
         </Text>
 
         {errorMessage !== null ? (
-          <Text variant="caption" className="text-danger">
+          <Text variant="caption" className="danger">
             {errorMessage}
           </Text>
         ) : null}

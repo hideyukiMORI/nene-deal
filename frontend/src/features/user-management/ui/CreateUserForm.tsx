@@ -53,7 +53,7 @@ export function CreateUserForm({ pending, errorMessage, onSubmit, onCancel }: Cr
       onSubmit={(e) => {
         void submit(e)
       }}
-      className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-md"
+      className="card card-pad"
     >
       <Stack gap="sm">
         <Text as="h2" variant="heading-sm">
@@ -61,7 +61,7 @@ export function CreateUserForm({ pending, errorMessage, onSubmit, onCancel }: Cr
         </Text>
 
         {errorMessage !== null ? (
-          <Text variant="caption" className="text-danger">
+          <Text variant="caption" className="danger">
             {errorMessage}
           </Text>
         ) : null}

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import type { CreateStageInput, PipelineStage, UpdateStageInput } from '@/entities/pipeline-stage'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
-import { Button, EmptyState, Input, Stack, Text } from '@/shared/ui'
+import { Button, EmptyState, Input } from '@/shared/ui'
+import { IconPlus } from '@/shared/ui/icons'
 import type { StageManagementStatus } from '../hooks/use-stage-management-page'
 import { CreateStageForm } from './CreateStageForm'
 
@@ -15,6 +16,14 @@ export interface StageManagementViewProps {
   createErrorKey: MessageKey | null
   updateStage: (stageId: string, input: UpdateStageInput) => Promise<boolean>
   deleteStage: (stageId: string) => Promise<boolean>
+}
+
+const STAGE_COLORS: Record<string, string> = {
+  lead: 'var(--info)',
+  qualified: 'var(--warn)',
+  proposal: 'var(--accent)',
+  won: 'var(--ok)',
+  lost: 'var(--fg-faint)',
 }
 
 export function StageManagementView({
@@ -33,23 +42,23 @@ export function StageManagementView({
   const [editingId, setEditingId] = useState<string | null>(null)
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-stack-lg px-inline-lg py-stack-lg">
-      <header className="flex flex-col gap-stack-sm">
-        <Text as="h1" variant="heading-md">
-          {t('stages.title')}
-        </Text>
-        <Text muted>{t('stages.subtitle')}</Text>
-      </header>
-
-      <Stack direction="horizontal" gap="sm">
-        <Button
+    <section className="content content-narrow stack g6">
+      <div className="row between wrap g4 page-head">
+        <div className="stack g1">
+          <h1 className="t-h1">{t('stages.title')}</h1>
+          <span className="muted t-cap">{t('stages.subtitle')}</span>
+        </div>
+        <button
+          type="button"
+          className="btn btn-primary"
           onClick={() => {
             setFormOpen((o) => !o)
           }}
         >
+          <IconPlus />
           {t('stages.create.open')}
-        </Button>
-      </Stack>
+        </button>
+      </div>
 
       {formOpen ? (
         <CreateStageForm
@@ -66,18 +75,20 @@ export function StageManagementView({
         />
       ) : null}
 
-      {status === 'loading' ? <Text muted>{t('stages.loading')}</Text> : null}
+      {status === 'loading' ? <p className="muted t-body">{t('stages.loading')}</p> : null}
 
       {status === 'error' ? (
-        <Stack gap="sm">
-          <Text as="h2" variant="heading-sm">
-            {t('stages.error.title')}
-          </Text>
-          <Text muted>{errorKey !== null ? t(errorKey) : t('common.error.unknown')}</Text>
-          <Button variant="secondary" onClick={retry}>
-            {t('common.actions.retry')}
-          </Button>
-        </Stack>
+        <div className="stack g3">
+          <h2 className="t-h2">{t('stages.error.title')}</h2>
+          <p className="muted t-body">
+            {errorKey !== null ? t(errorKey) : t('common.error.unknown')}
+          </p>
+          <div className="row g3">
+            <button type="button" className="btn btn-secondary" onClick={retry}>
+              {t('common.actions.retry')}
+            </button>
+          </div>
+        </div>
       ) : null}
 
       {status === 'ready' && stages.length === 0 ? (
@@ -85,14 +96,12 @@ export function StageManagementView({
       ) : null}
 
       {status === 'ready' && stages.length > 0 ? (
-        <ul className="flex flex-col gap-stack-sm">
-          {stages.map((stage) => (
-            <li
-              key={stage.id}
-              className="rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
-            >
-              {editingId === stage.id ? (
+        <div className="card">
+          <div className="rows">
+            {stages.map((stage) =>
+              editingId === stage.id ? (
                 <StageEditRow
+                  key={stage.id}
                   stage={stage}
                   onSave={async (input) => {
                     const ok = await updateStage(stage.id, input)
@@ -104,6 +113,7 @@ export function StageManagementView({
                 />
               ) : (
                 <StageReadRow
+                  key={stage.id}
                   stage={stage}
                   onEdit={() => {
                     setEditingId(stage.id)
@@ -114,67 +124,83 @@ export function StageManagementView({
                     }
                   }}
                 />
-              )}
-            </li>
-          ))}
-        </ul>
+              ),
+            )}
+          </div>
+        </div>
       ) : null}
-    </main>
+    </section>
   )
 }
 
-interface StageReadRowProps {
+function StageReadRow({
+  stage,
+  onEdit,
+  onDelete,
+}: {
   stage: PipelineStage
   onEdit: () => void
   onDelete: () => void
-}
-
-function StageReadRow({ stage, onEdit, onDelete }: StageReadRowProps) {
+}) {
   const { t } = useTranslation()
-
+  const color = STAGE_COLORS[stage.slug] ?? 'var(--fg-faint)'
   return (
-    <div className="flex items-center justify-between gap-inline-md">
-      <div className="flex flex-col gap-stack-xs">
-        <div className="flex items-center gap-inline-sm">
-          <Text as="span" className="font-medium">
-            {stage.label}
-          </Text>
-          {stage.isWon ? (
-            <span className="rounded-sm bg-green-100 px-1.5 py-0.5 font-sans text-caption text-green-800">
-              {t('stages.badge.won')}
-            </span>
-          ) : stage.isTerminal ? (
-            <span className="rounded-sm bg-gray-100 px-1.5 py-0.5 font-sans text-caption text-gray-700">
-              {t('stages.badge.terminal')}
-            </span>
-          ) : null}
+    <div className="list-row">
+      <div className="row g3">
+        <span className="num faint" style={{ width: 18, textAlign: 'center' }}>
+          {stage.sortOrder}
+        </span>
+        <span
+          className="stage-dot"
+          style={{ width: 9, height: 9, borderRadius: 2, background: color }}
+        />
+        <div className="stack g1">
+          <span className="row g2">
+            <span className="medium">{stage.label}</span>
+            {stage.isWon ? (
+              <span className="badge badge-ok">
+                <span className="dot" />
+                {t('stages.badge.won')}
+              </span>
+            ) : stage.isTerminal ? (
+              <span className="badge badge-muted">{t('stages.badge.terminal')}</span>
+            ) : null}
+          </span>
+          <span className="faint t-tiny mono">
+            {stage.slug} · order {stage.sortOrder}
+          </span>
         </div>
-        <Text as="span" variant="caption" muted>
-          {stage.slug} · order {stage.sortOrder}
-        </Text>
       </div>
 
-      {!stage.isTerminal ? (
-        <Stack direction="horizontal" gap="xs">
+      {stage.isTerminal ? null : (
+        <div className="row g2">
           <Button variant="secondary" size="sm" onClick={onEdit}>
             {t('common.actions.edit')}
           </Button>
-          <Button variant="secondary" size="sm" onClick={onDelete}>
+          <button
+            type="button"
+            className="icon-btn"
+            title={t('stages.delete.confirm')}
+            aria-label={t('common.actions.edit')}
+            onClick={onDelete}
+          >
             ×
-          </Button>
-        </Stack>
-      ) : null}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
 
-interface StageEditRowProps {
+function StageEditRow({
+  stage,
+  onSave,
+  onCancel,
+}: {
   stage: PipelineStage
   onSave: (input: UpdateStageInput) => Promise<void>
   onCancel: () => void
-}
-
-function StageEditRow({ stage, onSave, onCancel }: StageEditRowProps) {
+}) {
   const { t } = useTranslation()
   const [label, setLabel] = useState(stage.label)
   const [sortOrder, setSortOrder] = useState(String(stage.sortOrder))
@@ -186,37 +212,53 @@ function StageEditRow({ stage, onSave, onCancel }: StageEditRowProps) {
   }
 
   return (
-    <Stack gap="sm">
-      <Input
-        id={`stage-label-edit-${stage.id}`}
-        label={t('stages.field.label')}
-        value={label}
-        onChange={(e) => {
-          setLabel(e.target.value)
+    <div className="list-row">
+      <form
+        className="stack g4 grow"
+        onSubmit={(e) => {
+          e.preventDefault()
         }}
-      />
-      <Input
-        id={`stage-sort-edit-${stage.id}`}
-        label={t('stages.field.sortOrder')}
-        type="number"
-        value={sortOrder}
-        onChange={(e) => {
-          setSortOrder(e.target.value)
-        }}
-      />
-      <Stack direction="horizontal" gap="sm">
-        <Button
-          size="sm"
-          onClick={() => {
-            void handleSave()
-          }}
-        >
-          {t('stages.edit.save')}
-        </Button>
-        <Button variant="secondary" size="sm" onClick={onCancel}>
-          {t('common.actions.cancel')}
-        </Button>
-      </Stack>
-    </Stack>
+      >
+        <div className="row g2 t-cap semi" style={{ color: 'var(--accent)' }}>
+          {t('stages.editing')}
+        </div>
+        <div className="row g4 wrap">
+          <div className="grow">
+            <Input
+              id={`stage-label-edit-${stage.id}`}
+              label={t('stages.field.label')}
+              value={label}
+              onChange={(e) => {
+                setLabel(e.target.value)
+              }}
+            />
+          </div>
+          <div style={{ width: 150 }}>
+            <Input
+              id={`stage-sort-edit-${stage.id}`}
+              label={t('stages.field.sortOrder')}
+              type="number"
+              value={sortOrder}
+              onChange={(e) => {
+                setSortOrder(e.target.value)
+              }}
+            />
+          </div>
+        </div>
+        <div className="row g2">
+          <Button
+            size="sm"
+            onClick={() => {
+              void handleSave()
+            }}
+          >
+            {t('stages.edit.save')}
+          </Button>
+          <Button variant="secondary" size="sm" onClick={onCancel}>
+            {t('common.actions.cancel')}
+          </Button>
+        </div>
+      </form>
+    </div>
   )
 }

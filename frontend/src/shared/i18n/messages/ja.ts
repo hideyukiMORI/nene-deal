@@ -75,6 +75,35 @@ export interface MessageCatalog {
 
   'locale.label': string
 
+  // Calm redesign — shell, nav, hero
+  'nav.board': string
+  'nav.stages': string
+  'nav.users': string
+  'shell.account': string
+  'shell.settingsTitle': string
+  'shell.signout': string
+  'shell.theme': string
+  'shell.themeLight': string
+  'shell.themeDark': string
+  'shell.lang': string
+  'board.heading': string
+  'login.heroEyebrow': string
+  'login.heroTitle': string
+  'login.heroBody': string
+  'login.secure': string
+  'login.kpiActive': string
+  'login.kpiWeighted': string
+  'login.kpiUptime': string
+  'detail.back': string
+  'detail.signed': string
+  'handoff.hint': string
+  'stages.editing': string
+  'users.you': string
+  'users.detail.title': string
+  'users.detail.idLabel': string
+  'users.detail.tap': string
+  'users.delete.label': string
+
   'users.title': string
   'users.subtitle': string
   'users.loading': string
@@ -196,6 +225,37 @@ export const ja: MessageCatalog = {
   'login.validation.passwordRequired': 'パスワードを入力してください。',
 
   'locale.label': '言語',
+
+  // Calm redesign — shell, nav, hero
+  'nav.board': 'パイプライン',
+  'nav.stages': 'ステージ管理',
+  'nav.users': 'ユーザー管理',
+  'shell.account': 'アカウント',
+  'shell.settingsTitle': 'アカウント・設定',
+  'shell.signout': 'サインアウト',
+  'shell.theme': '表示モード',
+  'shell.themeLight': 'ライト',
+  'shell.themeDark': 'ダーク',
+  'shell.lang': '言語',
+  'board.heading': 'パイプライン',
+  'login.heroEyebrow': 'SALES PIPELINE',
+  'login.heroTitle': '日々の商談を、確かな数字で見渡す。',
+  'login.heroBody':
+    '軽量な B2B 商談パイプライン。カンバン管理・売上予測・受注後の請求引き継ぎまでを一気通貫で。',
+  'login.secure': '通信は暗号化され、安全に保護されています',
+  'login.kpiActive': '進行中',
+  'login.kpiWeighted': '加重予測',
+  'login.kpiUptime': '稼働率',
+  'detail.back': 'パイプラインへ戻る',
+  'detail.signed': '署名日',
+  'handoff.hint':
+    '未連携の場合は「Invoice へ送信」ボタンが表示されます（連携後はこの状態に切り替わります）。',
+  'stages.editing': '編集中',
+  'users.you': 'あなた',
+  'users.detail.title': 'ユーザー詳細',
+  'users.detail.idLabel': 'ユーザーID',
+  'users.detail.tap': 'タップで詳細',
+  'users.delete.label': 'このユーザーを削除',
 
   'users.title': 'ユーザー管理',
   'users.subtitle': 'オペレーターアカウントを管理します。',

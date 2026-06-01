@@ -1,21 +1,23 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from '@/shared/i18n'
-import { Stack, Text } from '@/shared/ui'
 
 export function NotFoundPage() {
   const { t } = useTranslation()
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl items-center px-inline-lg py-stack-xl">
-      <Stack gap="sm">
-        <Text as="h1" variant="heading-md">
-          404
-        </Text>
-        <Text muted>{t('common.error.notFound')}</Text>
-        <Link to="/" className="font-sans text-body text-accent hover:text-accent-hover">
-          {t('app.title')}
-        </Link>
-      </Stack>
-    </main>
+    <div className="fs-wrap">
+      <section className="notfound stack g4" style={{ alignContent: 'center' }}>
+        <span className="code">404</span>
+        <h1 className="t-h1">{t('common.error.notFound')}</h1>
+        <p className="muted t-body" style={{ maxWidth: '44ch' }}>
+          {t('common.error.unknown')}
+        </p>
+        <div className="row g3" style={{ justifyContent: 'center', marginTop: 8 }}>
+          <Link className="btn btn-primary" to="/">
+            {t('detail.back')}
+          </Link>
+        </div>
+      </section>
+    </div>
   )
 }
