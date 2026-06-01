@@ -1,7 +1,8 @@
 import type { Deal, InvoiceHandoffResult, UpdateDealInput } from '@/entities/deal'
+import type { PipelineStage } from '@/entities/pipeline-stage'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { formatMoneyJpy } from '@/shared/lib/format-money'
-import { EmptyState } from '@/shared/ui'
+import { EmptyState, Select } from '@/shared/ui'
 import { IconBack, IconCheck, IconInvoice } from '@/shared/ui/icons'
 import type { DealDetailStatus } from '../hooks/use-deal-detail-page'
 import { EditDealForm } from './EditDealForm'
@@ -18,6 +19,9 @@ export interface DealDetailViewProps {
   handoffPending: boolean
   handoffErrorKey: MessageKey | null
   handoffResult: InvoiceHandoffResult | null
+  stages: PipelineStage[]
+  changeStage: (toStageId: string) => Promise<boolean>
+  stagePending: boolean
 }
 
 export function DealDetailView({
@@ -32,6 +36,9 @@ export function DealDetailView({
   handoffPending,
   handoffErrorKey,
   handoffResult,
+  stages,
+  changeStage,
+  stagePending,
 }: DealDetailViewProps) {
   const { t, locale } = useTranslation()
 
@@ -82,6 +89,20 @@ export function DealDetailView({
               </span>
             </div>
             <p className="muted t-cap">{deal.note ?? t('detail.note.empty')}</p>
+            {stages.length > 0 ? (
+              <div style={{ maxWidth: 240 }}>
+                <Select
+                  id="detail-stage"
+                  label={t('deal.field.stage')}
+                  options={stages.map((stage) => ({ value: stage.id, label: stage.label }))}
+                  value={deal.stageId}
+                  disabled={stagePending}
+                  onChange={(event) => {
+                    void changeStage(event.target.value)
+                  }}
+                />
+              </div>
+            ) : null}
           </div>
 
           <EditDealForm

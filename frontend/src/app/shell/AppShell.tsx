@@ -60,7 +60,8 @@ function Brand() {
  * Calm app shell: desktop top nav + a completely separate mobile UI
  * (sticky top bar, bottom tab bar, and an account/settings bottom sheet),
  * switched purely by CSS at the ≤1024px breakpoint. Wraps authenticated routes
- * via <Outlet/>; the board's "add deal" FAB lives in the board feature.
+ * via <Outlet/>. Each screen keeps its own header "Add" button (visible on
+ * mobile too), so creation works on every screen without a FAB.
  */
 export function AppShell() {
   const { t } = useTranslation()

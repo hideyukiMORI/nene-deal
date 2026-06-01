@@ -4,7 +4,7 @@ import type { CreateDealInput } from '@/entities/deal'
 import type { ForecastSummary } from '@/entities/forecast'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { formatMoneyJpy } from '@/shared/lib/format-money'
-import { EmptyState, Select, type SelectOption } from '@/shared/ui'
+import { EmptyState, type SelectOption } from '@/shared/ui'
 import { IconChevron, IconPlus } from '@/shared/ui/icons'
 import type { BoardStatus } from '../hooks/use-kanban-board-page'
 import { CreateDealForm } from './CreateDealForm'
@@ -71,7 +71,6 @@ export function KanbanBoardView({
   submitCreateDeal,
   createPending,
   createErrorKey,
-  moveDeal,
   onOpenDeal,
 }: KanbanBoardViewProps) {
   const { t, locale } = useTranslation()
@@ -167,36 +166,19 @@ export function KanbanBoardView({
             <BoardColumn
               key={column.stageId}
               column={column}
-              stageOptions={stageOptions}
               moneyLocale={locale}
               summaryLabel={t('board.column.summary', {
                 count: column.dealCount,
                 weighted: formatMoneyJpy(column.weightedTotalCents, locale),
               })}
               emptyLabel={t('board.column.empty')}
-              moveLabel={t('deal.field.stage')}
               detailLabel={t('deal.open.detail')}
               wonBadgeLabel={t('stages.badge.won')}
-              onMove={(dealId, toStageRef) => {
-                void moveDeal(dealId, toStageRef)
-              }}
               onOpenDeal={onOpenDeal}
             />
           ))}
         </div>
       ) : null}
-
-      {/* Mobile-only floating action button (CSS shows it ≤1024px). */}
-      <button
-        type="button"
-        className="m-fab"
-        aria-label={t('deal.create.title')}
-        onClick={() => {
-          setFormOpen(true)
-        }}
-      >
-        <IconPlus />
-      </button>
     </section>
   )
 }
@@ -214,27 +196,21 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
 
 interface BoardColumnProps {
   column: KanbanColumn
-  stageOptions: SelectOption[]
   moneyLocale: string
   summaryLabel: string
   emptyLabel: string
-  moveLabel: string
   detailLabel: string
   wonBadgeLabel: string
-  onMove: (dealId: string, toStageRef: string) => void
   onOpenDeal: (dealId: string) => void
 }
 
 function BoardColumn({
   column,
-  stageOptions,
   moneyLocale,
   summaryLabel,
   emptyLabel,
-  moveLabel,
   detailLabel,
   wonBadgeLabel,
-  onMove,
   onOpenDeal,
 }: BoardColumnProps) {
   const isWon = column.stageSlug === 'won'
@@ -278,16 +254,6 @@ function BoardColumn({
                 <IconChevron />
               </button>
             </div>
-            <Select
-              id={`move-${deal.id}`}
-              label={moveLabel}
-              labelHidden
-              options={stageOptions}
-              value={column.stageSlug}
-              onChange={(event) => {
-                onMove(deal.id, event.target.value)
-              }}
-            />
           </article>
         ))
       )}

@@ -47,7 +47,7 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
         </span>
       </div>
 
-      <div className="auth">
+      <div className="auth" style={{ minHeight: '100vh' }}>
         <aside className="auth-brand">
           <div className="grid-deco" />
           <div className="row g3">

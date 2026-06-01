@@ -2,7 +2,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { boardKeys } from '@/entities/board'
 import {
+  dealKeys,
   toDealId,
+  useChangeDealStage,
   useDeal,
   useInvoiceHandoff,
   useUpdateDeal,
@@ -11,6 +13,7 @@ import {
   type UpdateDealInput,
 } from '@/entities/deal'
 import { forecastKeys } from '@/entities/forecast'
+import { useStageList, type PipelineStage } from '@/entities/pipeline-stage'
 import { mapProblemDetailsToMessageKey, type MessageKey } from '@/shared/i18n'
 
 export type DealDetailStatus = 'loading' | 'error' | 'missing' | 'ready'
@@ -26,14 +29,19 @@ export interface DealDetailPage {
   handoffPending: boolean
   handoffErrorKey: MessageKey | null
   handoffResult: InvoiceHandoffResult | null
+  stages: PipelineStage[]
+  changeStage: (toStageId: string) => Promise<boolean>
+  stagePending: boolean
 }
 
 export function useDealDetailPage(dealId: string | undefined): DealDetailPage {
   const queryClient = useQueryClient()
   const id = toDealId(dealId ?? '')
   const dealQuery = useDeal(id)
+  const stagesQuery = useStageList()
   const updateMutation = useUpdateDeal()
   const handoffMutation = useInvoiceHandoff()
+  const changeStageMutation = useChangeDealStage()
 
   const invalidatePipelineViews = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: boardKeys.all })
@@ -51,6 +59,20 @@ export function useDealDetailPage(dealId: string | undefined): DealDetailPage {
       }
     },
     [updateMutation, id, invalidatePipelineViews],
+  )
+
+  const changeStage = useCallback(
+    async (toStageId: string): Promise<boolean> => {
+      try {
+        await changeStageMutation.mutateAsync({ id, toStageRef: toStageId })
+        await queryClient.invalidateQueries({ queryKey: dealKeys.detail(id) })
+        await invalidatePipelineViews()
+        return true
+      } catch {
+        return false
+      }
+    },
+    [changeStageMutation, id, queryClient, invalidatePipelineViews],
   )
 
   const handoff = useCallback(async (): Promise<boolean> => {
@@ -88,5 +110,8 @@ export function useDealDetailPage(dealId: string | undefined): DealDetailPage {
     handoffErrorKey:
       handoffMutation.error !== null ? mapProblemDetailsToMessageKey(handoffMutation.error) : null,
     handoffResult: handoffMutation.data ?? null,
+    stages: stagesQuery.data ?? [],
+    changeStage,
+    stagePending: changeStageMutation.isPending,
   }
 }
