@@ -66,6 +66,7 @@ export interface MessageCatalog {
 
   'login.title': string
   'login.subtitle': string
+  'login.brandTagline': string
   'login.email': string
   'login.password': string
   'login.submit': string
@@ -188,6 +189,7 @@ export const ja: MessageCatalog = {
 
   'login.title': 'ログイン',
   'login.subtitle': 'NeNe Deal にサインインしてください。',
+  'login.brandTagline': '軽量な B2B ディールパイプライン — カンバン・予測・受注引き渡し。',
   'login.email': 'メールアドレス',
   'login.password': 'パスワード',
   'login.submit': 'ログイン',

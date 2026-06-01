@@ -65,6 +65,7 @@ export const en: MessageCatalog = {
 
   'login.title': 'Sign in',
   'login.subtitle': 'Sign in to NeNe Deal.',
+  'login.brandTagline': 'Ultra-light B2B deal pipeline — kanban, forecast, and won-deal handoff.',
   'login.email': 'Email',
   'login.password': 'Password',
   'login.submit': 'Sign in',
