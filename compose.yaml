@@ -4,7 +4,9 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile
     ports:
-      - '${NENE_DEAL_PORT:-8080}:80'
+      # Fixed, family-unique host port (NeNe Deal owns the 81** block).
+      # See AGENTS.md "Local dev ports".
+      - '${NENE_DEAL_PORT:-8110}:80'
     volumes:
       - .:/var/www/html
       - composer-cache:/tmp/composer-cache
@@ -33,7 +35,8 @@ services:
   mysql:
     image: mysql:8.4
     ports:
-      - '${NENE_DEAL_DB_PORT:-3306}:3306'
+      # Fixed, family-unique host port for the in-compose MySQL.
+      - '${NENE_DEAL_DB_PORT:-3310}:3306'
     environment:
       MYSQL_ROOT_PASSWORD: nene_deal_root
       MYSQL_DATABASE: nene_deal
