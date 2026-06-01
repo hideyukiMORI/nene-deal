@@ -12,11 +12,13 @@ final class UpdateDefaultOperatorRoleToAdmin extends AbstractMigration
 {
     public function up(): void
     {
-        $this->execute("UPDATE users SET role = 'admin', updated_at = NOW() WHERE email = 'operator@nene-deal.test'");
+        $now = date('Y-m-d H:i:s');
+        $this->execute("UPDATE users SET role = 'admin', updated_at = '{$now}' WHERE email = 'operator@nene-deal.test'");
     }
 
     public function down(): void
     {
-        $this->execute("UPDATE users SET role = 'operator', updated_at = NOW() WHERE email = 'operator@nene-deal.test'");
+        $now = date('Y-m-d H:i:s');
+        $this->execute("UPDATE users SET role = 'operator', updated_at = '{$now}' WHERE email = 'operator@nene-deal.test'");
     }
 }
