@@ -509,14 +509,15 @@ textarea.input:focus {
   padding: 4px 6px var(--s5);
 }
 .brandmark .logo {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   flex: none;
-  display: grid;
-  place-items: center;
-  border: 1.5px solid var(--accent);
-  border-radius: 7px;
-  color: var(--accent);
+  display: block;
+}
+.brandmark .logo svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 .brandmark .name {
   font-weight: 600;

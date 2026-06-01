@@ -38,6 +38,18 @@ function stageColor(slug: string): string {
   return STAGE_COLORS[slug] ?? 'var(--fg-faint)'
 }
 
+/** Format a `YYYY-MM` forecast month for the board subtitle. */
+function monthLabel(month: string, locale: string): string {
+  const [year, mon] = month.split('-').map(Number)
+  if (year === undefined || mon === undefined || Number.isNaN(year) || Number.isNaN(mon)) {
+    return month
+  }
+  return new Intl.DateTimeFormat(locale === 'ja' ? 'ja-JP' : 'en-US', {
+    year: 'numeric',
+    month: 'long',
+  }).format(new Date(year, mon - 1, 1))
+}
+
 function ProbBar({ value }: { value: number }) {
   return (
     <span className="prob">
@@ -70,7 +82,14 @@ export function KanbanBoardView({
       <div className="row between wrap g4 page-head">
         <div className="stack g1">
           <h1 className="t-h1">{t('board.heading')}</h1>
-          <span className="muted t-cap">{t('app.subtitle')}</span>
+          <span className="muted t-cap">
+            {forecast !== null
+              ? t('board.subtitle', {
+                  month: monthLabel(forecast.month, locale),
+                  count: forecast.openDealCount,
+                })
+              : t('app.subtitle')}
+          </span>
         </div>
         <button
           type="button"
@@ -85,11 +104,7 @@ export function KanbanBoardView({
       </div>
 
       {forecast !== null ? (
-        <section
-          aria-label={t('forecast.title')}
-          className="forecast"
-          style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}
-        >
+        <section aria-label={t('forecast.title')} className="forecast">
           <Stat label={t('forecast.openDealCount')} value={String(forecast.openDealCount)} />
           <Stat
             label={t('forecast.pipelineTotal')}
@@ -99,6 +114,13 @@ export function KanbanBoardView({
             label={t('forecast.weightedTotal')}
             value={formatMoneyJpy(forecast.weightedTotalCents, locale)}
             accent
+          />
+          <Stat
+            label={t('forecast.wonThisMonth')}
+            value={formatMoneyJpy(
+              forecast.byStage.find((bucket) => bucket.slug === 'won')?.totalCents ?? 0,
+              locale,
+            )}
           />
         </section>
       ) : null}

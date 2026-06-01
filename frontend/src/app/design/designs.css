@@ -82,11 +82,13 @@ html[data-design='enterprise'][data-theme='light'] {
   width: 34px;
   height: 34px;
   flex: none;
-  display: grid;
-  place-items: center;
-  border: 1.5px solid var(--accent);
-  border-radius: calc(var(--radius) + 2px);
-  color: var(--accent);
+  display: block;
+}
+.brand-logo svg,
+.m-brand .logo svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 .auth-card {
   border: 1px solid var(--line);
@@ -237,11 +239,8 @@ html[data-design='enterprise'][data-theme='light'] {
 .m-brand .logo {
   width: 28px;
   height: 28px;
-  display: grid;
-  place-items: center;
-  border: 1.5px solid var(--accent);
-  border-radius: 8px;
-  color: var(--accent);
+  display: block;
+  flex: none;
 }
 .m-back {
   display: grid;

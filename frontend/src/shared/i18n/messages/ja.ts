@@ -87,6 +87,8 @@ export interface MessageCatalog {
   'shell.themeDark': string
   'shell.lang': string
   'board.heading': string
+  'board.subtitle': string
+  'forecast.wonThisMonth': string
   'login.heroEyebrow': string
   'login.heroTitle': string
   'login.heroBody': string
@@ -238,6 +240,8 @@ export const ja: MessageCatalog = {
   'shell.themeDark': 'ダーク',
   'shell.lang': '言語',
   'board.heading': 'パイプライン',
+  'board.subtitle': '{{month}} · 全{{count}}件の進行中商談',
+  'forecast.wonThisMonth': '今月の受注',
   'login.heroEyebrow': 'SALES PIPELINE',
   'login.heroTitle': '日々の商談を、確かな数字で見渡す。',
   'login.heroBody':

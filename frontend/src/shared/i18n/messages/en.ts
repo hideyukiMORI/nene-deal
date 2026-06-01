@@ -86,6 +86,8 @@ export const en: MessageCatalog = {
   'shell.themeDark': 'Dark',
   'shell.lang': 'Language',
   'board.heading': 'Pipeline',
+  'board.subtitle': '{{month}} · {{count}} open deals',
+  'forecast.wonThisMonth': 'Won this month',
   'login.heroEyebrow': 'SALES PIPELINE',
   'login.heroTitle': 'See every deal in clear, reliable numbers.',
   'login.heroBody':

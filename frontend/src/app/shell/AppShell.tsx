@@ -119,8 +119,10 @@ export function AppShell() {
           ))}
         </nav>
         <div className="topnav-right">
-          <ThemeToggle />
-          <LangToggle />
+          <span className="hdr-controls">
+            <ThemeToggle />
+            <LangToggle />
+          </span>
           <span className="nav-divider" />
           <span className="account-chip">
             <span className="avatar">{avatarLetter}</span>
