@@ -14,9 +14,9 @@ source-of-truth message catalog.
 
 ```bash
 npm install
-npm run dev          # http://localhost:5173 (API proxied to the PHP app)
+npm run dev          # http://localhost:5187 (API proxied to the PHP app)
 npm run mock         # dev server backed by MSW handlers (no PHP needed)
-npm run storybook    # component catalog on :6006
+npm run storybook    # component catalog on :6106
 npm run codegen      # regenerate src/shared/api/schema.gen.ts from ../docs/openapi/openapi.yaml
 npm run check        # type-check, lint, format, test, knip, build-storybook
 ```

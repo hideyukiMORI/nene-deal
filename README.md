@@ -75,13 +75,17 @@ docker compose build
 docker compose up -d
 docker compose exec app composer install        # first run only
 docker compose exec app composer migrations:migrate
-curl -i http://localhost:8080/health            # {"status":"ok","checks":{"database":"ok"}}
+curl -i http://localhost:8110/health            # {"status":"ok","checks":{"database":"ok"}}
 ```
 
 The stack runs the PHP app (Apache, docroot `public_html/`) against a MySQL 8.4
 service. DB settings are fixed in `compose.yaml` for the in-compose database, so a
 host `.env` used for sqlite `php -S` development does not affect the container.
-Override the host port with `NENE_DEAL_PORT`.
+
+**Local dev ports are fixed and family-unique** (NeNe Deal owns the `81**`
+block): app `8110`, MySQL `3310`, Vite `5187`, Storybook `6106`. Override the
+host ports with `NENE_DEAL_PORT` / `NENE_DEAL_DB_PORT`. See the
+[`AGENTS.md` port table](./AGENTS.md#local-dev-ports) for the full family map.
 
 ### Frontend
 
