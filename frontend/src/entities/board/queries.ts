@@ -7,6 +7,7 @@ import { boardKeys } from './query-keys'
 
 export interface BoardParams {
   includeTerminal: boolean
+  includeDeleted: boolean
 }
 
 export function useBoard(params: BoardParams): UseQueryResult<KanbanBoard, AppError> {
@@ -16,6 +17,9 @@ export function useBoard(params: BoardParams): UseQueryResult<KanbanBoard, AppEr
       const search = new URLSearchParams()
       if (params.includeTerminal) {
         search.set('include_terminal', 'true')
+      }
+      if (params.includeDeleted) {
+        search.set('include_deleted', 'true')
       }
       const query = search.toString()
       const dto = await apiClient.get<KanbanBoardDto>(

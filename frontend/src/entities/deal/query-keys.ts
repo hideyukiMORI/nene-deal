@@ -4,4 +4,5 @@ export const dealKeys = {
   all: ['deals'] as const,
   details: () => [...dealKeys.all, 'detail'] as const,
   detail: (id: DealId) => [...dealKeys.details(), id] as const,
+  activity: (id: DealId) => [...dealKeys.all, 'activity', id] as const,
 }

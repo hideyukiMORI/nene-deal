@@ -5,20 +5,32 @@ declare(strict_types=1);
 namespace NeneDeal\Tests\Support;
 
 use NeneDeal\Deal\Deal;
+use NeneDeal\Deal\DealActivity;
 use NeneDeal\Deal\DealFilter;
 use NeneDeal\Deal\DealNotFoundException;
 use NeneDeal\Deal\DealRepositoryInterface;
-use NeneDeal\Deal\StageHistoryEntry;
 
 final class InMemoryDealRepository implements DealRepositoryInterface
 {
     /** @var array<string, Deal> */
     private array $deals = [];
 
-    /** @var list<StageHistoryEntry> */
-    public array $history = [];
+    /** @var array<string, string> deal id => deleted_at */
+    private array $deleted = [];
+
+    /** @var list<DealActivity> */
+    public array $activity = [];
 
     public function findById(string $id): ?Deal
+    {
+        if (isset($this->deleted[$id])) {
+            return null;
+        }
+
+        return $this->deals[$id] ?? null;
+    }
+
+    public function findByIdIncludingDeleted(string $id): ?Deal
     {
         return $this->deals[$id] ?? null;
     }
@@ -26,9 +38,11 @@ final class InMemoryDealRepository implements DealRepositoryInterface
     /** @return list<Deal> */
     public function findAll(DealFilter $filter, int $limit, int $offset): array
     {
-        $all = array_values($this->deals);
+        $all = array_values(array_filter($this->deals, function (Deal $deal) use ($filter): bool {
+            if (!$filter->includeDeleted && isset($this->deleted[$deal->id])) {
+                return false;
+            }
 
-        $all = array_values(array_filter($all, static function (Deal $deal) use ($filter): bool {
             if ($filter->stageRef !== null && $deal->stageId !== $filter->stageRef && $deal->stageSlug !== $filter->stageRef) {
                 return false;
             }
@@ -56,29 +70,34 @@ final class InMemoryDealRepository implements DealRepositoryInterface
 
     public function update(Deal $deal): void
     {
-        if (!isset($this->deals[$deal->id])) {
+        if (!isset($this->deals[$deal->id]) || isset($this->deleted[$deal->id])) {
             throw new DealNotFoundException($deal->id);
         }
 
         $this->deals[$deal->id] = $deal;
     }
 
-    public function delete(string $id): void
+    public function delete(string $id, ?string $actorUserId = null): void
+    {
+        if (!isset($this->deals[$id]) || isset($this->deleted[$id])) {
+            throw new DealNotFoundException($id);
+        }
+
+        $this->deleted[$id] = date('Y-m-d H:i:s');
+    }
+
+    public function restore(string $id): void
     {
         if (!isset($this->deals[$id])) {
             throw new DealNotFoundException($id);
         }
 
-        unset($this->deals[$id]);
-        $this->history = array_values(array_filter(
-            $this->history,
-            static fn (StageHistoryEntry $entry): bool => $entry->dealId !== $id,
-        ));
+        unset($this->deleted[$id]);
     }
 
     public function markHandedOff(string $id, int $invoiceClientId, int $invoiceQuoteId, string $handoffAt): void
     {
-        $deal = $this->deals[$id] ?? null;
+        $deal = $this->findById($id);
 
         if ($deal === null) {
             throw new DealNotFoundException($id);
@@ -100,20 +119,22 @@ final class InMemoryDealRepository implements DealRepositoryInterface
             stageSlug: $deal->stageSlug,
             createdAt: $deal->createdAt,
             updatedAt: $deal->updatedAt,
+            ownerLabel: $deal->ownerLabel,
         );
     }
 
-    public function appendHistory(StageHistoryEntry $entry): void
+    public function recordActivity(DealActivity $activity): void
     {
-        $this->history[] = $entry;
+        $this->activity[] = $activity;
     }
 
     /** @return list<Deal> */
-    public function findForBoard(?string $ownerUserId): array
+    public function findForBoard(?string $ownerUserId, bool $includeDeleted = false): array
     {
         $all = array_values(array_filter(
-            array_values($this->deals),
-            static fn (Deal $deal): bool => $ownerUserId === null || $deal->ownerUserId === $ownerUserId,
+            $this->deals,
+            fn (Deal $deal): bool => ($includeDeleted || !isset($this->deleted[$deal->id]))
+                && ($ownerUserId === null || $deal->ownerUserId === $ownerUserId),
         ));
 
         usort($all, static fn (Deal $a, Deal $b): int => strcmp($a->id, $b->id));
@@ -125,8 +146,9 @@ final class InMemoryDealRepository implements DealRepositoryInterface
     public function findInMonth(string $startDate, string $endDate): array
     {
         $all = array_values(array_filter(
-            array_values($this->deals),
-            static fn (Deal $deal): bool => $deal->expectedCloseDate !== null
+            $this->deals,
+            fn (Deal $deal): bool => !isset($this->deleted[$deal->id])
+                && $deal->expectedCloseDate !== null
                 && $deal->expectedCloseDate >= $startDate
                 && $deal->expectedCloseDate <= $endDate,
         ));
@@ -136,12 +158,12 @@ final class InMemoryDealRepository implements DealRepositoryInterface
         return $all;
     }
 
-    /** @return list<StageHistoryEntry> */
-    public function findHistory(string $dealId): array
+    /** @return list<DealActivity> */
+    public function findActivity(string $dealId): array
     {
         $entries = array_values(array_filter(
-            $this->history,
-            static fn (StageHistoryEntry $entry): bool => $entry->dealId === $dealId,
+            $this->activity,
+            static fn (DealActivity $entry): bool => $entry->dealId === $dealId,
         ));
 
         return array_reverse($entries);

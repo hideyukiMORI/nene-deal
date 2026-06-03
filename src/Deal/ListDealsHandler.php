@@ -41,6 +41,7 @@ final readonly class ListDealsHandler implements RequestHandlerInterface
             ownerUserId: self::stringParam($params, 'owner_user_id'),
             query: self::stringParam($params, 'q'),
             includeTerminal: self::boolParam($params, 'include_terminal'),
+            includeDeleted: self::boolParam($params, 'include_deleted'),
         );
 
         $page = $this->useCase->execute($filter, $limit, $offset);

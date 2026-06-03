@@ -29,7 +29,7 @@
   --on-accent: oklch(20% 0.04 200);
   /* ステータス */
   --ok: oklch(76% 0.14 155);
-  --ok-weak: color-mix(in oklch, var(--ok) 18%, var(--surface));
+  --ok-weak: color-mix(in srgb, var(--ok) 20%, var(--surface));
   --warn: oklch(80% 0.13 80);
   --danger: oklch(68% 0.17 25);
   --danger-weak: color-mix(in oklch, var(--danger) 16%, var(--surface));
@@ -60,7 +60,7 @@
   --accent-line: color-mix(in srgb, var(--accent) 35%, var(--line));
   --on-accent: oklch(99% 0 0);
   --ok: oklch(52% 0.12 155);
-  --ok-weak: color-mix(in oklch, var(--ok) 12%, var(--surface));
+  --ok-weak: color-mix(in srgb, var(--ok) 14%, var(--surface));
   --warn: oklch(62% 0.13 70);
   --danger: oklch(54% 0.18 25);
   --danger-weak: color-mix(in oklch, var(--danger) 9%, var(--surface));
@@ -89,7 +89,7 @@
   --accent-line: color-mix(in srgb, var(--accent) 45%, var(--line));
   --on-accent: oklch(22% 0.05 200);
   --ok: oklch(78% 0.14 158);
-  --ok-weak: color-mix(in oklch, var(--ok) 18%, var(--surface));
+  --ok-weak: color-mix(in srgb, var(--ok) 20%, var(--surface));
   --warn: oklch(82% 0.13 82);
   --danger: oklch(70% 0.16 25);
   --danger-weak: color-mix(in oklch, var(--danger) 16%, var(--surface));
@@ -601,13 +601,15 @@ textarea.input:focus {
   height: 32px;
   flex: none;
   border-radius: 50%;
-  background: var(--accent-weak);
-  color: var(--accent);
+  /* Neutral so the accent colour stays reserved for meaningful tags
+     (e.g. the "you" badge) and the two don't read as the same chip. */
+  background: var(--surface-2);
+  color: var(--fg-muted);
   display: grid;
   place-items: center;
   font-weight: 600;
   font-size: 13px;
-  border: 1px solid var(--accent-line);
+  border: 1px solid var(--line);
 }
 
 /* main column */
@@ -1049,4 +1051,684 @@ textarea.input:focus {
   .fade-in {
     animation: none;
   }
+}
+
+/* ---------- Kanban column drop zones ---------- */
+.col-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.col-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  border: 2px dashed transparent;
+  border-radius: var(--radius);
+  margin: -3px;
+  padding: 3px;
+  min-height: 52px;
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+.col-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--fg-faint);
+  font-size: 12px;
+  padding: var(--s5) var(--s3);
+}
+/* Hide the "no deals" placeholder as soon as the column holds a card. */
+.col-body:has(.deal) > .col-empty {
+  display: none;
+}
+
+/* Drag grip affordance (appears on hover; hidden on terminal cards) */
+.deal {
+  position: relative;
+  touch-action: none;
+  /* Cards are drag handles, not selectable text — avoids text selection
+     while dragging. */
+  -webkit-user-select: none;
+  user-select: none;
+}
+.deal:hover {
+  cursor: grab;
+}
+.deal:active {
+  cursor: grabbing;
+}
+.deal-grip {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(2, 3px);
+  gap: 3px;
+  opacity: 0;
+  transition: opacity 0.14s ease;
+  pointer-events: none;
+}
+.deal-grip i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--fg-faint);
+}
+.deal:hover .deal-grip {
+  opacity: 0.55;
+}
+.deal[data-won] .deal-grip,
+.deal[data-lost] .deal-grip {
+  display: none;
+}
+
+/* ---------- Drag & drop ---------- */
+.board.is-dragging,
+.board.is-dragging .deal {
+  cursor: grabbing;
+}
+.board.is-dragging .col {
+  transition: opacity 0.16s ease;
+}
+.board.is-dragging .col:not(.drop-ok) {
+  opacity: 0.6;
+}
+.board.is-dragging .col-body {
+  border-color: var(--line-strong);
+}
+.col.drop-ok {
+  opacity: 1 !important;
+}
+.col.drop-ok .col-body {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  box-shadow: 0 0 0 3px var(--accent-weak);
+}
+.board.is-dragging .col-empty {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+/* Dashed placeholder left where the card was picked up */
+.deal.is-ghost {
+  background: var(--sunk);
+  border: 1.5px dashed var(--line-strong);
+  border-left: 1.5px dashed var(--line-strong);
+  box-shadow: none;
+}
+.deal.is-ghost > * {
+  visibility: hidden;
+}
+/* Lifted clone that follows the cursor */
+.deal-drag {
+  position: fixed;
+  left: 0;
+  top: 0;
+  margin: 0;
+  z-index: 600;
+  pointer-events: none;
+  border-color: var(--accent-line);
+  border-left-color: var(--accent);
+  box-shadow: var(--shadow-pop);
+  will-change: transform;
+  animation: deal-lift 0.14s ease;
+}
+.deal-drag .deal-grip {
+  display: none;
+}
+@keyframes deal-lift {
+  from {
+    transform: rotate(0) scale(1);
+  }
+  to {
+    transform: rotate(-1.5deg) scale(1.025);
+  }
+}
+/* Insertion position marker */
+.drop-marker {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-weak);
+  margin: 1px 3px;
+  flex: none;
+  animation: marker-in 0.12s ease;
+}
+@keyframes marker-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .deal-drag,
+  .drop-marker {
+    animation: none;
+  }
+}
+
+/* ---------- Toasts ---------- */
+.toast-host {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 400;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 10px;
+  align-items: center;
+  pointer-events: none;
+}
+.toast {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: var(--shadow-pop);
+  padding: 11px 16px 11px 13px;
+  min-width: 248px;
+  max-width: min(92vw, 380px);
+  font: inherit;
+  text-align: left;
+  pointer-events: auto;
+  cursor: pointer;
+  animation: toast-in 0.26s cubic-bezier(0.16, 0.84, 0.44, 1);
+}
+.toast.leaving {
+  animation: toast-out 0.2s ease forwards;
+}
+.toast-ic {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ok-weak);
+  color: var(--ok);
+  border: 1px solid color-mix(in srgb, var(--ok) 35%, var(--line));
+}
+.toast-ic svg {
+  width: 15px;
+  height: 15px;
+}
+.toast-error .toast-ic {
+  background: var(--danger-weak);
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 35%, var(--line));
+}
+.toast-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.toast-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.toast-sub {
+  font-size: 11.5px;
+  color: var(--fg-faint);
+}
+.toast-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--accent);
+  border-radius: 0 0 var(--radius-lg, 14px) var(--radius-lg, 14px);
+  transform-origin: left;
+  animation: toast-bar 2.6s linear forwards;
+}
+.toast-error .toast-bar {
+  background: var(--danger);
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes toast-bar {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+/* ---------- Owner on cards ---------- */
+.deal-owner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--fg-faint);
+  font-size: 11px;
+  min-width: 0;
+}
+.deal-owner svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+.deal-owner {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Soft-deleted cards ---------- */
+.deal-deleted {
+  opacity: 0.62;
+  border-left-color: var(--line-strong);
+  background: var(--sunk);
+}
+.deal-deleted .amt {
+  text-decoration: line-through;
+  color: var(--fg-muted);
+}
+
+/* ---------- Activity timeline ---------- */
+.activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+.activity-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.activity-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-weak);
+}
+
+/* ============================================================
+   Design spec v3 — filter chips, activity timeline, audit
+   ============================================================ */
+.forecast .stat .delta {
+  font-size: 11.5px;
+}
+
+/* ---------- Stage-filter chips (board) ---------- */
+.board-tools {
+  align-items: center;
+}
+.fchips {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 10px;
+  background: var(--sunk);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+}
+.fchips-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--fg-faint);
+  letter-spacing: 0.02em;
+  padding-right: 2px;
+  white-space: nowrap;
+}
+.fchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  flex: none;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--r-pill);
+  padding: 5px 11px 5px 7px;
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--fg-muted);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s,
+    opacity 0.12s;
+}
+.fchip:hover {
+  border-color: var(--line-strong);
+  color: var(--fg);
+}
+.fchip .stage-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  opacity: 0.4;
+  transition: opacity 0.12s;
+}
+.fchip .fchip-label {
+  line-height: 1;
+}
+.fchip .fchip-count {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--fg-faint);
+  background: var(--surface-2);
+  border-radius: var(--r-pill);
+  padding: 1px 6px;
+  min-width: 18px;
+  text-align: center;
+}
+.fchip .fchip-box {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface);
+  color: transparent;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
+}
+.fchip .fchip-box svg {
+  width: 11px;
+  height: 11px;
+}
+.fchip.on {
+  color: var(--fg);
+  border-color: var(--accent-line);
+  background: var(--accent-weak);
+}
+.fchip.on .stage-dot {
+  opacity: 1;
+}
+.fchip.on .fchip-box {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.fchip.on .fchip-count {
+  color: var(--fg-muted);
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+}
+.fchip-plain .fchip-ic {
+  display: inline-flex;
+  align-items: center;
+  width: 13px;
+  height: 13px;
+  opacity: 0.5;
+  color: var(--fg-muted);
+  transition: opacity 0.12s;
+}
+.fchip-plain.on .fchip-ic {
+  opacity: 1;
+}
+@media (max-width: 560px) {
+  .fchips-label {
+    display: none;
+  }
+  .fchip .fchip-count {
+    display: none;
+  }
+}
+
+/* ---------- Restore link (deleted card) ---------- */
+.restore-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent);
+  transition: color 0.12s;
+}
+.restore-link svg {
+  flex: none;
+}
+.restore-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+/* ---------- Activity timeline (audit log) ---------- */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 2px 0 0;
+  display: flex;
+  flex-direction: column;
+}
+.tl-item {
+  position: relative;
+  display: flex;
+  gap: 14px;
+  padding-bottom: 18px;
+}
+.tl-item:last-child {
+  padding-bottom: 0;
+}
+.tl-rail {
+  position: relative;
+  flex: none;
+  display: flex;
+  justify-content: center;
+  width: 28px;
+}
+.tl-item:not(:last-child) .tl-rail::after {
+  content: '';
+  position: absolute;
+  top: 28px;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  background: var(--line);
+}
+.tl-node {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent-weak);
+  color: var(--accent);
+  border: 1px solid var(--accent-line);
+}
+.tl-node.ok {
+  background: var(--ok-weak);
+  color: var(--ok);
+  border-color: color-mix(in oklch, var(--ok) 35%, var(--line));
+}
+.tl-node.muted {
+  background: var(--surface-2);
+  color: var(--fg-faint);
+  border-color: var(--line-strong);
+}
+.tl-node.danger {
+  background: var(--danger-weak);
+  color: var(--danger);
+  border-color: color-mix(in oklch, var(--danger) 40%, var(--line));
+}
+.tl-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding-top: 4px;
+}
+.tl-title {
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.tl-change {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 3px;
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+.tl-change svg {
+  color: var(--fg-faint);
+}
+.tl-change .from {
+  color: var(--fg-faint);
+  text-decoration: line-through;
+}
+.tl-change .to {
+  color: var(--fg);
+}
+.tl-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--fg-faint);
+}
+.tl-gap .tl-rail::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  background-image: linear-gradient(var(--line-strong) 55%, transparent 0);
+  background-size: 2px 7px;
+  background-repeat: repeat-y;
+}
+.tl-gapnode {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--fg-faint);
+  border: 1px dashed var(--line-strong);
+  transition:
+    color 0.12s,
+    border-color 0.12s,
+    background 0.12s;
+}
+.tl-gapnode svg {
+  width: 14px;
+  height: 14px;
+}
+.tl-gap:hover .tl-gapnode {
+  color: var(--accent);
+  border-color: var(--accent-line);
+  background: var(--accent-weak);
+}
+.tl-gapbtn {
+  align-self: flex-start;
+  margin-top: 3px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+  transition: color 0.12s;
+}
+.tl-gapbtn:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+.tl-gapnote {
+  font-size: 11px;
+  color: var(--fg-faint);
+  margin-top: 1px;
+}
+
+/* ---------- Audit export ---------- */
+.audit-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  border-radius: var(--r-pill);
+  padding: 5px 12px 5px 9px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--fg-muted);
+}
+.audit-chip svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  opacity: 0.8;
+}
+.audit-cols {
+  align-items: center;
+  gap: var(--s4);
+}
+.audit-cols code {
+  color: var(--fg-muted);
+  background: var(--sunk);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+}
+.danger-zone .btn-danger {
+  align-self: flex-start;
 }

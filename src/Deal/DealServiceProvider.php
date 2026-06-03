@@ -46,6 +46,7 @@ final readonly class DealServiceProvider implements ServiceProviderInterface
             ->set(GetDealUseCase::class, static fn (ContainerInterface $c): GetDealUseCase => new GetDealUseCase(self::deals($c)))
             ->set(UpdateDealUseCase::class, static fn (ContainerInterface $c): UpdateDealUseCase => new UpdateDealUseCase(self::deals($c)))
             ->set(DeleteDealUseCase::class, static fn (ContainerInterface $c): DeleteDealUseCase => new DeleteDealUseCase(self::deals($c)))
+            ->set(RestoreDealUseCase::class, static fn (ContainerInterface $c): RestoreDealUseCase => new RestoreDealUseCase(self::deals($c)))
             ->set(ChangeDealStageUseCase::class, static fn (ContainerInterface $c): ChangeDealStageUseCase => new ChangeDealStageUseCase(self::deals($c), self::stages($c)))
             ->set(ListDealHistoryUseCase::class, static fn (ContainerInterface $c): ListDealHistoryUseCase => new ListDealHistoryUseCase(self::deals($c)))
             ->set(
@@ -67,6 +68,10 @@ final readonly class DealServiceProvider implements ServiceProviderInterface
             ->set(
                 DeleteDealHandler::class,
                 static fn (ContainerInterface $c): DeleteDealHandler => new DeleteDealHandler(self::deleteUseCase($c), self::json($c)),
+            )
+            ->set(
+                RestoreDealHandler::class,
+                static fn (ContainerInterface $c): RestoreDealHandler => new RestoreDealHandler(self::restoreUseCase($c), self::json($c)),
             )
             ->set(
                 ChangeDealStageHandler::class,
@@ -94,6 +99,7 @@ final readonly class DealServiceProvider implements ServiceProviderInterface
                     $delete = $c->get(DeleteDealHandler::class);
                     $stageChange = $c->get(ChangeDealStageHandler::class);
                     $history = $c->get(ListDealHistoryHandler::class);
+                    $restore = $c->get(RestoreDealHandler::class);
 
                     if (!$list instanceof ListDealsHandler
                         || !$create instanceof CreateDealHandler
@@ -102,11 +108,12 @@ final readonly class DealServiceProvider implements ServiceProviderInterface
                         || !$delete instanceof DeleteDealHandler
                         || !$stageChange instanceof ChangeDealStageHandler
                         || !$history instanceof ListDealHistoryHandler
+                        || !$restore instanceof RestoreDealHandler
                     ) {
                         throw new LogicException('Deal handler services are invalid.');
                     }
 
-                    return new DealRouteRegistrar($list, $create, $get, $update, $delete, $stageChange, $history);
+                    return new DealRouteRegistrar($list, $create, $get, $update, $delete, $stageChange, $history, $restore);
                 },
             );
     }
@@ -183,6 +190,17 @@ final readonly class DealServiceProvider implements ServiceProviderInterface
 
         if (!$u instanceof DeleteDealUseCase) {
             throw new LogicException('Delete deal use case service is invalid.');
+        }
+
+        return $u;
+    }
+
+    private static function restoreUseCase(ContainerInterface $c): RestoreDealUseCase
+    {
+        $u = $c->get(RestoreDealUseCase::class);
+
+        if (!$u instanceof RestoreDealUseCase) {
+            throw new LogicException('Restore deal use case service is invalid.');
         }
 
         return $u;

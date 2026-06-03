@@ -17,6 +17,7 @@ interface EditDealFormValues {
   amountCents: number
   probabilityPercent: number
   note: string
+  expectedCloseDate: string
 }
 
 export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDealFormProps) {
@@ -34,6 +35,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
       .min(0, t('deal.validation.probabilityRange'))
       .max(100, t('deal.validation.probabilityRange')),
     note: z.string(),
+    expectedCloseDate: z.string(),
   })
 
   const {
@@ -47,6 +49,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
       amountCents: deal.amountCents,
       probabilityPercent: deal.probabilityPercent,
       note: deal.note ?? '',
+      expectedCloseDate: deal.expectedCloseDate ?? '',
     },
   })
 
@@ -56,6 +59,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
       amountCents: values.amountCents,
       probabilityPercent: values.probabilityPercent,
       note: values.note.trim() === '' ? null : values.note,
+      expectedCloseDate: values.expectedCloseDate.trim() === '' ? null : values.expectedCloseDate,
     })
   })
 
@@ -84,22 +88,35 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
           error={errors.accountLabel?.message}
           {...register('accountLabel')}
         />
+        <div className="row g4 wrap">
+          <div className="grow">
+            <Input
+              id="edit-amount"
+              label={t('deal.field.amount')}
+              type="number"
+              min={0}
+              error={errors.amountCents?.message}
+              {...register('amountCents', { valueAsNumber: true })}
+            />
+          </div>
+          <div className="grow">
+            <Input
+              id="edit-probability"
+              label={t('deal.field.probability')}
+              type="number"
+              min={0}
+              max={100}
+              error={errors.probabilityPercent?.message}
+              {...register('probabilityPercent', { valueAsNumber: true })}
+            />
+          </div>
+        </div>
         <Input
-          id="edit-amount"
-          label={t('deal.field.amount')}
-          type="number"
-          min={0}
-          error={errors.amountCents?.message}
-          {...register('amountCents', { valueAsNumber: true })}
-        />
-        <Input
-          id="edit-probability"
-          label={t('deal.field.probability')}
-          type="number"
-          min={0}
-          max={100}
-          error={errors.probabilityPercent?.message}
-          {...register('probabilityPercent', { valueAsNumber: true })}
+          id="edit-expected-close-date"
+          label={t('deal.field.expectedCloseDate')}
+          type="date"
+          error={errors.expectedCloseDate?.message}
+          {...register('expectedCloseDate')}
         />
         <Input id="edit-note" label={t('deal.field.note')} {...register('note')} />
 

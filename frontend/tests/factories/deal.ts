@@ -9,10 +9,12 @@ export function buildDeal(overrides: Partial<Deal> = {}): Deal {
     stageSlug: 'won',
     probabilityPercent: 100,
     expectedCloseDate: null,
+    ownerLabel: null,
     note: null,
     invoiceClientId: null,
     invoiceQuoteId: null,
     handoffAt: null,
+    deletedAt: null,
     ...overrides,
   }
 }

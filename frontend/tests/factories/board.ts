@@ -6,6 +6,8 @@ export function buildKanbanDeal(overrides: Partial<KanbanDeal> = {}): KanbanDeal
     accountLabel: 'Acme Corp',
     amountCents: 150_000_000,
     probabilityPercent: 40,
+    ownerLabel: null,
+    deletedAt: null,
     ...overrides,
   }
 }

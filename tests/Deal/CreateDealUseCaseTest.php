@@ -41,7 +41,7 @@ final class CreateDealUseCaseTest extends TestCase
         self::assertSame('01STAGELEAD0000000000000AA', $deal->stageId);
         self::assertSame(30, $deal->probabilityPercent);
 
-        $history = $this->deals->findHistory($deal->id);
+        $history = $this->deals->findActivity($deal->id);
         self::assertCount(1, $history);
         self::assertNull($history[0]->fromStageId);
         self::assertSame('01STAGELEAD0000000000000AA', $history[0]->toStageId);

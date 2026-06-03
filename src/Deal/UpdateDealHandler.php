@@ -6,6 +6,7 @@ namespace NeneDeal\Deal;
 
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeneDeal\Auth\AuthContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -73,7 +74,7 @@ final readonly class UpdateDealHandler implements RequestHandlerInterface
             ownerUserId: DealField::optionalString($body, 'owner_user_id'),
             hasNote: array_key_exists('note', $body),
             note: DealField::optionalString($body, 'note'),
-        ));
+        ), AuthContext::userId($request));
 
         return $this->json->create(DealResponse::toArray($deal));
     }

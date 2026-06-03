@@ -12,6 +12,8 @@ function mapColumn(dto: BoardColumnDto): KanbanColumn {
       accountLabel: deal.account_label,
       amountCents: deal.amount_cents,
       probabilityPercent: deal.probability_percent,
+      ownerLabel: deal.owner_label ?? null,
+      deletedAt: deal.deleted_at ?? null,
     })),
     dealCount: dto.deal_count,
     totalCents: dto.total_cents,

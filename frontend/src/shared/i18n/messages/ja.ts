@@ -25,11 +25,31 @@ export interface MessageCatalog {
   'board.empty.description': string
   'board.column.summary': string
   'board.column.empty': string
+  'board.show': string
+  'board.showTerminal': string
+  'board.showDeleted': string
+  'board.deletedBadge': string
+  'board.restore': string
+  'board.dragHint': string
+
+  'toast.region': string
+  'toast.dismiss': string
+  'toast.saved.title': string
+  'toast.saved.sub': string
+  'toast.moved.title': string
+  'toast.move.error.title': string
+  'toast.deleted.title': string
+  'toast.delete.error.title': string
+  'toast.restored.title': string
+  'toast.restore.error.title': string
 
   'forecast.title': string
   'forecast.openDealCount': string
   'forecast.pipelineTotal': string
   'forecast.weightedTotal': string
+  'forecast.delta.allStages': string
+  'forecast.delta.weighted': string
+  'forecast.delta.wonCount': string
 
   'deal.create.open': string
   'deal.create.title': string
@@ -39,6 +59,8 @@ export interface MessageCatalog {
   'deal.field.amount': string
   'deal.field.stage': string
   'deal.field.probability': string
+  'deal.field.expectedCloseDate': string
+  'deal.field.owner': string
   'deal.field.note': string
   'deal.validation.accountLabelRequired': string
   'deal.validation.amountPositive': string
@@ -55,6 +77,21 @@ export interface MessageCatalog {
   'detail.edit.title': string
   'detail.edit.error': string
   'detail.note.empty': string
+  'detail.owner.label': string
+  'detail.owner.empty': string
+  'detail.delete.label': string
+  'detail.delete.confirm': string
+  'detail.delete.hint': string
+  'detail.activity.title': string
+  'detail.activity.sub': string
+  'detail.activity.expand': string
+  'detail.activity.empty': string
+  'detail.activity.created': string
+  'detail.activity.updated': string
+  'detail.activity.stageChanged': string
+  'detail.activity.deleted': string
+  'detail.activity.restored': string
+  'detail.activity.handoff': string
 
   'handoff.title': string
   'handoff.description': string
@@ -79,7 +116,38 @@ export interface MessageCatalog {
   'nav.board': string
   'nav.stages': string
   'nav.users': string
+  'nav.audit': string
+  'nav.settings': string
+  'settings.title': string
+  'settings.subtitle': string
+  'settings.forecast.title': string
+  'settings.closingDay.label': string
+  'settings.closingDay.monthEnd': string
+  'settings.closingDay.hint': string
+  'settings.error': string
   'shell.account': string
+
+  'audit.title': string
+  'audit.subtitle': string
+  'audit.adminOnly': string
+  'audit.rangeTitle': string
+  'audit.from': string
+  'audit.to': string
+  'audit.recorded': string
+  'audit.chip.created': string
+  'audit.chip.edited': string
+  'audit.chip.moved': string
+  'audit.chip.deleted': string
+  'audit.chip.restored': string
+  'audit.chip.handoff': string
+  'audit.colsLabel': string
+  'audit.colsVal': string
+  'audit.download': string
+  'audit.downloading': string
+  'audit.invalidRange': string
+  'audit.hint': string
+  'toast.audit.success.title': string
+  'toast.audit.error.title': string
   'shell.settingsTitle': string
   'shell.signout': string
   'shell.theme': string
@@ -178,11 +246,31 @@ export const ja: MessageCatalog = {
   'board.empty.description': 'パイプラインのステージが設定されていません。',
   'board.column.summary': '{{count}} 件 · 加重 {{weighted}}',
   'board.column.empty': 'ディールなし',
+  'board.show': '表示',
+  'board.showTerminal': '受注・失注も表示',
+  'board.showDeleted': '削除済みも表示',
+  'board.deletedBadge': '削除済み',
+  'board.restore': '復元',
+  'board.dragHint': 'ドラッグでステージを移動',
+
+  'toast.region': '通知',
+  'toast.dismiss': '閉じる',
+  'toast.saved.title': '保存しました',
+  'toast.saved.sub': '変更を反映しました',
+  'toast.moved.title': 'ステージを移動しました',
+  'toast.move.error.title': '移動できませんでした',
+  'toast.deleted.title': '削除しました',
+  'toast.delete.error.title': '削除できませんでした',
+  'toast.restored.title': '復元しました',
+  'toast.restore.error.title': '復元できませんでした',
 
   'forecast.title': '今月の着地見込み',
   'forecast.openDealCount': '進行中ディール',
   'forecast.pipelineTotal': 'パイプライン合計',
   'forecast.weightedTotal': '加重見込み',
+  'forecast.delta.allStages': '全ステージ',
+  'forecast.delta.weighted': '確度で按分',
+  'forecast.delta.wonCount': '受注{{count}}件',
 
   'deal.create.open': 'ディールを追加',
   'deal.create.title': '新規ディール',
@@ -192,6 +280,8 @@ export const ja: MessageCatalog = {
   'deal.field.amount': '金額（円）',
   'deal.field.stage': 'ステージ',
   'deal.field.probability': '確度（％）',
+  'deal.field.expectedCloseDate': '完了予定日',
+  'deal.field.owner': '担当者',
   'deal.field.note': 'メモ',
   'deal.validation.accountLabelRequired': '取引先名を入力してください。',
   'deal.validation.amountPositive': '金額は0以上で入力してください。',
@@ -208,6 +298,21 @@ export const ja: MessageCatalog = {
   'detail.edit.title': 'ディールを編集',
   'detail.edit.error': 'ディールを更新できませんでした。',
   'detail.note.empty': '（メモなし）',
+  'detail.owner.label': '担当者',
+  'detail.owner.empty': '担当者なし',
+  'detail.delete.label': 'このディールを削除',
+  'detail.delete.confirm': 'このディールを削除しますか？（あとで復元できます）',
+  'detail.delete.hint': '論理削除です。30日以内であればパイプラインから復元できます。',
+  'detail.activity.title': '変更履歴',
+  'detail.activity.sub': '監査用のアクティビティログ（誰が・いつ・何を）',
+  'detail.activity.expand': '中間の{{count}}件を表示',
+  'detail.activity.empty': '履歴はまだありません',
+  'detail.activity.created': '作成しました',
+  'detail.activity.updated': '内容を変更しました',
+  'detail.activity.stageChanged': 'ステージを移動しました',
+  'detail.activity.deleted': '削除しました',
+  'detail.activity.restored': '復元しました',
+  'detail.activity.handoff': 'Invoice へ引き継ぎました',
 
   'handoff.title': 'NeNe Invoice へ引き渡し',
   'handoff.description': '受注したディールを Invoice に下書きの顧客・見積として送ります。',
@@ -232,6 +337,38 @@ export const ja: MessageCatalog = {
   'nav.board': 'パイプライン',
   'nav.stages': 'ステージ管理',
   'nav.users': 'ユーザー管理',
+  'nav.audit': '監査ログ',
+  'nav.settings': '設定',
+  'settings.title': '設定',
+  'settings.subtitle': '組織のフォーキャスト設定を管理します。',
+  'settings.forecast.title': 'フォーキャスト',
+  'settings.closingDay.label': '締め日（集計期間）',
+  'settings.closingDay.monthEnd': '月末（暦月）',
+  'settings.closingDay.hint':
+    '営業目標の集計期間の締め日です。例: 20 を選ぶと「前月21日〜当月20日」で集計します。請求の締め日（NeNe Invoice 側）とは別物です。',
+  'settings.error': '設定を更新できませんでした。',
+  'audit.title': '監査ログのエクスポート',
+  'audit.subtitle': '期間を指定して、変更履歴をCSVでダウンロードします。',
+  'audit.adminOnly': '管理者のみ',
+  'audit.rangeTitle': '期間を指定',
+  'audit.from': '開始日',
+  'audit.to': '終了日',
+  'audit.recorded': '記録される操作',
+  'audit.chip.created': '商談を作成',
+  'audit.chip.edited': '内容を編集',
+  'audit.chip.moved': 'ステージを移動',
+  'audit.chip.deleted': '削除済み',
+  'audit.chip.restored': '復元',
+  'audit.chip.handoff': 'Invoice へ引き継ぎ',
+  'audit.colsLabel': 'CSV の列',
+  'audit.colsVal': 'timestamp, actor, action, deal_id, field, before, after',
+  'audit.download': 'CSVをダウンロード',
+  'audit.downloading': '生成中…',
+  'audit.invalidRange': '開始日は終了日より前にしてください。',
+  'audit.hint':
+    '作成・編集・ステージ移動・削除・復元・引き継ぎを、実行者と日時付きで記録しています。',
+  'toast.audit.success.title': 'CSVをダウンロードしました',
+  'toast.audit.error.title': 'エクスポートに失敗しました',
   'shell.account': 'アカウント',
   'shell.settingsTitle': 'アカウント・設定',
   'shell.signout': 'サインアウト',

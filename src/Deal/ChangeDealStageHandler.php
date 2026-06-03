@@ -6,6 +6,7 @@ namespace NeneDeal\Deal;
 
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeneDeal\Auth\AuthContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -37,7 +38,7 @@ final readonly class ChangeDealStageHandler implements RequestHandlerInterface
             return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, '"to_stage_id" is required.');
         }
 
-        $deal = $this->useCase->execute(DealField::pathId($request), $toStageRef);
+        $deal = $this->useCase->execute(DealField::pathId($request), $toStageRef, AuthContext::userId($request));
 
         return $this->json->create(DealResponse::toArray($deal));
     }

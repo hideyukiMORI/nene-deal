@@ -1,10 +1,11 @@
-import type { Deal, InvoiceHandoffResult, UpdateDealInput } from '@/entities/deal'
+import type { Deal, DealActivity, InvoiceHandoffResult, UpdateDealInput } from '@/entities/deal'
 import type { PipelineStage } from '@/entities/pipeline-stage'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { formatMoneyJpy } from '@/shared/lib/format-money'
-import { EmptyState, Select } from '@/shared/ui'
-import { IconBack, IconCheck, IconInvoice } from '@/shared/ui/icons'
+import { EmptyState, Select, useToast } from '@/shared/ui'
+import { IconBack, IconCheck, IconInvoice, IconOwner, IconTrash } from '@/shared/ui/icons'
 import type { DealDetailStatus } from '../hooks/use-deal-detail-page'
+import { ActivityTimeline } from './ActivityTimeline'
 import { EditDealForm } from './EditDealForm'
 
 export interface DealDetailViewProps {
@@ -12,6 +13,7 @@ export interface DealDetailViewProps {
   errorMessageKey: MessageKey | null
   deal: Deal | null
   onBack: () => void
+  onDeleted: () => void
   submitEdit: (input: UpdateDealInput) => Promise<boolean>
   editPending: boolean
   editErrorKey: MessageKey | null
@@ -22,6 +24,9 @@ export interface DealDetailViewProps {
   stages: PipelineStage[]
   changeStage: (toStageId: string) => Promise<boolean>
   stagePending: boolean
+  deleteDeal: () => Promise<boolean>
+  deletePending: boolean
+  activity: DealActivity[]
 }
 
 export function DealDetailView({
@@ -29,6 +34,7 @@ export function DealDetailView({
   errorMessageKey,
   deal,
   onBack,
+  onDeleted,
   submitEdit,
   editPending,
   editErrorKey,
@@ -39,8 +45,12 @@ export function DealDetailView({
   stages,
   changeStage,
   stagePending,
+  deleteDeal,
+  deletePending,
+  activity,
 }: DealDetailViewProps) {
   const { t, locale } = useTranslation()
+  const toast = useToast()
 
   return (
     <section className="content content-narrow stack g6">
@@ -87,6 +97,16 @@ export function DealDetailView({
                 {t('deal.field.probability')}{' '}
                 <span className="num">{deal.probabilityPercent}%</span>
               </span>
+              <span className="row g1">
+                <IconOwner />
+                <span className="num">{deal.ownerLabel ?? t('detail.owner.empty')}</span>
+              </span>
+              {deal.expectedCloseDate !== null ? (
+                <span>
+                  {t('deal.field.expectedCloseDate')}{' '}
+                  <span className="num">{deal.expectedCloseDate}</span>
+                </span>
+              ) : null}
             </div>
             <p className="muted t-cap">{deal.note ?? t('detail.note.empty')}</p>
             {stages.length > 0 ? (
@@ -98,7 +118,11 @@ export function DealDetailView({
                   value={deal.stageId}
                   disabled={stagePending}
                   onChange={(event) => {
-                    void changeStage(event.target.value)
+                    const toStageId = event.target.value
+                    const stageLabel = stages.find((stage) => stage.id === toStageId)?.label
+                    void changeStage(toStageId).then((ok) => {
+                      if (ok) toast.success(t('toast.moved.title'), stageLabel)
+                    })
                   }}
                 />
               </div>
@@ -109,7 +133,11 @@ export function DealDetailView({
             deal={deal}
             pending={editPending}
             errorMessage={editErrorKey !== null ? t(editErrorKey) : null}
-            onSubmit={submitEdit}
+            onSubmit={async (input) => {
+              const ok = await submitEdit(input)
+              if (ok) toast.success(t('toast.saved.title'), t('toast.saved.sub'))
+              return ok
+            }}
           />
 
           <HandoffSection
@@ -119,6 +147,31 @@ export function DealDetailView({
             handoffErrorMessage={handoffErrorKey !== null ? t(handoffErrorKey) : null}
             handoffResult={handoffResult}
           />
+
+          <ActivityTimeline activity={activity} stages={stages} locale={locale} />
+
+          <div className="stack g2 danger-zone">
+            <button
+              type="button"
+              className="btn btn-danger"
+              disabled={deletePending}
+              onClick={() => {
+                if (!window.confirm(t('detail.delete.confirm'))) return
+                void deleteDeal().then((ok) => {
+                  if (ok) {
+                    toast.success(t('toast.deleted.title'), deal.accountLabel)
+                    onDeleted()
+                  } else {
+                    toast.error(t('toast.delete.error.title'))
+                  }
+                })
+              }}
+            >
+              <IconTrash />
+              {t('detail.delete.label')}
+            </button>
+            <span className="faint t-tiny">{t('detail.delete.hint')}</span>
+          </div>
         </>
       ) : null}
     </section>

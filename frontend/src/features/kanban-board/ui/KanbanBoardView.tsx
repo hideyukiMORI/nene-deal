@@ -4,8 +4,9 @@ import type { CreateDealInput } from '@/entities/deal'
 import type { ForecastSummary } from '@/entities/forecast'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { formatMoneyJpy } from '@/shared/lib/format-money'
-import { EmptyState, type SelectOption } from '@/shared/ui'
-import { IconChevron, IconPlus } from '@/shared/ui/icons'
+import { EmptyState, useToast, type SelectOption } from '@/shared/ui'
+import { IconAccount, IconBack, IconCheck, IconChevron, IconEye, IconPlus } from '@/shared/ui/icons'
+import { useKanbanDnd } from '../hooks/use-kanban-dnd'
 import type { BoardStatus } from '../hooks/use-kanban-board-page'
 import { CreateDealForm } from './CreateDealForm'
 
@@ -15,11 +16,16 @@ export interface KanbanBoardViewProps {
   columns: KanbanColumn[]
   forecast: ForecastSummary | null
   stageOptions: SelectOption[]
+  includeTerminal: boolean
+  toggleTerminal: () => void
+  includeDeleted: boolean
+  toggleDeleted: () => void
   retry: () => void
   submitCreateDeal: (input: CreateDealInput) => Promise<boolean>
   createPending: boolean
   createErrorKey: MessageKey | null
   moveDeal: (dealId: string, toStageRef: string) => Promise<void>
+  restoreDeal: (dealId: string) => Promise<void>
   onOpenDeal: (dealId: string) => void
   onOpenUsers?: () => void
   onOpenStages?: () => void
@@ -67,14 +73,49 @@ export function KanbanBoardView({
   columns,
   forecast,
   stageOptions,
+  includeTerminal,
+  toggleTerminal,
+  includeDeleted,
+  toggleDeleted,
   retry,
   submitCreateDeal,
   createPending,
   createErrorKey,
+  moveDeal,
+  restoreDeal,
   onOpenDeal,
 }: KanbanBoardViewProps) {
   const { t, locale } = useTranslation()
+  const toast = useToast()
   const [formOpen, setFormOpen] = useState(false)
+
+  const handleRestore = (dealId: string, accountLabel: string): void => {
+    void (async () => {
+      try {
+        await restoreDeal(dealId)
+        toast.success(t('toast.restored.title'), accountLabel)
+      } catch {
+        toast.error(t('toast.restore.error.title'))
+      }
+    })()
+  }
+
+  const handleMove = (dealId: string, _fromStageSlug: string, toStageSlug: string): void => {
+    const deal = columns.flatMap((column) => column.deals).find((d) => d.id === dealId)
+    const toColumn = columns.find((column) => column.stageSlug === toStageSlug)
+    const stageLabel = toColumn?.stageLabel ?? toStageSlug
+    const accountLabel = deal?.accountLabel ?? ''
+    void (async () => {
+      try {
+        await moveDeal(dealId, toStageSlug)
+        toast.success(t('toast.moved.title'), `${accountLabel}  →  ${stageLabel}`)
+      } catch {
+        toast.error(t('toast.move.error.title'))
+      }
+    })()
+  }
+
+  const { boardRef, onPointerDown } = useKanbanDnd(handleMove)
 
   return (
     <section className="content stack g6">
@@ -90,16 +131,48 @@ export function KanbanBoardView({
               : t('app.subtitle')}
           </span>
         </div>
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={() => {
-            setFormOpen((open) => !open)
-          }}
-        >
-          <IconPlus />
-          {t('deal.create.open')}
-        </button>
+        <div className="row g4 wrap board-tools">
+          <div className="fchips">
+            <span className="fchips-label">{t('board.show')}</span>
+            <button
+              type="button"
+              className={`fchip${includeTerminal ? ' on' : ''}`}
+              role="checkbox"
+              aria-checked={includeTerminal}
+              onClick={toggleTerminal}
+            >
+              <span className="fchip-box">
+                <IconCheck />
+              </span>
+              <span className="fchip-label">{t('board.showTerminal')}</span>
+            </button>
+            <button
+              type="button"
+              className={`fchip fchip-plain${includeDeleted ? ' on' : ''}`}
+              role="checkbox"
+              aria-checked={includeDeleted}
+              onClick={toggleDeleted}
+            >
+              <span className="fchip-box">
+                <IconCheck />
+              </span>
+              <span className="fchip-ic">
+                <IconEye />
+              </span>
+              <span className="fchip-label">{t('board.showDeleted')}</span>
+            </button>
+          </div>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => {
+              setFormOpen((open) => !open)
+            }}
+          >
+            <IconPlus />
+            {t('deal.create.open')}
+          </button>
+        </div>
       </div>
 
       {forecast !== null ? (
@@ -108,11 +181,14 @@ export function KanbanBoardView({
           <Stat
             label={t('forecast.pipelineTotal')}
             value={formatMoneyJpy(forecast.pipelineTotalCents, locale)}
+            delta={t('forecast.delta.allStages')}
           />
           <Stat
             label={t('forecast.weightedTotal')}
             value={formatMoneyJpy(forecast.weightedTotalCents, locale)}
             accent
+            delta={t('forecast.delta.weighted')}
+            deltaOk
           />
           <Stat
             label={t('forecast.wonThisMonth')}
@@ -120,6 +196,9 @@ export function KanbanBoardView({
               forecast.byStage.find((bucket) => bucket.slug === 'won')?.totalCents ?? 0,
               locale,
             )}
+            delta={t('forecast.delta.wonCount', {
+              count: forecast.byStage.find((bucket) => bucket.slug === 'won')?.dealCount ?? 0,
+            })}
           />
         </section>
       ) : null}
@@ -161,7 +240,7 @@ export function KanbanBoardView({
       ) : null}
 
       {status === 'ready' && columns.length > 0 ? (
-        <div className="board">
+        <div className="board" ref={boardRef} onPointerDown={onPointerDown}>
           {columns.map((column) => (
             <BoardColumn
               key={column.stageId}
@@ -174,7 +253,11 @@ export function KanbanBoardView({
               emptyLabel={t('board.column.empty')}
               detailLabel={t('deal.open.detail')}
               wonBadgeLabel={t('stages.badge.won')}
+              deletedBadgeLabel={t('board.deletedBadge')}
+              restoreLabel={t('board.restore')}
+              dragHint={t('board.dragHint')}
               onOpenDeal={onOpenDeal}
+              onRestore={handleRestore}
             />
           ))}
         </div>
@@ -183,13 +266,28 @@ export function KanbanBoardView({
   )
 }
 
-function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function Stat({
+  label,
+  value,
+  accent,
+  delta,
+  deltaOk,
+}: {
+  label: string
+  value: string
+  accent?: boolean
+  delta?: string
+  deltaOk?: boolean
+}) {
   return (
     <div className="stat">
       <span className="label">{label}</span>
       <span className="val" style={accent === true ? { color: 'var(--accent)' } : undefined}>
         {value}
       </span>
+      {delta !== undefined ? (
+        <span className={`delta ${deltaOk === true ? 'ok' : 'muted'}`}>{delta}</span>
+      ) : null}
     </div>
   )
 }
@@ -201,7 +299,11 @@ interface BoardColumnProps {
   emptyLabel: string
   detailLabel: string
   wonBadgeLabel: string
+  deletedBadgeLabel: string
+  restoreLabel: string
+  dragHint: string
   onOpenDeal: (dealId: string) => void
+  onRestore: (dealId: string, accountLabel: string) => void
 }
 
 function BoardColumn({
@@ -211,52 +313,113 @@ function BoardColumn({
   emptyLabel,
   detailLabel,
   wonBadgeLabel,
+  deletedBadgeLabel,
+  restoreLabel,
+  dragHint,
   onOpenDeal,
+  onRestore,
 }: BoardColumnProps) {
   const isWon = column.stageSlug === 'won'
-  return (
-    <section className="col" aria-label={column.stageLabel}>
-      <div className="col-head">
-        <h2 className="col-name">
-          <span className="stage-dot" style={{ background: stageColor(column.stageSlug) }} />
-          {column.stageLabel}
-        </h2>
-        <span className="count">{column.dealCount}</span>
-      </div>
-      <span className="col-meta">{summaryLabel}</span>
+  const isLost = column.stageSlug === 'lost'
 
-      {column.deals.length === 0 ? (
-        <span className="col-meta">{emptyLabel}</span>
-      ) : (
-        column.deals.map((deal) => (
-          <article key={deal.id} className="deal">
-            <div className="row between g2">
-              <span className="acct">{deal.accountLabel}</span>
-              {isWon ? (
-                <span className="badge badge-ok">
-                  <span className="dot" />
-                  {wonBadgeLabel}
+  return (
+    <section className="col" data-stage={column.stageSlug} aria-label={column.stageLabel}>
+      <div className="col-header">
+        <div className="col-head">
+          <h2 className="col-name">
+            <span className="stage-dot" style={{ background: stageColor(column.stageSlug) }} />
+            {column.stageLabel}
+          </h2>
+          <span className="count">{column.dealCount}</span>
+        </div>
+        <span className="col-meta">{summaryLabel}</span>
+      </div>
+
+      <div className="col-body">
+        {column.deals.map((deal) => {
+          const isDeleted = Boolean(deal.deletedAt)
+
+          return (
+            <article
+              key={deal.id}
+              className={`deal${isDeleted ? ' deal-deleted' : ''}`}
+              // Deleted cards carry no data-deal, so drag & drop skips them.
+              data-deal={isDeleted ? undefined : deal.id}
+              data-won={isWon ? '1' : undefined}
+              data-lost={isLost ? '1' : undefined}
+              title={isDeleted ? undefined : dragHint}
+            >
+              {isDeleted ? null : (
+                <span className="deal-grip" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              )}
+              <div className="row between g2">
+                <span className="acct">{deal.accountLabel}</span>
+                {isDeleted ? (
+                  <span className="badge badge-muted">{deletedBadgeLabel}</span>
+                ) : isWon ? (
+                  <span className="badge badge-ok">
+                    <span className="dot" />
+                    {wonBadgeLabel}
+                  </span>
+                ) : null}
+              </div>
+              <span className="amt">{formatMoneyJpy(deal.amountCents, moneyLocale)}</span>
+              {deal.ownerLabel !== null ? (
+                <span className="deal-owner faint t-tiny">
+                  <IconAccount />
+                  {deal.ownerLabel}
                 </span>
               ) : null}
-            </div>
-            <span className="amt">{formatMoneyJpy(deal.amountCents, moneyLocale)}</span>
-            <div className="deal-foot">
-              <ProbBar value={deal.probabilityPercent} />
-              <button
-                type="button"
-                className="details-link row g1 faint t-tiny"
-                style={{ border: 'none', background: 'none', cursor: 'pointer', font: 'inherit' }}
-                onClick={() => {
-                  onOpenDeal(deal.id)
-                }}
-              >
-                {detailLabel}
-                <IconChevron />
-              </button>
-            </div>
-          </article>
-        ))
-      )}
+              <div className="deal-foot">
+                <ProbBar value={deal.probabilityPercent} />
+                {isDeleted ? (
+                  <button
+                    type="button"
+                    className="details-link row g1 faint t-tiny"
+                    style={{
+                      border: 'none',
+                      background: 'none',
+                      cursor: 'pointer',
+                      font: 'inherit',
+                    }}
+                    onClick={() => {
+                      onRestore(deal.id, deal.accountLabel)
+                    }}
+                  >
+                    <IconBack />
+                    {restoreLabel}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="details-link row g1 faint t-tiny"
+                    style={{
+                      border: 'none',
+                      background: 'none',
+                      cursor: 'pointer',
+                      font: 'inherit',
+                    }}
+                    onClick={() => {
+                      onOpenDeal(deal.id)
+                    }}
+                  >
+                    {detailLabel}
+                    <IconChevron />
+                  </button>
+                )}
+              </div>
+            </article>
+          )
+        })}
+        <div className="col-empty">{emptyLabel}</div>
+      </div>
     </section>
   )
 }

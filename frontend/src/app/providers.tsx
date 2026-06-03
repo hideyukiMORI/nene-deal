@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
 import { AppError } from '@/shared/api/client'
 import { I18nProvider } from '@/shared/i18n'
+import { Toaster } from '@/shared/ui'
 import { RootErrorBoundary } from './root-error-boundary'
 
 function createAppQueryClient(): QueryClient {
@@ -27,6 +28,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
     <I18nProvider>
       <QueryClientProvider client={queryClient}>
         <RootErrorBoundary>{children}</RootErrorBoundary>
+        <Toaster />
       </QueryClientProvider>
     </I18nProvider>
   )

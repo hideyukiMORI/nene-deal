@@ -11,6 +11,7 @@ function baseProps(overrides: Partial<DealDetailViewProps> = {}): DealDetailView
     errorMessageKey: null,
     deal: buildDeal(),
     onBack: vi.fn(),
+    onDeleted: vi.fn(),
     submitEdit: () => Promise.resolve(true),
     editPending: false,
     editErrorKey: null,
@@ -21,6 +22,9 @@ function baseProps(overrides: Partial<DealDetailViewProps> = {}): DealDetailView
     stages: [],
     changeStage: () => Promise.resolve(true),
     stagePending: false,
+    deleteDeal: () => Promise.resolve(true),
+    deletePending: false,
+    activity: [],
     ...overrides,
   }
 }

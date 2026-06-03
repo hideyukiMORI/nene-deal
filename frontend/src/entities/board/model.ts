@@ -3,6 +3,8 @@ export interface KanbanDeal {
   accountLabel: string
   amountCents: number
   probabilityPercent: number
+  ownerLabel: string | null
+  deletedAt: string | null
 }
 
 export interface KanbanColumn {

@@ -38,7 +38,7 @@ final class ChangeDealStageUseCaseTest extends TestCase
 
         self::assertSame('01STAGEPROP0000000000000AA', $moved->stageId);
 
-        $history = $this->deals->findHistory($deal->id);
+        $history = $this->deals->findActivity($deal->id);
         self::assertCount(2, $history);
         // newest first: the move from lead -> proposal
         self::assertSame('01STAGELEAD0000000000000AA', $history[0]->fromStageId);
@@ -55,7 +55,7 @@ final class ChangeDealStageUseCaseTest extends TestCase
 
         self::assertSame('01STAGELEAD0000000000000AA', $unchanged->stageId);
         // Only the initial creation entry; no move entry added
-        self::assertCount(1, $this->deals->findHistory($deal->id));
+        self::assertCount(1, $this->deals->findActivity($deal->id));
     }
 
     public function test_actor_user_id_recorded_in_history(): void
@@ -66,7 +66,7 @@ final class ChangeDealStageUseCaseTest extends TestCase
         $useCase = new ChangeDealStageUseCase($this->deals, $this->stages);
         $useCase->execute($deal->id, 'proposal', '01ACTOR00000000000000000AA');
 
-        $history = $this->deals->findHistory($deal->id);
+        $history = $this->deals->findActivity($deal->id);
         self::assertSame('01ACTOR00000000000000000AA', $history[0]->actorUserId);
     }
 

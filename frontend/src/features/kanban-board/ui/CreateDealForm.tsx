@@ -18,6 +18,7 @@ interface CreateDealFormValues {
   amountCents: number
   stageRef: string
   probabilityPercent: number
+  expectedCloseDate: string
 }
 
 export function CreateDealForm({
@@ -41,6 +42,7 @@ export function CreateDealForm({
       .int(t('deal.validation.probabilityRange'))
       .min(0, t('deal.validation.probabilityRange'))
       .max(100, t('deal.validation.probabilityRange')),
+    expectedCloseDate: z.string(),
   })
 
   const {
@@ -55,11 +57,18 @@ export function CreateDealForm({
       amountCents: 0,
       stageRef: stageOptions[0]?.value ?? '',
       probabilityPercent: 50,
+      expectedCloseDate: '',
     },
   })
 
   const submit = handleSubmit(async (values) => {
-    const created = await onSubmit(values)
+    const created = await onSubmit({
+      accountLabel: values.accountLabel,
+      amountCents: values.amountCents,
+      stageRef: values.stageRef,
+      probabilityPercent: values.probabilityPercent,
+      expectedCloseDate: values.expectedCloseDate.trim() === '' ? null : values.expectedCloseDate,
+    })
     if (created) {
       reset()
     }
@@ -90,14 +99,29 @@ export function CreateDealForm({
           error={errors.accountLabel?.message}
           {...register('accountLabel')}
         />
-        <Input
-          id="deal-amount"
-          label={t('deal.field.amount')}
-          type="number"
-          min={0}
-          error={errors.amountCents?.message}
-          {...register('amountCents', { valueAsNumber: true })}
-        />
+        <div className="row g4 wrap">
+          <div className="grow">
+            <Input
+              id="deal-amount"
+              label={t('deal.field.amount')}
+              type="number"
+              min={0}
+              error={errors.amountCents?.message}
+              {...register('amountCents', { valueAsNumber: true })}
+            />
+          </div>
+          <div className="grow">
+            <Input
+              id="deal-probability"
+              label={t('deal.field.probability')}
+              type="number"
+              min={0}
+              max={100}
+              error={errors.probabilityPercent?.message}
+              {...register('probabilityPercent', { valueAsNumber: true })}
+            />
+          </div>
+        </div>
         <Select
           id="deal-stage"
           label={t('deal.field.stage')}
@@ -106,13 +130,11 @@ export function CreateDealForm({
           {...register('stageRef')}
         />
         <Input
-          id="deal-probability"
-          label={t('deal.field.probability')}
-          type="number"
-          min={0}
-          max={100}
-          error={errors.probabilityPercent?.message}
-          {...register('probabilityPercent', { valueAsNumber: true })}
+          id="deal-expected-close-date"
+          label={t('deal.field.expectedCloseDate')}
+          type="date"
+          error={errors.expectedCloseDate?.message}
+          {...register('expectedCloseDate')}
         />
 
         <Stack direction="horizontal" gap="sm">

@@ -23,12 +23,14 @@ final class DealResponse
             'probability_percent' => $deal->probabilityPercent,
             'expected_close_date' => $deal->expectedCloseDate,
             'owner_user_id' => $deal->ownerUserId,
+            'owner_label' => $deal->ownerLabel,
             'note' => $deal->note,
             'invoice_client_id' => $deal->invoiceClientId,
             'invoice_quote_id' => $deal->invoiceQuoteId,
             'handoff_at' => $deal->handoffAt,
             'created_at' => $deal->createdAt,
             'updated_at' => $deal->updatedAt,
+            'deleted_at' => $deal->deletedAt,
         ];
     }
 }

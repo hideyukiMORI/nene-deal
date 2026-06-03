@@ -11,6 +11,8 @@ export interface BoardDealDto {
   amount_cents: number
   stage_slug?: string | null
   probability_percent: number
+  owner_label?: string | null
+  deleted_at?: string | null
 }
 
 export interface BoardColumnDto {

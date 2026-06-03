@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace NeneDeal\Handoff;
 
+use NeneDeal\Deal\DealActivity;
 use NeneDeal\Deal\DealNotFoundException;
 use NeneDeal\Deal\DealRepositoryInterface;
 use NeneDeal\Pipeline\PipelineStageRepositoryInterface;
+use Symfony\Component\Uid\Ulid;
 
 /**
  * Orchestrates the operator-confirmed won-deal handoff to NeNe Invoice:
@@ -62,6 +64,14 @@ final readonly class InvoiceHandoffUseCase
 
         $handoffAt = date('Y-m-d H:i:s');
         $this->deals->markHandedOff($dealId, $clientId, $quoteId, $handoffAt);
+
+        $this->deals->recordActivity(new DealActivity(
+            id: (string) new Ulid(),
+            dealId: $dealId,
+            action: 'handoff',
+            actorUserId: $actorUserId,
+            changes: ['invoice_client_id' => ['from' => null, 'to' => $clientId], 'invoice_quote_id' => ['from' => null, 'to' => $quoteId]],
+        ));
 
         return new InvoiceHandoffResult($dealId, $clientId, $quoteId, $handoffAt, $actorUserId);
     }

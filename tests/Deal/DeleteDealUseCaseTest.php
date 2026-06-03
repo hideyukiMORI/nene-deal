@@ -7,7 +7,6 @@ namespace NeneDeal\Tests\Deal;
 use NeneDeal\Deal\Deal;
 use NeneDeal\Deal\DealNotFoundException;
 use NeneDeal\Deal\DeleteDealUseCase;
-use NeneDeal\Deal\StageHistoryEntry;
 use NeneDeal\Tests\Support\InMemoryDealRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -22,24 +21,29 @@ final class DeleteDealUseCaseTest extends TestCase
         $this->useCase = new DeleteDealUseCase($this->deals);
     }
 
-    public function test_removes_deal_from_repository(): void
-    {
-        $this->deals->save(new Deal('01DEALAAAAAAAAAAAAAAAAAAAAA', 'Acme', 1000, '01STAGE000000000000000000A', 50));
-
-        $this->useCase->execute('01DEALAAAAAAAAAAAAAAAAAAAAA');
-
-        self::assertNull($this->deals->findById('01DEALAAAAAAAAAAAAAAAAAAAAA'));
-    }
-
-    public function test_cascades_stage_history_on_delete(): void
+    public function test_soft_deletes_so_the_deal_is_recoverable(): void
     {
         $id = '01DEALAAAAAAAAAAAAAAAAAAAAA';
         $this->deals->save(new Deal($id, 'Acme', 1000, '01STAGE000000000000000000A', 50));
-        $this->deals->appendHistory(new StageHistoryEntry('01HISTENTRY0000000000000000', $id, null, '01STAGE000000000000000000A'));
 
         $this->useCase->execute($id);
 
-        self::assertCount(0, $this->deals->findHistory($id));
+        // Hidden from normal reads, but retained so it can be restored.
+        self::assertNull($this->deals->findById($id));
+        self::assertNotNull($this->deals->findByIdIncludingDeleted($id));
+    }
+
+    public function test_records_a_deleted_activity_entry_with_actor(): void
+    {
+        $id = '01DEALAAAAAAAAAAAAAAAAAAAAA';
+        $this->deals->save(new Deal($id, 'Acme', 1000, '01STAGE000000000000000000A', 50));
+
+        $this->useCase->execute($id, '01ACTOR00000000000000000AA');
+
+        $activity = $this->deals->findActivity($id);
+        self::assertCount(1, $activity);
+        self::assertSame('deleted', $activity[0]->action);
+        self::assertSame('01ACTOR00000000000000000AA', $activity[0]->actorUserId);
     }
 
     public function test_throws_for_unknown_id(): void

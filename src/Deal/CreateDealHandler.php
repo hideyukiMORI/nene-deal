@@ -6,6 +6,7 @@ namespace NeneDeal\Deal;
 
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeneDeal\Auth\AuthContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -62,7 +63,7 @@ final readonly class CreateDealHandler implements RequestHandlerInterface
             expectedCloseDate: DealField::optionalString($body, 'expected_close_date'),
             ownerUserId: DealField::optionalString($body, 'owner_user_id'),
             note: DealField::optionalString($body, 'note'),
-        ));
+        ), AuthContext::userId($request));
 
         return $this->json->create(DealResponse::toArray($deal), 201);
     }

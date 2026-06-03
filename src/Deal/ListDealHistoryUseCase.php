@@ -12,15 +12,17 @@ final readonly class ListDealHistoryUseCase
     }
 
     /**
-     * @return list<StageHistoryEntry>
+     * @return list<DealActivity>
      * @throws DealNotFoundException
      */
     public function execute(string $dealId): array
     {
-        if ($this->deals->findById($dealId) === null) {
+        // Include soft-deleted deals so their trail (and the delete itself)
+        // stays visible.
+        if ($this->deals->findByIdIncludingDeleted($dealId) === null) {
             throw new DealNotFoundException($dealId);
         }
 
-        return $this->deals->findHistory($dealId);
+        return $this->deals->findActivity($dealId);
     }
 }
