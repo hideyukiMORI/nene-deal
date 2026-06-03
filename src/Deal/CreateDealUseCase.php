@@ -17,7 +17,7 @@ final readonly class CreateDealUseCase
     }
 
     /** @throws UnknownStageException */
-    public function execute(CreateDealInput $input): Deal
+    public function execute(CreateDealInput $input, ?string $actorUserId = null): Deal
     {
         $stage = $this->stages->findByIdOrSlug($input->stageRef);
 
@@ -27,6 +27,9 @@ final readonly class CreateDealUseCase
 
         $id = (string) new Ulid();
 
+        // Default the owner to the creator so every deal has a visible owner.
+        $ownerUserId = $input->ownerUserId ?? $actorUserId;
+
         $this->deals->save(new Deal(
             id: $id,
             accountLabel: $input->accountLabel,
@@ -34,16 +37,17 @@ final readonly class CreateDealUseCase
             stageId: $stage->id,
             probabilityPercent: $input->probabilityPercent,
             expectedCloseDate: $input->expectedCloseDate,
-            ownerUserId: $input->ownerUserId,
+            ownerUserId: $ownerUserId,
             note: $input->note,
         ));
 
-        $this->deals->appendHistory(new StageHistoryEntry(
+        $this->deals->recordActivity(new DealActivity(
             id: (string) new Ulid(),
             dealId: $id,
+            action: 'created',
             fromStageId: null,
             toStageId: $stage->id,
-            actorUserId: $input->ownerUserId,
+            actorUserId: $actorUserId,
         ));
 
         $created = $this->deals->findById($id);

@@ -15,6 +15,8 @@ final class ForecastResponse
     {
         return [
             'month' => $summary->month,
+            'period_start' => $summary->periodStart,
+            'period_end' => $summary->periodEnd,
             'open_deal_count' => $summary->openDealCount,
             'pipeline_total_cents' => $summary->pipelineTotalCents,
             'weighted_total_cents' => $summary->weightedTotalCents,

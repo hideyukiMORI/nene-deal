@@ -12,6 +12,8 @@ final readonly class ForecastSummary
     /** @param list<ForecastStageBucket> $byStage */
     public function __construct(
         public string $month,
+        public string $periodStart,
+        public string $periodEnd,
         public int $openDealCount,
         public int $pipelineTotalCents,
         public int $weightedTotalCents,

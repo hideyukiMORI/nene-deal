@@ -5,6 +5,8 @@ describe('forecast mapper', () => {
   it('maps the forecast summary and stage buckets', () => {
     const summary = mapForecastDtoToModel({
       month: '2026-06',
+      period_start: '2026-06-01',
+      period_end: '2026-06-30',
       open_deal_count: 2,
       pipeline_total_cents: 300_000_000,
       weighted_total_cents: 100_000_000,

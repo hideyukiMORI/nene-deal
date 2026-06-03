@@ -25,11 +25,13 @@ use Nene2\Http\ResponseEmitter;
 use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Routing\Router;
 use NeneDeal\ApplicationServiceProvider;
+use NeneDeal\Audit\AuditServiceProvider;
 use NeneDeal\Auth\AuthServiceProvider;
 use NeneDeal\Deal\DealServiceProvider;
 use NeneDeal\Forecast\ForecastServiceProvider;
 use NeneDeal\Handoff\HandoffServiceProvider;
 use NeneDeal\Pipeline\PipelineServiceProvider;
+use NeneDeal\Settings\SettingsServiceProvider;
 use NeneDeal\Tenancy\CurrentOrganization;
 use NeneDeal\Tenancy\HolderCurrentOrganization;
 use NeneDeal\Tenancy\OrganizationResolver;
@@ -65,6 +67,8 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
         $builder->addProvider(new HandoffServiceProvider());
         $builder->addProvider(new UserServiceProvider());
         $builder->addProvider(new AuthServiceProvider());
+        $builder->addProvider(new AuditServiceProvider());
+        $builder->addProvider(new SettingsServiceProvider());
 
         $builder
             ->set(Psr17Factory::class, static fn (ContainerInterface $container): Psr17Factory => new Psr17Factory())

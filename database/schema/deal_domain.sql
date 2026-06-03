@@ -5,6 +5,7 @@ CREATE TABLE organizations (
     id TEXT PRIMARY KEY NOT NULL,
     slug TEXT NOT NULL,
     name TEXT NOT NULL,
+    forecast_closing_day INTEGER DEFAULT NULL,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
@@ -50,16 +51,21 @@ CREATE TABLE deals (
     invoice_quote_id INTEGER DEFAULT NULL,
     handoff_at TEXT DEFAULT NULL,
     created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
+    updated_at TEXT NOT NULL,
+    deleted_at TEXT DEFAULT NULL,
+    deleted_by TEXT DEFAULT NULL
 );
 CREATE INDEX idx_deals_org_stage ON deals (organization_id, stage_id);
 CREATE INDEX idx_deals_org_close_date ON deals (organization_id, expected_close_date);
+CREATE INDEX idx_deals_org_deleted ON deals (organization_id, deleted_at);
 
 CREATE TABLE deal_stage_history (
     id TEXT PRIMARY KEY NOT NULL,
     deal_id TEXT NOT NULL,
     from_stage_id TEXT DEFAULT NULL,
-    to_stage_id TEXT NOT NULL,
+    to_stage_id TEXT DEFAULT NULL,
+    action TEXT NOT NULL DEFAULT 'stage_changed',
+    changes TEXT DEFAULT NULL,
     actor_user_id TEXT DEFAULT NULL,
     created_at TEXT NOT NULL,
     FOREIGN KEY (deal_id) REFERENCES deals (id) ON DELETE CASCADE

@@ -29,6 +29,10 @@ final readonly class Deal
         public ?string $stageSlug = null,
         public ?string $createdAt = null,
         public ?string $updatedAt = null,
+        /** Read-only display label (owner's email), populated on reads. */
+        public ?string $ownerLabel = null,
+        /** Set when the deal is soft-deleted; null while active. */
+        public ?string $deletedAt = null,
     ) {
     }
 }

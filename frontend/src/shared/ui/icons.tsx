@@ -172,3 +172,81 @@ export function IconAccount(props: IconProps) {
     </svg>
   )
 }
+
+export function IconOwner(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width="12" height="12" strokeWidth={1.9} {...base} {...props}>
+      <circle cx="12" cy="8" r="3.4" />
+      <path d="M5.5 20a6.5 6.5 0 0 1 13 0" />
+    </svg>
+  )
+}
+
+export function IconPencil(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width="12" height="12" strokeWidth={1.9} {...base} {...props}>
+      <path d="M4 20h4L19 9l-4-4L4 16z" />
+      <path d="M14 6l4 4" />
+    </svg>
+  )
+}
+
+export function IconArrowRight(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width="12" height="12" strokeWidth={2.1} {...base} {...props}>
+      <path d="M5 12h13M13 6l6 6-6 6" />
+    </svg>
+  )
+}
+
+export function IconTrash(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" strokeWidth={1.8} {...base} {...props}>
+      <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6.5 7l.8 12a1 1 0 0 0 1 .94h7.4a1 1 0 0 0 1-.94l.8-12" />
+    </svg>
+  )
+}
+
+export function IconRestore(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width="13" height="13" strokeWidth={2} {...base} {...props}>
+      <path d="M4.5 11a7.5 7.5 0 1 1 1.6 5.3" />
+      <path d="M4.5 5v6h6" />
+    </svg>
+  )
+}
+
+export function IconDownload(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width="15" height="15" strokeWidth={1.9} {...base} {...props}>
+      <path d="M12 4v10M8 11l4 4 4-4" />
+      <path d="M5 18.5h14" />
+    </svg>
+  )
+}
+
+export function IconEye(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width="13" height="13" strokeWidth={1.8} {...base} {...props}>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+      <circle cx="12" cy="12" r="2.6" />
+    </svg>
+  )
+}
+
+export function IconSettings(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" strokeWidth={1.7} {...base} {...props}>
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M19.4 13.5a1 1 0 0 0 .2 1.1l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a2 2 0 1 1-4 0v-.1a1 1 0 0 0-.7-.9 1 1 0 0 0-1.1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4a2 2 0 1 1 0-4h.1a1 1 0 0 0 .9-.7 1 1 0 0 0-.2-1.1l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1 1 0 0 0 1.1.2H9a1 1 0 0 0 .6-.9V4a2 2 0 1 1 4 0v.1a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1 1 0 0 0-.2 1.1V9a1 1 0 0 0 .9.6H20a2 2 0 1 1 0 4h-.1a1 1 0 0 0-.9.6z" />
+    </svg>
+  )
+}
+
+export function IconMore(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width="14" height="14" strokeWidth={2.2} {...base} {...props}>
+      <path d="M6 12h.01M12 12h.01M18 12h.01" />
+    </svg>
+  )
+}

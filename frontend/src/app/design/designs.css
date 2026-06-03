@@ -1113,3 +1113,41 @@ html[data-design='calm'] .signout-btn {
     display: none;
   }
 }
+
+/* Mobile account-sheet link (e.g. Settings) — design spec v4 */
+.m-sheet-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--sunk);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg);
+  padding: 13px 14px;
+  border-radius: var(--radius);
+  text-align: left;
+}
+.m-sheet-link > span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.m-sheet-link svg:first-child {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  opacity: 0.8;
+}
+.m-sheet-link svg:last-child {
+  flex: none;
+  color: var(--fg-faint);
+}
+.m-sheet-link:hover {
+  background: var(--surface-2);
+}
+.m-sheet-link:active {
+  transform: translateY(1px);
+}

@@ -6,9 +6,12 @@ import {
   toDealId,
   useChangeDealStage,
   useDeal,
+  useDealActivity,
+  useDeleteDeal,
   useInvoiceHandoff,
   useUpdateDeal,
   type Deal,
+  type DealActivity,
   type InvoiceHandoffResult,
   type UpdateDealInput,
 } from '@/entities/deal'
@@ -32,6 +35,9 @@ export interface DealDetailPage {
   stages: PipelineStage[]
   changeStage: (toStageId: string) => Promise<boolean>
   stagePending: boolean
+  deleteDeal: () => Promise<boolean>
+  deletePending: boolean
+  activity: DealActivity[]
 }
 
 export function useDealDetailPage(dealId: string | undefined): DealDetailPage {
@@ -42,11 +48,16 @@ export function useDealDetailPage(dealId: string | undefined): DealDetailPage {
   const updateMutation = useUpdateDeal()
   const handoffMutation = useInvoiceHandoff()
   const changeStageMutation = useChangeDealStage()
+  const deleteMutation = useDeleteDeal()
+  const activityQuery = useDealActivity(id)
 
   const invalidatePipelineViews = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: boardKeys.all })
     await queryClient.invalidateQueries({ queryKey: forecastKeys.all })
-  }, [queryClient])
+    // The detail and its audit trail change with every write.
+    await queryClient.invalidateQueries({ queryKey: dealKeys.detail(id) })
+    await queryClient.invalidateQueries({ queryKey: dealKeys.activity(id) })
+  }, [queryClient, id])
 
   const submitEdit = useCallback(
     async (input: UpdateDealInput): Promise<boolean> => {
@@ -65,14 +76,13 @@ export function useDealDetailPage(dealId: string | undefined): DealDetailPage {
     async (toStageId: string): Promise<boolean> => {
       try {
         await changeStageMutation.mutateAsync({ id, toStageRef: toStageId })
-        await queryClient.invalidateQueries({ queryKey: dealKeys.detail(id) })
         await invalidatePipelineViews()
         return true
       } catch {
         return false
       }
     },
-    [changeStageMutation, id, queryClient, invalidatePipelineViews],
+    [changeStageMutation, id, invalidatePipelineViews],
   )
 
   const handoff = useCallback(async (): Promise<boolean> => {
@@ -84,6 +94,16 @@ export function useDealDetailPage(dealId: string | undefined): DealDetailPage {
       return false
     }
   }, [handoffMutation, id, invalidatePipelineViews])
+
+  const deleteDeal = useCallback(async (): Promise<boolean> => {
+    try {
+      await deleteMutation.mutateAsync(id)
+      await invalidatePipelineViews()
+      return true
+    } catch {
+      return false
+    }
+  }, [deleteMutation, id, invalidatePipelineViews])
 
   let status: DealDetailStatus
   if (dealId === undefined || dealId === '') {
@@ -113,5 +133,8 @@ export function useDealDetailPage(dealId: string | undefined): DealDetailPage {
     stages: stagesQuery.data ?? [],
     changeStage,
     stagePending: changeStageMutation.isPending,
+    deleteDeal,
+    deletePending: deleteMutation.isPending,
+    activity: activityQuery.data ?? [],
   }
 }

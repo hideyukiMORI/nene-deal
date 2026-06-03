@@ -54,9 +54,10 @@ final readonly class ChangeDealStageUseCase
                 handoffAt: $deal->handoffAt,
             ));
 
-            $this->deals->appendHistory(new StageHistoryEntry(
+            $this->deals->recordActivity(new DealActivity(
                 id: (string) new Ulid(),
                 dealId: $deal->id,
+                action: 'stage_changed',
                 fromStageId: $fromStageId,
                 toStageId: $stage->id,
                 actorUserId: $actorUserId,

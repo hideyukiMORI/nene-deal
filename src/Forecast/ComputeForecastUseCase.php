@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace NeneDeal\Forecast;
 
-use DateTimeImmutable;
-use LogicException;
 use NeneDeal\Deal\Deal;
 use NeneDeal\Deal\DealRepositoryInterface;
 use NeneDeal\Pipeline\PipelineStage;
@@ -24,17 +22,15 @@ final readonly class ComputeForecastUseCase
     ) {
     }
 
-    /** @param string $month `YYYY-MM` (assumed already validated by the caller). */
-    public function execute(string $month): ForecastSummary
+    /**
+     * @param string $month `YYYY-MM` (assumed already validated by the caller).
+     * @param ?int $closingDay Organization closing day (1–28); null = calendar month.
+     */
+    public function execute(string $month, ?int $closingDay = null): ForecastSummary
     {
-        $startDate = DateTimeImmutable::createFromFormat('!Y-m-d', $month . '-01');
-
-        if ($startDate === false) {
-            throw new LogicException('Invalid month passed to forecast computation.');
-        }
-
-        $start = $startDate->format('Y-m-d');
-        $end = $startDate->modify('last day of this month')->format('Y-m-d');
+        $period = ForecastPeriod::forMonth($month, $closingDay);
+        $start = $period->start;
+        $end = $period->end;
 
         /** @var array<string, PipelineStage> $stageById */
         $stageById = [];
@@ -51,12 +47,21 @@ final readonly class ComputeForecastUseCase
         foreach ($this->deals->findInMonth($start, $end) as $deal) {
             $stage = $stageById[$deal->stageId] ?? null;
 
-            // Skip deals in terminal stages (won/lost) and orphaned stage refs.
-            if ($stage === null || $stage->isTerminal) {
+            // Skip orphaned stage refs.
+            if ($stage === null) {
                 continue;
             }
 
+            // Every in-month deal contributes to the per-stage breakdown so
+            // terminal stages (e.g. won) expose their landed total to the UI.
             $byStage[$deal->stageId][] = $deal;
+
+            // Open pipeline metrics exclude terminal stages (won/lost): those
+            // are no longer forecastable, they have already landed.
+            if ($stage->isTerminal) {
+                continue;
+            }
+
             $openCount++;
             $pipelineTotal += $deal->amountCents;
             $weightedTotal += intdiv($deal->amountCents * $deal->probabilityPercent, 100);
@@ -88,6 +93,8 @@ final readonly class ComputeForecastUseCase
 
         return new ForecastSummary(
             month: $month,
+            periodStart: $start,
+            periodEnd: $end,
             openDealCount: $openCount,
             pipelineTotalCents: $pipelineTotal,
             weightedTotalCents: $weightedTotal,

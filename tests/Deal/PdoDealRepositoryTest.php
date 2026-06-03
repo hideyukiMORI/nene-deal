@@ -8,9 +8,9 @@ use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
 use NeneDeal\Deal\Deal;
+use NeneDeal\Deal\DealActivity;
 use NeneDeal\Deal\DealFilter;
 use NeneDeal\Deal\PdoDealRepository;
-use NeneDeal\Deal\StageHistoryEntry;
 use NeneDeal\Tenancy\FixedOrganization;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
@@ -106,19 +106,23 @@ final class PdoDealRepositoryTest extends TestCase
         self::assertNotNull($this->repository->findById($id));
     }
 
-    public function test_history_cascades_on_delete(): void
+    public function test_delete_is_soft_and_keeps_the_activity_trail(): void
     {
         $id = (string) new Ulid();
         $this->repository->save(new Deal($id, 'Acme', 1000, $this->leadStageId, 10));
-        $this->repository->appendHistory(new StageHistoryEntry((string) new Ulid(), $id, null, $this->leadStageId));
+        $this->repository->recordActivity(new DealActivity((string) new Ulid(), $id, 'created', null, $this->leadStageId));
 
-        self::assertCount(1, $this->repository->findHistory($id));
+        self::assertCount(1, $this->repository->findActivity($id));
 
-        $this->repository->delete($id);
+        $this->repository->delete($id, '01ACTOR00000000000000000AA');
 
-        $row = $this->query->fetchOne('SELECT COUNT(*) AS cnt FROM deal_stage_history WHERE deal_id = ?', [$id]);
-        self::assertNotNull($row);
-        self::assertSame(0, (int) $row['cnt']);
+        // Hidden from normal reads but recoverable, and the trail is preserved.
+        self::assertNull($this->repository->findById($id));
+        self::assertNotNull($this->repository->findByIdIncludingDeleted($id));
+        self::assertCount(1, $this->repository->findActivity($id));
+
+        $this->repository->restore($id);
+        self::assertNotNull($this->repository->findById($id));
     }
 
     public function test_find_by_id_returns_null_for_unknown(): void
@@ -201,10 +205,10 @@ final class PdoDealRepositoryTest extends TestCase
     {
         $id = (string) new Ulid();
         $this->repository->save(new Deal($id, 'Acme', 1000, $this->leadStageId, 10));
-        $this->repository->appendHistory(new StageHistoryEntry((string) new Ulid(), $id, null, $this->leadStageId, createdAt: '2026-01-01 00:00:00'));
-        $this->repository->appendHistory(new StageHistoryEntry((string) new Ulid(), $id, $this->leadStageId, $this->wonStageId, createdAt: '2026-06-01 00:00:00'));
+        $this->repository->recordActivity(new DealActivity((string) new Ulid(), $id, 'created', null, $this->leadStageId, createdAt: '2026-01-01 00:00:00'));
+        $this->repository->recordActivity(new DealActivity((string) new Ulid(), $id, 'stage_changed', $this->leadStageId, $this->wonStageId, createdAt: '2026-06-01 00:00:00'));
 
-        $history = $this->repository->findHistory($id);
+        $history = $this->repository->findActivity($id);
         self::assertCount(2, $history);
         self::assertSame($this->wonStageId, $history[0]->toStageId);
         self::assertSame($this->leadStageId, $history[1]->toStageId);

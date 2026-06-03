@@ -11,6 +11,7 @@ use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeneDeal\Deal\DealRepositoryInterface;
 use NeneDeal\Pipeline\PipelineStageRepositoryInterface;
+use NeneDeal\Settings\OrganizationSettingsRepositoryInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -43,11 +44,16 @@ final readonly class ForecastServiceProvider implements ServiceProviderInterface
                 GetForecastHandler::class,
                 static function (ContainerInterface $c): GetForecastHandler {
                     $useCase = $c->get(ComputeForecastUseCase::class);
+                    $settings = $c->get(OrganizationSettingsRepositoryInterface::class);
                     $json = $c->get(JsonResponseFactory::class);
                     $problem = $c->get(ProblemDetailsResponseFactory::class);
 
                     if (!$useCase instanceof ComputeForecastUseCase) {
                         throw new LogicException('Compute forecast use case service is invalid.');
+                    }
+
+                    if (!$settings instanceof OrganizationSettingsRepositoryInterface) {
+                        throw new LogicException('Organization settings repository service is invalid.');
                     }
 
                     if (!$json instanceof JsonResponseFactory) {
@@ -58,7 +64,7 @@ final readonly class ForecastServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Problem details response factory service is invalid.');
                     }
 
-                    return new GetForecastHandler($useCase, $json, $problem);
+                    return new GetForecastHandler($useCase, $settings, $json, $problem);
                 },
             )
             ->set(

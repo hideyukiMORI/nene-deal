@@ -12,6 +12,9 @@ export function DealDetailPage() {
       onBack={() => {
         void navigate('/')
       }}
+      onDeleted={() => {
+        void navigate('/')
+      }}
     />
   )
 }

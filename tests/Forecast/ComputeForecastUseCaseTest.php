@@ -16,7 +16,7 @@ final class ComputeForecastUseCaseTest extends TestCase
     private const LEAD = '01STAGELEAD0000000000000AA';
     private const WON = '01STAGEWON00000000000000AA';
 
-    public function test_aggregates_open_in_month_deals_excluding_terminal_and_out_of_range(): void
+    public function test_open_totals_exclude_terminal_but_breakdown_includes_won(): void
     {
         $deals = new InMemoryDealRepository();
         $deals->save(new Deal('01DEALA0000000000000000000', 'Acme', 100_000, self::LEAD, 50, expectedCloseDate: '2026-06-10'));
@@ -31,14 +31,18 @@ final class ComputeForecastUseCaseTest extends TestCase
         $summary = (new ComputeForecastUseCase($stages, $deals))->execute('2026-06');
 
         self::assertSame('2026-06', $summary->month);
+        // Open metrics exclude the terminal (won) deal and the out-of-range one.
         self::assertSame(1, $summary->openDealCount);
         self::assertSame(100_000, $summary->pipelineTotalCents);
         self::assertSame(50_000, $summary->weightedTotalCents);
 
-        self::assertCount(1, $summary->byStage);
-        self::assertSame('lead', $summary->byStage[0]->slug);
-        self::assertSame(1, $summary->byStage[0]->dealCount);
-        self::assertSame(50_000, $summary->byStage[0]->weightedTotalCents);
+        // The per-stage breakdown surfaces both the open lead and the won total.
+        $bySlug = array_column($summary->byStage, null, 'slug');
+        self::assertArrayHasKey('lead', $bySlug);
+        self::assertArrayHasKey('won', $bySlug);
+        self::assertSame(1, $bySlug['lead']->dealCount);
+        self::assertSame(50_000, $bySlug['lead']->weightedTotalCents);
+        self::assertSame(900_000, $bySlug['won']->totalCents);
     }
 
     public function test_deal_without_expected_close_date_is_excluded(): void

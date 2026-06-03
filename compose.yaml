@@ -28,6 +28,9 @@ services:
       # Won → Invoice handoff (optional passthrough; leave empty to disable).
       NENE_DEAL_INVOICE_BASE_URL: ${NENE_DEAL_INVOICE_BASE_URL:-}
       NENE_DEAL_INVOICE_BEARER_TOKEN: ${NENE_DEAL_INVOICE_BEARER_TOKEN:-}
+      # Recycle bin: soft-deleted deals stay recoverable this many days, then
+      # `php tools/purge-trash.php` (run from cron) permanently removes them.
+      NENE_DEAL_TRASH_RETENTION_DAYS: ${NENE_DEAL_TRASH_RETENTION_DAYS:-30}
     depends_on:
       mysql:
         condition: service_healthy

@@ -19,11 +19,11 @@ final readonly class BuildBoardUseCase
     ) {
     }
 
-    public function execute(?string $ownerUserId, bool $includeTerminal): KanbanBoard
+    public function execute(?string $ownerUserId, bool $includeTerminal, bool $includeDeleted = false): KanbanBoard
     {
         /** @var array<string, list<Deal>> $byStage */
         $byStage = [];
-        foreach ($this->deals->findForBoard($ownerUserId) as $deal) {
+        foreach ($this->deals->findForBoard($ownerUserId, $includeDeleted) as $deal) {
             $byStage[$deal->stageId][] = $deal;
         }
 

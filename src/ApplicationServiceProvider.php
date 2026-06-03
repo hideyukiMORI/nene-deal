@@ -7,6 +7,7 @@ namespace NeneDeal;
 use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use NeneDeal\Audit\AuditRouteRegistrar;
 use NeneDeal\Auth\AuthRouteRegistrar;
 use NeneDeal\Auth\InvalidCredentialsExceptionHandler;
 use NeneDeal\Deal\DealNotFoundExceptionHandler;
@@ -22,6 +23,7 @@ use NeneDeal\Pipeline\SlugAlreadyTakenExceptionHandler;
 use NeneDeal\Pipeline\StageDeletionForbiddenExceptionHandler;
 use NeneDeal\Pipeline\StageHasDealsExceptionHandler;
 use NeneDeal\Pipeline\StageNotFoundExceptionHandler;
+use NeneDeal\Settings\SettingsRouteRegistrar;
 use NeneDeal\User\CannotModifySelfExceptionHandler;
 use NeneDeal\User\EmailAlreadyTakenExceptionHandler;
 use NeneDeal\User\UserNotFoundExceptionHandler;
@@ -50,6 +52,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $handoff = $container->get(InvoiceHandoffRouteRegistrar::class);
                     $auth = $container->get(AuthRouteRegistrar::class);
                     $users = $container->get(UserRouteRegistrar::class);
+                    $audit = $container->get(AuditRouteRegistrar::class);
+                    $settings = $container->get(SettingsRouteRegistrar::class);
 
                     if (!$stages instanceof PipelineStageRouteRegistrar
                         || !$deals instanceof DealRouteRegistrar
@@ -57,11 +61,13 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$handoff instanceof InvoiceHandoffRouteRegistrar
                         || !$auth instanceof AuthRouteRegistrar
                         || !$users instanceof UserRouteRegistrar
+                        || !$audit instanceof AuditRouteRegistrar
+                        || !$settings instanceof SettingsRouteRegistrar
                     ) {
                         throw new LogicException('Route registrar services are invalid.');
                     }
 
-                    return [$stages, $deals, $forecast, $handoff, $auth, $users];
+                    return [$stages, $deals, $forecast, $handoff, $auth, $users, $audit, $settings];
                 },
             )
             ->set(

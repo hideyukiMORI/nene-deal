@@ -28,10 +28,12 @@ describe('deal mapper', () => {
       stageSlug: 'lead',
       probabilityPercent: 40,
       expectedCloseDate: null,
+      ownerLabel: null,
       note: 'first deal',
       invoiceClientId: null,
       invoiceQuoteId: null,
       handoffAt: null,
+      deletedAt: null,
     })
   })
 

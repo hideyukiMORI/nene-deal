@@ -10,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * `GET /deals/{dealId}/history` — stage-change history, newest first.
+ * `GET /deals/{dealId}/history` — full activity trail, newest first.
  */
 final readonly class ListDealHistoryHandler implements RequestHandlerInterface
 {
@@ -25,7 +25,7 @@ final readonly class ListDealHistoryHandler implements RequestHandlerInterface
         $entries = $this->useCase->execute(DealField::pathId($request));
 
         $data = array_map(
-            static fn (StageHistoryEntry $entry): array => StageHistoryResponse::toArray($entry),
+            static fn (DealActivity $entry): array => DealActivityResponse::toArray($entry),
             $entries,
         );
 

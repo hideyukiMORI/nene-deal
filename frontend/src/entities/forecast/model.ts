@@ -8,6 +8,8 @@ export interface ForecastBucket {
 
 export interface ForecastSummary {
   month: string
+  periodStart: string
+  periodEnd: string
   openDealCount: number
   pipelineTotalCents: number
   weightedTotalCents: number

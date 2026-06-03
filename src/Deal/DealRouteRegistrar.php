@@ -9,7 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Registers deal routes (CRUD + stage move + history).
+ * Registers deal routes (CRUD + stage move + restore + activity history).
  */
 final readonly class DealRouteRegistrar
 {
@@ -21,6 +21,7 @@ final readonly class DealRouteRegistrar
         private DeleteDealHandler $deleteHandler,
         private ChangeDealStageHandler $stageChangeHandler,
         private ListDealHistoryHandler $historyHandler,
+        private RestoreDealHandler $restoreHandler,
     ) {
     }
 
@@ -33,6 +34,7 @@ final readonly class DealRouteRegistrar
         $delete = $this->deleteHandler;
         $stageChange = $this->stageChangeHandler;
         $history = $this->historyHandler;
+        $restore = $this->restoreHandler;
 
         $router->get('/api/v1/deals', static fn (ServerRequestInterface $r): ResponseInterface => $list->handle($r));
         $router->post('/api/v1/deals', static fn (ServerRequestInterface $r): ResponseInterface => $create->handle($r));
@@ -40,6 +42,7 @@ final readonly class DealRouteRegistrar
         $router->patch('/api/v1/deals/{dealId}', static fn (ServerRequestInterface $r): ResponseInterface => $update->handle($r));
         $router->delete('/api/v1/deals/{dealId}', static fn (ServerRequestInterface $r): ResponseInterface => $delete->handle($r));
         $router->post('/api/v1/deals/{dealId}/stage-change', static fn (ServerRequestInterface $r): ResponseInterface => $stageChange->handle($r));
+        $router->post('/api/v1/deals/{dealId}/restore', static fn (ServerRequestInterface $r): ResponseInterface => $restore->handle($r));
         $router->get('/api/v1/deals/{dealId}/history', static fn (ServerRequestInterface $r): ResponseInterface => $history->handle($r));
     }
 }

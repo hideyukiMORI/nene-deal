@@ -64,6 +64,26 @@ export function useUpdateDeal(): UseMutationResult<Deal, AppError, UpdateDealVar
   })
 }
 
+export function useDeleteDeal(): UseMutationResult<void, AppError, DealId> {
+  return useMutation({
+    mutationFn: async (id) => {
+      await apiClient.delete(`/api/v1/deals/${encodeURIComponent(id)}`)
+    },
+  })
+}
+
+export function useRestoreDeal(): UseMutationResult<Deal, AppError, DealId> {
+  return useMutation({
+    mutationFn: async (id) => {
+      const dto = await apiClient.post<DealDto>(
+        `/api/v1/deals/${encodeURIComponent(id)}/restore`,
+        {},
+      )
+      return mapDealDtoToModel(dto)
+    },
+  })
+}
+
 export function useInvoiceHandoff(): UseMutationResult<InvoiceHandoffResult, AppError, DealId> {
   const queryClient = useQueryClient()
 

@@ -32,7 +32,11 @@ final readonly class GetBoardHandler implements RequestHandlerInterface
             && is_string($params['include_terminal'])
             && in_array(strtolower($params['include_terminal']), ['1', 'true', 'yes', 'on'], true);
 
-        $board = $this->useCase->execute($owner, $includeTerminal);
+        $includeDeleted = isset($params['include_deleted'])
+            && is_string($params['include_deleted'])
+            && in_array(strtolower($params['include_deleted']), ['1', 'true', 'yes', 'on'], true);
+
+        $board = $this->useCase->execute($owner, $includeTerminal, $includeDeleted);
 
         return $this->json->create(BoardResponse::toArray($board));
     }

@@ -1,8 +1,10 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { AuditPage } from '@/pages/audit/AuditPage'
 import { BoardPage } from '@/pages/board/BoardPage'
 import { DealDetailPage } from '@/pages/deal-detail/DealDetailPage'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
+import { SettingsPage } from '@/pages/settings/SettingsPage'
 import { StagesPage } from '@/pages/stages/StagesPage'
 import { UsersPage } from '@/pages/users/UsersPage'
 import { AppShell } from './shell/AppShell'
@@ -33,6 +35,22 @@ const router = createBrowserRouter([
         element: (
           <RequireAdmin>
             <StagesPage />
+          </RequireAdmin>
+        ),
+      },
+      {
+        path: '/audit',
+        element: (
+          <RequireAdmin>
+            <AuditPage />
+          </RequireAdmin>
+        ),
+      },
+      {
+        path: '/settings',
+        element: (
+          <RequireAdmin>
+            <SettingsPage />
           </RequireAdmin>
         ),
       },

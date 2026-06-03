@@ -8,6 +8,8 @@ export interface ForecastStageBucketDto {
 
 export interface ForecastSummaryDto {
   month: string
+  period_start: string
+  period_end: string
   open_deal_count: number
   pipeline_total_cents: number
   weighted_total_cents: number

@@ -6,15 +6,17 @@ import {
   IconAccount,
   IconBack,
   IconBoard,
+  IconChevron,
   IconClose,
   IconLogo,
+  IconSettings,
   IconShield,
   IconStages,
   IconUsers,
 } from '@/shared/ui/icons'
 import { LangToggle, SignoutButton, ThemeToggle } from './Toggles'
 
-type ScreenKey = 'board' | 'detail' | 'users' | 'stages'
+type ScreenKey = 'board' | 'detail' | 'users' | 'stages' | 'audit' | 'settings'
 
 interface NavEntry {
   key: Exclude<ScreenKey, 'detail'>
@@ -28,12 +30,16 @@ const NAV: NavEntry[] = [
   { key: 'board', to: '/', label: 'nav.board', Icon: IconBoard },
   { key: 'stages', to: '/stages', label: 'nav.stages', Icon: IconStages, admin: true },
   { key: 'users', to: '/users', label: 'nav.users', Icon: IconUsers, admin: true },
+  { key: 'audit', to: '/audit', label: 'nav.audit', Icon: IconShield, admin: true },
+  { key: 'settings', to: '/settings', label: 'nav.settings', Icon: IconSettings, admin: true },
 ]
 
 function screenFromPath(pathname: string): ScreenKey {
   if (pathname.startsWith('/deals')) return 'detail'
   if (pathname.startsWith('/users')) return 'users'
   if (pathname.startsWith('/stages')) return 'stages'
+  if (pathname.startsWith('/audit')) return 'audit'
+  if (pathname.startsWith('/settings')) return 'settings'
   return 'board'
 }
 
@@ -75,6 +81,9 @@ export function AppShell() {
   const email = currentUser.data?.email ?? 'operator@nene-deal.test'
   const avatarLetter = (email[0] ?? 'O').toUpperCase()
   const navItems = NAV.filter((n) => n.admin !== true || isAdmin)
+  // Settings is reachable from the desktop nav and the mobile account sheet,
+  // but is kept out of the bottom tab bar (design spec).
+  const mobileTabs = navItems.filter((n) => n.key !== 'settings')
 
   const go = (to: string) => {
     setSheetOpen(false)
@@ -134,7 +143,7 @@ export function AppShell() {
 
       {/* Mobile top bar */}
       <header className="m-topbar">
-        {screen === 'detail' ? (
+        {screen === 'detail' || screen === 'settings' ? (
           <button
             type="button"
             className="m-back"
@@ -171,9 +180,13 @@ export function AppShell() {
         </div>
       </div>
 
-      {/* Mobile bottom tabs */}
-      <nav className="m-tabs">
-        {navItems.map((n) => {
+      {/* Mobile bottom tabs — primary nav (no Settings) + the account tab;
+          columns are dynamic so the account tab never wraps (design spec). */}
+      <nav
+        className="m-tabs"
+        style={{ gridTemplateColumns: `repeat(${String(mobileTabs.length + 1)}, 1fr)` }}
+      >
+        {mobileTabs.map((n) => {
           const Icon = n.Icon
           return (
             <button
@@ -191,7 +204,7 @@ export function AppShell() {
         })}
         <button
           type="button"
-          className="m-tab"
+          className={`m-tab ${screen === 'settings' ? 'active' : ''}`}
           onClick={() => {
             setSheetOpen(true)
           }}
@@ -227,6 +240,19 @@ export function AppShell() {
             </button>
           </div>
           {accountBlock}
+          {isAdmin ? (
+            <button
+              type="button"
+              className="m-sheet-link"
+              onClick={() => {
+                go('/settings')
+              }}
+            >
+              <IconSettings />
+              <span>{t('nav.settings')}</span>
+              <IconChevron />
+            </button>
+          ) : null}
           <div className="m-sheet-row">
             <span className="mm-label">{t('shell.theme')}</span>
             <ThemeToggle />

@@ -16,3 +16,10 @@
 .idea/
 .vscode/
 !.vscode/extensions.json
+
+# Design handoff bundles / Windows zone metadata (not source)
+design-handoff/
+design-handoff.zip
+*.zip
+*:Zone.Identifier
+*Zone.Identifier

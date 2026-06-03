@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace NeneDeal\Tests\Deal;
 
 use NeneDeal\Deal\Deal;
+use NeneDeal\Deal\DealActivity;
 use NeneDeal\Deal\DealNotFoundException;
 use NeneDeal\Deal\ListDealHistoryUseCase;
-use NeneDeal\Deal\StageHistoryEntry;
 use NeneDeal\Tests\Support\InMemoryDealRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -28,8 +28,8 @@ final class ListDealHistoryUseCaseTest extends TestCase
     {
         $this->deals->save(new Deal(self::DEAL_ID, 'Acme', 1000, '01STAGEAA000000000000000AA', 10));
         // Append in chronological order; expect reversed
-        $this->deals->appendHistory(new StageHistoryEntry('01HIST1000000000000000000A', self::DEAL_ID, null, '01STAGEAA000000000000000AA'));
-        $this->deals->appendHistory(new StageHistoryEntry('01HIST2000000000000000000A', self::DEAL_ID, '01STAGEAA000000000000000AA', '01STAGEBB000000000000000AA'));
+        $this->deals->recordActivity(new DealActivity('01HIST1000000000000000000A', self::DEAL_ID, 'created', null, '01STAGEAA000000000000000AA'));
+        $this->deals->recordActivity(new DealActivity('01HIST2000000000000000000A', self::DEAL_ID, 'stage_changed', '01STAGEAA000000000000000AA', '01STAGEBB000000000000000AA'));
 
         $history = $this->useCase->execute(self::DEAL_ID);
 
