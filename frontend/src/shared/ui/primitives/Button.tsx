@@ -14,17 +14,9 @@ export interface ButtonProps {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary:
-    'bg-accent text-text-inverse hover:bg-accent-hover border-transparent focus-visible:shadow-focus',
-  secondary:
-    'bg-transparent text-text-primary hover:bg-surface-overlay border-border focus-visible:shadow-focus',
-  danger:
-    'bg-transparent text-danger hover:bg-danger hover:text-text-inverse border-danger focus-visible:shadow-focus',
-}
-
-const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'px-inline-sm py-stack-xs text-caption',
-  md: 'px-inline-md py-stack-sm text-body',
+  primary: 'btn-primary',
+  secondary: 'btn-secondary',
+  danger: 'btn-danger',
 }
 
 export function Button({
@@ -38,13 +30,7 @@ export function Button({
   onFocus,
   onBlur,
 }: ButtonProps) {
-  const classes = [
-    'inline-flex items-center justify-center rounded-sm border font-sans font-semibold tracking-tight transition-colors duration-fast ease-default',
-    'focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
-    variantClasses[variant],
-    sizeClasses[size],
-    className,
-  ]
+  const classes = ['btn', variantClasses[variant], size === 'sm' ? 'btn-sm' : '', className]
     .filter(Boolean)
     .join(' ')
 

@@ -71,7 +71,7 @@ export function CreateDealForm({
       onSubmit={(event) => {
         void submit(event)
       }}
-      className="rounded-md border border-border bg-surface-raised px-inline-lg py-stack-lg shadow-sm"
+      className="card card-pad"
     >
       <Stack gap="md">
         <Text as="h2" variant="heading-sm">
@@ -79,7 +79,7 @@ export function CreateDealForm({
         </Text>
 
         {errorMessage !== null ? (
-          <Text variant="caption" className="text-danger">
+          <Text variant="caption" className="danger">
             {errorMessage}
           </Text>
         ) : null}

@@ -18,6 +18,9 @@ function baseProps(overrides: Partial<DealDetailViewProps> = {}): DealDetailView
     handoffPending: false,
     handoffErrorKey: null,
     handoffResult: null,
+    stages: [],
+    changeStage: () => Promise.resolve(true),
+    stagePending: false,
     ...overrides,
   }
 }

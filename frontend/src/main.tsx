@@ -3,8 +3,13 @@ import { createRoot } from 'react-dom/client'
 import { AppProviders } from '@/app/providers'
 import { AppRouter } from '@/app/router'
 import { applyLocaleFontFamily, resolveLocale } from '@/shared/i18n'
+import { applyStoredTheme } from '@/shared/theme'
 import '@/shared/ui/theme/index.css'
 import '@/fonts'
+// Calm design system (ClaudeDesign spec) — imported last so its tokens and
+// component classes are authoritative over the legacy Tailwind theme.
+import '@/app/design/styles.css'
+import '@/app/design/designs.css'
 
 // FOUC guard: detect the locale and apply its font family before React renders.
 const storedLocale = (() => {
@@ -15,6 +20,7 @@ const storedLocale = (() => {
   }
 })()
 applyLocaleFontFamily(resolveLocale(storedLocale))
+applyStoredTheme()
 
 async function enableMocking(): Promise<void> {
   if (import.meta.env.VITE_MOCK_API !== 'true') return

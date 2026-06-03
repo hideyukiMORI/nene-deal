@@ -2,9 +2,10 @@ import { useState } from 'react'
 import type { KanbanColumn } from '@/entities/board'
 import type { CreateDealInput } from '@/entities/deal'
 import type { ForecastSummary } from '@/entities/forecast'
-import { LOCALES, SUPPORTED_LOCALE_IDS, useTranslation, type MessageKey } from '@/shared/i18n'
+import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { formatMoneyJpy } from '@/shared/lib/format-money'
-import { Button, EmptyState, Select, Stack, Text, type SelectOption } from '@/shared/ui'
+import { EmptyState, type SelectOption } from '@/shared/ui'
+import { IconChevron, IconPlus } from '@/shared/ui/icons'
 import type { BoardStatus } from '../hooks/use-kanban-board-page'
 import { CreateDealForm } from './CreateDealForm'
 
@@ -25,6 +26,41 @@ export interface KanbanBoardViewProps {
   isAdmin?: boolean
 }
 
+const STAGE_COLORS: Record<string, string> = {
+  lead: 'var(--info)',
+  qualified: 'var(--warn)',
+  proposal: 'var(--accent)',
+  won: 'var(--ok)',
+  lost: 'var(--fg-faint)',
+}
+
+function stageColor(slug: string): string {
+  return STAGE_COLORS[slug] ?? 'var(--fg-faint)'
+}
+
+/** Format a `YYYY-MM` forecast month for the board subtitle. */
+function monthLabel(month: string, locale: string): string {
+  const [year, mon] = month.split('-').map(Number)
+  if (year === undefined || mon === undefined || Number.isNaN(year) || Number.isNaN(mon)) {
+    return month
+  }
+  return new Intl.DateTimeFormat(locale === 'ja' ? 'ja-JP' : 'en-US', {
+    year: 'numeric',
+    month: 'long',
+  }).format(new Date(year, mon - 1, 1))
+}
+
+function ProbBar({ value }: { value: number }) {
+  return (
+    <span className="prob">
+      <span className="prob-track">
+        <span className="prob-fill" style={{ width: `${String(value)}%` }} />
+      </span>
+      {value}%
+    </span>
+  )
+}
+
 export function KanbanBoardView({
   status,
   errorMessageKey,
@@ -35,81 +71,58 @@ export function KanbanBoardView({
   submitCreateDeal,
   createPending,
   createErrorKey,
-  moveDeal,
   onOpenDeal,
-  onOpenUsers,
-  onOpenStages,
-  isAdmin = false,
 }: KanbanBoardViewProps) {
-  const { t, locale, setLocale } = useTranslation()
+  const { t, locale } = useTranslation()
   const [formOpen, setFormOpen] = useState(false)
 
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-stack-lg px-inline-lg py-stack-lg">
-      <header className="flex flex-col gap-stack-sm">
-        <Stack direction="horizontal" gap="sm" className="justify-between">
-          <div className="flex flex-col gap-stack-xs">
-            <Text as="h1" variant="heading-md">
-              {t('app.title')}
-            </Text>
-            <Text muted>{t('app.subtitle')}</Text>
-          </div>
-          <Stack direction="horizontal" gap="xs">
-            {isAdmin && onOpenStages !== undefined ? (
-              <Button size="sm" variant="secondary" onClick={onOpenStages}>
-                {t('stages.title')}
-              </Button>
-            ) : null}
-            {isAdmin && onOpenUsers !== undefined ? (
-              <Button size="sm" variant="secondary" onClick={onOpenUsers}>
-                {t('users.title')}
-              </Button>
-            ) : null}
-            {SUPPORTED_LOCALE_IDS.map((id) => (
-              <Button
-                key={id}
-                size="sm"
-                variant={locale === id ? 'primary' : 'secondary'}
-                onClick={() => {
-                  setLocale(id)
-                }}
-              >
-                {LOCALES[id].label}
-              </Button>
-            ))}
-          </Stack>
-        </Stack>
-      </header>
-
-      {forecast !== null ? (
-        <section
-          aria-label={t('forecast.title')}
-          className="flex flex-wrap gap-inline-lg rounded-md border border-border bg-surface-raised px-inline-lg py-stack-md shadow-sm"
-        >
-          <ForecastStat
-            label={t('forecast.openDealCount')}
-            value={String(forecast.openDealCount)}
-          />
-          <ForecastStat
-            label={t('forecast.pipelineTotal')}
-            value={formatMoneyJpy(forecast.pipelineTotalCents, locale)}
-          />
-          <ForecastStat
-            label={t('forecast.weightedTotal')}
-            value={formatMoneyJpy(forecast.weightedTotalCents, locale)}
-          />
-        </section>
-      ) : null}
-
-      <Stack direction="horizontal" gap="sm">
-        <Button
+    <section className="content stack g6">
+      <div className="row between wrap g4 page-head">
+        <div className="stack g1">
+          <h1 className="t-h1">{t('board.heading')}</h1>
+          <span className="muted t-cap">
+            {forecast !== null
+              ? t('board.subtitle', {
+                  month: monthLabel(forecast.month, locale),
+                  count: forecast.openDealCount,
+                })
+              : t('app.subtitle')}
+          </span>
+        </div>
+        <button
+          type="button"
+          className="btn btn-primary"
           onClick={() => {
             setFormOpen((open) => !open)
           }}
         >
+          <IconPlus />
           {t('deal.create.open')}
-        </Button>
-      </Stack>
+        </button>
+      </div>
+
+      {forecast !== null ? (
+        <section aria-label={t('forecast.title')} className="forecast">
+          <Stat label={t('forecast.openDealCount')} value={String(forecast.openDealCount)} />
+          <Stat
+            label={t('forecast.pipelineTotal')}
+            value={formatMoneyJpy(forecast.pipelineTotalCents, locale)}
+          />
+          <Stat
+            label={t('forecast.weightedTotal')}
+            value={formatMoneyJpy(forecast.weightedTotalCents, locale)}
+            accent
+          />
+          <Stat
+            label={t('forecast.wonThisMonth')}
+            value={formatMoneyJpy(
+              forecast.byStage.find((bucket) => bucket.slug === 'won')?.totalCents ?? 0,
+              locale,
+            )}
+          />
+        </section>
+      ) : null}
 
       {formOpen ? (
         <CreateDealForm
@@ -118,9 +131,7 @@ export function KanbanBoardView({
           errorMessage={createErrorKey !== null ? t(createErrorKey) : null}
           onSubmit={async (input) => {
             const created = await submitCreateDeal(input)
-            if (created) {
-              setFormOpen(false)
-            }
+            if (created) setFormOpen(false)
             return created
           }}
           onCancel={() => {
@@ -129,22 +140,20 @@ export function KanbanBoardView({
         />
       ) : null}
 
-      {status === 'loading' ? <Text muted>{t('board.loading')}</Text> : null}
+      {status === 'loading' ? <p className="muted t-body">{t('board.loading')}</p> : null}
 
       {status === 'error' ? (
-        <Stack gap="sm">
-          <Text as="h2" variant="heading-sm">
-            {t('board.error.title')}
-          </Text>
-          <Text muted>
+        <div className="stack g3">
+          <h2 className="t-h2">{t('board.error.title')}</h2>
+          <p className="muted t-body">
             {errorMessageKey !== null ? t(errorMessageKey) : t('common.error.unknown')}
-          </Text>
-          <Stack direction="horizontal" gap="sm">
-            <Button variant="secondary" onClick={retry}>
+          </p>
+          <div className="row g3">
+            <button type="button" className="btn btn-secondary" onClick={retry}>
               {t('common.actions.retry')}
-            </Button>
-          </Stack>
-        </Stack>
+            </button>
+          </div>
+        </div>
       ) : null}
 
       {status === 'ready' && columns.length === 0 ? (
@@ -152,126 +161,101 @@ export function KanbanBoardView({
       ) : null}
 
       {status === 'ready' && columns.length > 0 ? (
-        <div className="grid grid-cols-1 gap-inline-md md:grid-cols-2 xl:grid-cols-4">
+        <div className="board">
           {columns.map((column) => (
-            <BoardColumnCard
+            <BoardColumn
               key={column.stageId}
               column={column}
-              stageOptions={stageOptions}
               moneyLocale={locale}
               summaryLabel={t('board.column.summary', {
                 count: column.dealCount,
                 weighted: formatMoneyJpy(column.weightedTotalCents, locale),
               })}
               emptyLabel={t('board.column.empty')}
-              moveLabel={t('deal.field.stage')}
               detailLabel={t('deal.open.detail')}
-              onMove={(dealId, toStageRef) => {
-                void moveDeal(dealId, toStageRef)
-              }}
+              wonBadgeLabel={t('stages.badge.won')}
               onOpenDeal={onOpenDeal}
             />
           ))}
         </div>
       ) : null}
-    </main>
+    </section>
   )
 }
 
-interface ForecastStatProps {
-  label: string
-  value: string
-}
-
-function ForecastStat({ label, value }: ForecastStatProps) {
+function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="flex flex-col gap-stack-xs">
-      <Text variant="caption" muted>
-        {label}
-      </Text>
-      <Text variant="heading-sm">{value}</Text>
+    <div className="stat">
+      <span className="label">{label}</span>
+      <span className="val" style={accent === true ? { color: 'var(--accent)' } : undefined}>
+        {value}
+      </span>
     </div>
   )
 }
 
-interface BoardColumnCardProps {
+interface BoardColumnProps {
   column: KanbanColumn
-  stageOptions: SelectOption[]
   moneyLocale: string
   summaryLabel: string
   emptyLabel: string
-  moveLabel: string
   detailLabel: string
-  onMove: (dealId: string, toStageRef: string) => void
+  wonBadgeLabel: string
   onOpenDeal: (dealId: string) => void
 }
 
-function BoardColumnCard({
+function BoardColumn({
   column,
-  stageOptions,
   moneyLocale,
   summaryLabel,
   emptyLabel,
-  moveLabel,
   detailLabel,
-  onMove,
+  wonBadgeLabel,
   onOpenDeal,
-}: BoardColumnCardProps) {
+}: BoardColumnProps) {
+  const isWon = column.stageSlug === 'won'
   return (
-    <section
-      aria-label={column.stageLabel}
-      className="flex flex-col gap-stack-sm rounded-md border border-border bg-surface px-inline-md py-stack-md"
-    >
-      <div className="flex flex-col gap-stack-xs">
-        <Text as="h2" variant="heading-sm">
+    <section className="col" aria-label={column.stageLabel}>
+      <div className="col-head">
+        <h2 className="col-name">
+          <span className="stage-dot" style={{ background: stageColor(column.stageSlug) }} />
           {column.stageLabel}
-        </Text>
-        <Text variant="caption" muted>
-          {summaryLabel}
-        </Text>
+        </h2>
+        <span className="count">{column.dealCount}</span>
       </div>
+      <span className="col-meta">{summaryLabel}</span>
 
       {column.deals.length === 0 ? (
-        <Text variant="caption" muted>
-          {emptyLabel}
-        </Text>
+        <span className="col-meta">{emptyLabel}</span>
       ) : (
-        <ul className="flex flex-col gap-stack-sm">
-          {column.deals.map((deal) => (
-            <li
-              key={deal.id}
-              className="flex flex-col gap-stack-xs rounded-sm border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm"
-            >
-              <Text as="span" className="font-medium">
-                {deal.accountLabel}
-              </Text>
-              <Text as="span" variant="caption" muted>
-                {formatMoneyJpy(deal.amountCents, moneyLocale)} · {String(deal.probabilityPercent)}%
-              </Text>
-              <Select
-                id={`move-${deal.id}`}
-                label={moveLabel}
-                labelHidden
-                options={stageOptions}
-                value={column.stageSlug}
-                onChange={(event) => {
-                  onMove(deal.id, event.target.value)
+        column.deals.map((deal) => (
+          <article key={deal.id} className="deal">
+            <div className="row between g2">
+              <span className="acct">{deal.accountLabel}</span>
+              {isWon ? (
+                <span className="badge badge-ok">
+                  <span className="dot" />
+                  {wonBadgeLabel}
+                </span>
+              ) : null}
+            </div>
+            <span className="amt">{formatMoneyJpy(deal.amountCents, moneyLocale)}</span>
+            <div className="deal-foot">
+              <ProbBar value={deal.probabilityPercent} />
+              <button
+                type="button"
+                className="details-link row g1 faint t-tiny"
+                style={{ border: 'none', background: 'none', cursor: 'pointer', font: 'inherit' }}
+                onClick={() => {
+                  onOpenDeal(deal.id)
                 }}
-              />
-              <Stack direction="horizontal" gap="xs">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    onOpenDeal(deal.id)
-                  }}
-                >
-                  {detailLabel}
-                </Button>
-              </Stack>
-            </li>
-          ))}
-        </ul>
+              >
+                {detailLabel}
+                <IconChevron />
+              </button>
+            </div>
+          </article>
+        ))
       )}
     </section>
   )

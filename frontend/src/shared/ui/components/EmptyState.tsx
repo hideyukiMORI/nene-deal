@@ -16,7 +16,7 @@ export interface EmptyStateProps {
  */
 export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-stack-md rounded-md border border-border bg-surface-raised px-inline-lg py-stack-lg text-center shadow-sm">
+    <div className="empty stack g3" style={{ alignItems: 'center' }}>
       <Text as="h2" variant="heading-sm">
         {title}
       </Text>

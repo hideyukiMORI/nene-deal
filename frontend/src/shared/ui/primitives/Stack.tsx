@@ -9,19 +9,14 @@ export interface StackProps {
 }
 
 const gapClasses: Record<StackGap, string> = {
-  xs: 'gap-stack-xs',
-  sm: 'gap-stack-sm',
-  md: 'gap-stack-md',
-  lg: 'gap-stack-lg',
+  xs: 'g1',
+  sm: 'g2',
+  md: 'g4',
+  lg: 'g6',
 }
 
 export function Stack({ direction = 'vertical', gap = 'md', children, className }: StackProps) {
-  const classes = [
-    'flex',
-    direction === 'vertical' ? 'flex-col' : 'flex-row items-center',
-    gapClasses[gap],
-    className,
-  ]
+  const classes = [direction === 'vertical' ? 'stack' : 'row', gapClasses[gap], className]
     .filter(Boolean)
     .join(' ')
 

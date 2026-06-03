@@ -5,49 +5,38 @@ import { LoginPage } from '@/pages/login/LoginPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { StagesPage } from '@/pages/stages/StagesPage'
 import { UsersPage } from '@/pages/users/UsersPage'
+import { AppShell } from './shell/AppShell'
 import { RequireAdmin, RequireAuth } from './auth-gate'
 
 const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   {
-    path: '/',
     element: (
       <RequireAuth>
-        <BoardPage />
+        <AppShell />
       </RequireAuth>
     ),
     errorElement: <NotFoundPage />,
-  },
-  {
-    path: '/deals/:dealId',
-    element: (
-      <RequireAuth>
-        <DealDetailPage />
-      </RequireAuth>
-    ),
-    errorElement: <NotFoundPage />,
-  },
-  {
-    path: '/users',
-    element: (
-      <RequireAuth>
-        <RequireAdmin>
-          <UsersPage />
-        </RequireAdmin>
-      </RequireAuth>
-    ),
-    errorElement: <NotFoundPage />,
-  },
-  {
-    path: '/stages',
-    element: (
-      <RequireAuth>
-        <RequireAdmin>
-          <StagesPage />
-        </RequireAdmin>
-      </RequireAuth>
-    ),
-    errorElement: <NotFoundPage />,
+    children: [
+      { path: '/', element: <BoardPage /> },
+      { path: '/deals/:dealId', element: <DealDetailPage /> },
+      {
+        path: '/users',
+        element: (
+          <RequireAdmin>
+            <UsersPage />
+          </RequireAdmin>
+        ),
+      },
+      {
+        path: '/stages',
+        element: (
+          <RequireAdmin>
+            <StagesPage />
+          </RequireAdmin>
+        ),
+      },
+    ],
   },
   { path: '*', element: <NotFoundPage /> },
 ])

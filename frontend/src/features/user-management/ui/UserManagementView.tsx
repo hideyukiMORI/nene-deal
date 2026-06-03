@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import type { CreateUserInput, OperatorRole, OperatorUser } from '@/entities/user'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
-import { Button, EmptyState, Select, Stack, Text, type SelectOption } from '@/shared/ui'
+import { EmptyState, Select, type SelectOption } from '@/shared/ui'
+import { IconChevron, IconClose, IconPlus } from '@/shared/ui/icons'
 import type { UserManagementStatus } from '../hooks/use-user-management-page'
 import { CreateUserForm } from './CreateUserForm'
 
@@ -32,30 +33,52 @@ export function UserManagementView({
 }: UserManagementViewProps) {
   const { t } = useTranslation()
   const [formOpen, setFormOpen] = useState(false)
+  const [openUser, setOpenUser] = useState<OperatorUser | null>(null)
 
   const roleOptions: SelectOption[] = [
     { value: 'operator', label: t('users.role.operator') },
     { value: 'admin', label: t('users.role.admin') },
   ]
 
-  return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-stack-lg px-inline-lg py-stack-lg">
-      <header className="flex flex-col gap-stack-sm">
-        <Text as="h1" variant="heading-md">
-          {t('users.title')}
-        </Text>
-        <Text muted>{t('users.subtitle')}</Text>
-      </header>
+  const roleSelect = (user: OperatorUser, labelHidden: boolean) => (
+    <Select
+      id={`role-${user.id}`}
+      label={t('users.field.role')}
+      labelHidden={labelHidden}
+      options={roleOptions}
+      value={user.role}
+      disabled={user.id === currentUserId}
+      onChange={(e) => {
+        void updateRole(user.id, e.target.value as OperatorRole)
+      }}
+    />
+  )
 
-      <Stack direction="horizontal" gap="sm">
-        <Button
+  const confirmDelete = (user: OperatorUser) => {
+    if (window.confirm(t('users.delete.confirm'))) {
+      void deleteUser(user.id)
+      setOpenUser(null)
+    }
+  }
+
+  return (
+    <section className="content content-narrow stack g6">
+      <div className="row between wrap g4 page-head">
+        <div className="stack g1">
+          <h1 className="t-h1">{t('users.title')}</h1>
+          <span className="muted t-cap">{t('users.subtitle')}</span>
+        </div>
+        <button
+          type="button"
+          className="btn btn-primary"
           onClick={() => {
             setFormOpen((open) => !open)
           }}
         >
+          <IconPlus />
           {t('users.create.open')}
-        </Button>
-      </Stack>
+        </button>
+      </div>
 
       {formOpen ? (
         <CreateUserForm
@@ -72,18 +95,20 @@ export function UserManagementView({
         />
       ) : null}
 
-      {status === 'loading' ? <Text muted>{t('users.loading')}</Text> : null}
+      {status === 'loading' ? <p className="muted t-body">{t('users.loading')}</p> : null}
 
       {status === 'error' ? (
-        <Stack gap="sm">
-          <Text as="h2" variant="heading-sm">
-            {t('users.error.title')}
-          </Text>
-          <Text muted>{errorKey !== null ? t(errorKey) : t('common.error.unknown')}</Text>
-          <Button variant="secondary" onClick={retry}>
-            {t('common.actions.retry')}
-          </Button>
-        </Stack>
+        <div className="stack g3">
+          <h2 className="t-h2">{t('users.error.title')}</h2>
+          <p className="muted t-body">
+            {errorKey !== null ? t(errorKey) : t('common.error.unknown')}
+          </p>
+          <div className="row g3">
+            <button type="button" className="btn btn-secondary" onClick={retry}>
+              {t('common.actions.retry')}
+            </button>
+          </div>
+        </div>
       ) : null}
 
       {status === 'ready' && users.length === 0 ? (
@@ -91,51 +116,121 @@ export function UserManagementView({
       ) : null}
 
       {status === 'ready' && users.length > 0 ? (
-        <ul className="flex flex-col gap-stack-sm">
-          {users.map((user) => (
-            <li
-              key={user.id}
-              className="flex flex-col gap-stack-xs rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm shadow-sm sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div className="flex flex-col gap-stack-xs">
-                <Text as="span" className="font-medium">
-                  {user.email}
-                </Text>
-                <Text as="span" variant="caption" muted>
-                  {user.id}
-                </Text>
-              </div>
-
-              <Stack direction="horizontal" gap="sm" className="items-center">
-                <Select
-                  id={`role-${user.id}`}
-                  label={t('users.field.role')}
-                  labelHidden
-                  options={roleOptions}
-                  value={user.role}
-                  disabled={user.id === currentUserId}
-                  onChange={(e) => {
-                    void updateRole(user.id, e.target.value as OperatorRole)
-                  }}
-                />
-                {user.id !== currentUserId ? (
-                  <Button
-                    variant="secondary"
-                    size="sm"
+        <div className="card">
+          <div className="rows">
+            {users.map((user) => {
+              const you = user.id === currentUserId
+              return (
+                <div key={user.id} className="list-row user-row">
+                  <button
+                    type="button"
+                    className="user-id"
+                    aria-label={`${user.email} — ${t('users.detail.tap')}`}
                     onClick={() => {
-                      if (window.confirm(t('users.delete.confirm'))) {
-                        void deleteUser(user.id)
-                      }
+                      setOpenUser(user)
                     }}
                   >
-                    {/* Delete icon — no label needed since it's adjacent to the user row */}×
-                  </Button>
-                ) : null}
-              </Stack>
-            </li>
-          ))}
-        </ul>
+                    <span className="avatar">{(user.email[0] ?? '?').toUpperCase()}</span>
+                    <div className="stack g1">
+                      <span className="row g2">
+                        <span className="medium">{user.email}</span>
+                        {you ? <span className="badge badge-accent">{t('users.you')}</span> : null}
+                      </span>
+                      <span className="faint t-tiny mono">{user.id}</span>
+                    </div>
+                    <span className="row-chevron">
+                      <IconChevron />
+                    </span>
+                  </button>
+                  <div className="row g3 user-ctrls">
+                    {roleSelect(user, true)}
+                    {you ? null : (
+                      <button
+                        type="button"
+                        className="icon-btn"
+                        title={t('users.delete.label')}
+                        aria-label={t('users.delete.label')}
+                        onClick={() => {
+                          confirmDelete(user)
+                        }}
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       ) : null}
-    </main>
+
+      {/* Mobile user-detail sheet (CSS shows the wrapper ≤1024px). */}
+      {openUser !== null ? (
+        <div className="m-sheet-wrap open">
+          <button
+            type="button"
+            className="m-sheet-scrim"
+            aria-label={t('common.actions.cancel')}
+            onClick={() => {
+              setOpenUser(null)
+            }}
+          />
+          <div className="m-sheet" role="dialog" aria-label={t('users.detail.title')}>
+            <div className="m-sheet-grab" />
+            <div className="m-sheet-head">
+              <span className="t-h2">{t('users.detail.title')}</span>
+              <button
+                type="button"
+                className="icon-btn neutral"
+                aria-label={t('common.actions.cancel')}
+                onClick={() => {
+                  setOpenUser(null)
+                }}
+              >
+                <IconClose />
+              </button>
+            </div>
+            <div className="us-id">
+              <span className="avatar" style={{ width: 48, height: 48, fontSize: 18 }}>
+                {(openUser.email[0] ?? '?').toUpperCase()}
+              </span>
+              <div className="stack g1" style={{ minWidth: 0 }}>
+                <span className="medium us-email">{openUser.email}</span>
+                {openUser.id === currentUserId ? (
+                  <span className="badge badge-accent" style={{ alignSelf: 'flex-start' }}>
+                    {t('users.you')}
+                  </span>
+                ) : (
+                  <span className="faint t-tiny">
+                    {t('users.field.role')}:{' '}
+                    {openUser.role === 'admin' ? t('users.role.admin') : t('users.role.operator')}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="field">
+              <label>{t('users.detail.idLabel')}</label>
+              <div className="us-code">{openUser.id}</div>
+            </div>
+            <div className="field">
+              <label>{t('users.field.role')}</label>
+              {roleSelect(openUser, true)}
+            </div>
+            {openUser.id === currentUserId ? null : (
+              <button
+                type="button"
+                className="btn btn-danger us-del"
+                onClick={() => {
+                  confirmDelete(openUser)
+                }}
+              >
+                {t('users.delete.label')}
+              </button>
+            )}
+          </div>
+        </div>
+      ) : null}
+    </section>
   )
 }
