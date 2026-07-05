@@ -6,6 +6,10 @@
 >
   <php>
     <env name="APP_ENV" value="test" force="true"/>
+    <!-- Permit the injected dev JWT secret so runtime-booting tests resolve a
+         secret without configuring one; the resolver still fails closed in
+         production regardless of this opt-in. -->
+    <env name="NENE2_ALLOW_DEV_SECRET" value="1" force="true"/>
     <env name="DB_ADAPTER" value="sqlite" force="true"/>
     <env name="DB_NAME" value=":memory:" force="true"/>
   </php>

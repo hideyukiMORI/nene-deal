@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e62853b25dfc3d15b02959e6c81929e2",
+    "content-hash": "9c30ae4709833ebf281d5bd84aa83b36",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -70,16 +70,16 @@
         },
         {
             "name": "hideyukimori/nene2",
-            "version": "v1.5.327",
+            "version": "v1.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hideyukiMORI/NENE2.git",
-                "reference": "d523678db8b58cb004ccd971ae4af2c66bad0ac8"
+                "reference": "01e05992aa585412c4d1b74010e9deeb158b2c54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hideyukiMORI/NENE2/zipball/d523678db8b58cb004ccd971ae4af2c66bad0ac8",
-                "reference": "d523678db8b58cb004ccd971ae4af2c66bad0ac8",
+                "url": "https://api.github.com/repos/hideyukiMORI/NENE2/zipball/01e05992aa585412c4d1b74010e9deeb158b2c54",
+                "reference": "01e05992aa585412c4d1b74010e9deeb158b2c54",
                 "shasum": ""
             },
             "require": {
@@ -101,6 +101,7 @@
                 "symfony/yaml": "^8.0"
             },
             "suggest": {
+                "robmorgan/phinx": "Required by Nene2\\Install\\DatabaseSchemaApplier. A consumer that uses it MUST add phinx to its require (NOT require-dev) — it is here only as a dev dependency, so a --no-dev production build would omit it and installs would fatally fail when applying migrations.",
                 "symfony/yaml": "Required to run validate-mcp-tools.php from a consumer project (add to your require-dev)"
             },
             "type": "library",
@@ -116,9 +117,9 @@
             "description": "PHP micro-framework: JSON APIs first, minimal server HTML, easy React/SPA integration, structure friendly to AI tooling.",
             "support": {
                 "issues": "https://github.com/hideyukiMORI/NENE2/issues",
-                "source": "https://github.com/hideyukiMORI/NENE2/tree/v1.5.327"
+                "source": "https://github.com/hideyukiMORI/NENE2/tree/v1.7.0"
             },
-            "time": "2026-05-29T13:06:56+00:00"
+            "time": "2026-07-05T11:45:02+00:00"
         },
         {
             "name": "monolog/monolog",
