@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": ">=8.4.1 <9.0",
-        "hideyukimori/nene2": "^1.8",
+        "hideyukimori/nene2": "^1.8.2",
         "psr/http-client": "^1.0",
         "symfony/http-client": "^8.1",
         "symfony/uid": "^8.1"
@@ -27,6 +27,7 @@
         "cs:fix": "php-cs-fixer fix --config=.php-cs-fixer.php",
         "openapi": "php tools/validate-openapi.php",
         "mcp": "php vendor/hideyukimori/nene2/tools/validate-mcp-tools.php --root=.",
+        "conformance": "php vendor/hideyukimori/nene2/tools/conformance.php --root=.",
         "migrations:status": "phinx status -c phinx.php",
         "migrations:migrate": "phinx migrate -c phinx.php",
         "migrations:rollback": "phinx rollback -c phinx.php",
@@ -35,7 +36,8 @@
             "@analyse",
             "@cs",
             "@openapi",
-            "@mcp"
+            "@mcp",
+            "@conformance"
         ]
     },
     "config": {
