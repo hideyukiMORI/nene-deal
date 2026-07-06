@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\Audit;
 
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Export\CsvWriter;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -62,15 +63,41 @@ final readonly class AuditCsvHandler implements RequestHandlerInterface
             return '';
         }
 
-        // UTF-8 BOM so Excel (incl. Japanese locales) reads the file correctly.
-        fwrite($handle, "\xEF\xBB\xBF");
-
+        // `Nene2\Export\CsvWriter` (NENE2 v1.8.0, ADR 0015) neutralises
+        // formula injection in string cells and emits a UTF-8 BOM by default, so
+        // attacker-controlled audit `before`/`after` values (arbitrary text a user
+        // may have entered into a deal field) can no longer execute as a formula
+        // when the file is opened in Excel / LibreOffice / Google Sheets.
         // Column schema per the design spec: one row per changed field.
-        fputcsv($handle, ['timestamp', 'actor', 'action', 'deal_id', 'field', 'before', 'after'], ',', '"', '');
+        $writer = new CsvWriter(
+            $handle,
+            headers: ['timestamp', 'actor', 'action', 'deal_id', 'field', 'before', 'after'],
+        );
 
+        // Pass a generator so the BOM and header row are emitted even for an empty
+        // export (`writeAll` writes the prologue regardless), keeping an empty range
+        // a valid header-only CSV rather than a zero-byte file.
+        $writer->writeAll(self::toRows($rows));
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return $csv === false ? '' : $csv;
+    }
+
+    /**
+     * Flattens each audit entry into one CSV row per changed field.
+     *
+     * @param list<AuditExportRow> $rows
+     *
+     * @return iterable<list<string>>
+     */
+    private static function toRows(array $rows): iterable
+    {
         foreach ($rows as $row) {
             foreach (self::fieldRows($row) as [$field, $before, $after]) {
-                fputcsv($handle, [
+                yield [
                     $row->createdAt,
                     $row->actorLabel ?? '',
                     $row->action,
@@ -78,15 +105,9 @@ final readonly class AuditCsvHandler implements RequestHandlerInterface
                     $field,
                     $before,
                     $after,
-                ], ',', '"', '');
+                ];
             }
         }
-
-        rewind($handle);
-        $csv = stream_get_contents($handle);
-        fclose($handle);
-
-        return $csv === false ? '' : $csv;
     }
 
     /**
