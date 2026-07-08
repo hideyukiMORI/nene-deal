@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeneDeal\Handoff;
 
+use Nene2\Http\ClockInterface;
 use NeneDeal\Deal\DealActivity;
 use NeneDeal\Deal\DealNotFoundException;
 use NeneDeal\Deal\DealRepositoryInterface;
@@ -24,6 +25,7 @@ final readonly class InvoiceHandoffUseCase
         private DealRepositoryInterface $deals,
         private PipelineStageRepositoryInterface $stages,
         private InvoiceClient $invoice,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -62,7 +64,7 @@ final readonly class InvoiceHandoffUseCase
         $clientId = $this->invoice->createDraftClient($deal->accountLabel);
         $quoteId = $this->invoice->createDraftQuote($clientId, $deal->amountCents, $deal->accountLabel);
 
-        $handoffAt = date('Y-m-d H:i:s');
+        $handoffAt = $this->clock->now()->format('Y-m-d H:i:s');
         $this->deals->markHandedOff($dealId, $clientId, $quoteId, $handoffAt);
 
         $this->deals->recordActivity(new DealActivity(

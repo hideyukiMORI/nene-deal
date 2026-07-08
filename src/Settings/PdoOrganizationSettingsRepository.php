@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\Settings;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use NeneDeal\Tenancy\CurrentOrganization;
 
 final readonly class PdoOrganizationSettingsRepository implements OrganizationSettingsRepositoryInterface
@@ -12,6 +13,7 @@ final readonly class PdoOrganizationSettingsRepository implements OrganizationSe
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private CurrentOrganization $organization,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -34,7 +36,7 @@ final readonly class PdoOrganizationSettingsRepository implements OrganizationSe
     {
         $this->query->execute(
             'UPDATE organizations SET forecast_closing_day = ?, updated_at = ? WHERE id = ?',
-            [$day, date('Y-m-d H:i:s'), $this->organization->id()],
+            [$day, $this->clock->now()->format('Y-m-d H:i:s'), $this->organization->id()],
         );
     }
 }

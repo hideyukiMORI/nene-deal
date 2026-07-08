@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeneDeal\Auth\RequireRoleMiddleware;
 use NeneDeal\Tenancy\CurrentOrganization;
@@ -32,7 +33,7 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Database query executor service is invalid.');
                     }
 
-                    return new PdoUserRepository($query);
+                    return new PdoUserRepository($query, self::clock($c));
                 },
             )
             ->set(
@@ -44,7 +45,7 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
             ->set(
                 CreateUserUseCase::class,
                 static function (ContainerInterface $c): CreateUserUseCase {
-                    return new CreateUserUseCase(self::repo($c), self::org($c));
+                    return new CreateUserUseCase(self::repo($c), self::org($c), self::clock($c));
                 },
             )
             ->set(
@@ -190,6 +191,17 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
         }
 
         return $org;
+    }
+
+    private static function clock(ContainerInterface $c): ClockInterface
+    {
+        $clock = $c->get(ClockInterface::class);
+
+        if (!$clock instanceof ClockInterface) {
+            throw new LogicException('Clock service is invalid.');
+        }
+
+        return $clock;
     }
 
     private static function json(ContainerInterface $c): JsonResponseFactory

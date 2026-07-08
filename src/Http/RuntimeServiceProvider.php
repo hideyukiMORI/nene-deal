@@ -20,10 +20,12 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\DomainExceptionHandlerInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use Nene2\Http\ResponseEmitter;
 use Nene2\Http\RuntimeApplicationFactory;
+use Nene2\Http\UtcClock;
 use Nene2\Routing\Router;
 use NeneDeal\ApplicationServiceProvider;
 use NeneDeal\Audit\AuditServiceProvider;
@@ -83,6 +85,10 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 
         $builder
             ->set(Psr17Factory::class, static fn (ContainerInterface $container): Psr17Factory => new Psr17Factory())
+            // Single time source for the whole application. Production resolves to
+            // the real UTC clock (`UtcClock::now()` is equivalent to the raw
+            // `time()`/`date()` reads it replaces); tests inject a fixed clock.
+            ->set(ClockInterface::class, static fn (ContainerInterface $container): ClockInterface => new UtcClock())
             ->set(
                 ConfigLoader::class,
                 static function (ContainerInterface $container): ConfigLoader {

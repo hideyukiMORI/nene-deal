@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\Auth;
 
 use Nene2\Auth\TokenIssuerInterface;
+use Nene2\Http\ClockInterface;
 use NeneDeal\User\UserRepositoryInterface;
 
 /**
@@ -18,6 +19,7 @@ final readonly class LoginUseCase
     public function __construct(
         private UserRepositoryInterface $users,
         private TokenIssuerInterface $tokenIssuer,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -30,7 +32,7 @@ final readonly class LoginUseCase
             throw new InvalidCredentialsException();
         }
 
-        $now = time();
+        $now = $this->clock->now()->getTimestamp();
         $token = $this->tokenIssuer->issue([
             'sub' => $user->id,
             'role' => $user->role->value,

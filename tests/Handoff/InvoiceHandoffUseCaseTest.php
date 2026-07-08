@@ -12,6 +12,7 @@ use NeneDeal\Handoff\InvoiceHandoffException;
 use NeneDeal\Handoff\InvoiceHandoffUseCase;
 use NeneDeal\Pipeline\PipelineStage;
 use NeneDeal\Tests\Support\FakeInvoiceClient;
+use NeneDeal\Tests\Support\FixedClock;
 use NeneDeal\Tests\Support\InMemoryDealRepository;
 use NeneDeal\Tests\Support\InMemoryPipelineStageRepository;
 use PHPUnit\Framework\TestCase;
@@ -38,12 +39,17 @@ final class InvoiceHandoffUseCaseTest extends TestCase
         return new Deal($id, 'Acme Corp', 150_000_00, self::WON, 100);
     }
 
+    private function useCase(FakeInvoiceClient $invoice): InvoiceHandoffUseCase
+    {
+        return new InvoiceHandoffUseCase($this->deals, $this->stages, $invoice, new FixedClock());
+    }
+
     public function test_creates_draft_client_and_quote_and_persists_link_ids(): void
     {
         $this->deals->save($this->wonDeal());
         $invoice = new FakeInvoiceClient(4821, 9930);
 
-        $result = (new InvoiceHandoffUseCase($this->deals, $this->stages, $invoice))->execute('01DEALWON00000000000000000');
+        $result = $this->useCase($invoice)->execute('01DEALWON00000000000000000');
 
         self::assertSame(4821, $result->invoiceClientId);
         self::assertSame(9930, $result->invoiceQuoteId);
@@ -52,7 +58,8 @@ final class InvoiceHandoffUseCaseTest extends TestCase
         self::assertNotNull($deal);
         self::assertSame(4821, $deal->invoiceClientId);
         self::assertSame(9930, $deal->invoiceQuoteId);
-        self::assertNotNull($deal->handoffAt);
+        // handoff_at comes from the injected fixed clock, not the wall clock.
+        self::assertSame('2026-06-01 10:00:00', $deal->handoffAt);
     }
 
     public function test_already_linked_is_idempotent_and_rejected_with_existing_ids(): void
@@ -61,7 +68,7 @@ final class InvoiceHandoffUseCaseTest extends TestCase
         $invoice = new FakeInvoiceClient();
 
         try {
-            (new InvoiceHandoffUseCase($this->deals, $this->stages, $invoice))->execute('01DEALWON00000000000000000');
+            $this->useCase($invoice)->execute('01DEALWON00000000000000000');
             self::fail('Expected AlreadyHandedOffException.');
         } catch (AlreadyHandedOffException $e) {
             self::assertSame(11, $e->invoiceClientId);
@@ -79,7 +86,7 @@ final class InvoiceHandoffUseCaseTest extends TestCase
         $invoice = new FakeInvoiceClient();
 
         try {
-            (new InvoiceHandoffUseCase($this->deals, $this->stages, $invoice))->execute('01DEALLEAD0000000000000000');
+            $this->useCase($invoice)->execute('01DEALLEAD0000000000000000');
             self::fail('Expected HandoffPreconditionException.');
         } catch (HandoffPreconditionException) {
             self::assertSame(0, $invoice->clientCalls);
@@ -89,7 +96,7 @@ final class InvoiceHandoffUseCaseTest extends TestCase
     public function test_unknown_deal_throws(): void
     {
         $this->expectException(DealNotFoundException::class);
-        (new InvoiceHandoffUseCase($this->deals, $this->stages, new FakeInvoiceClient()))->execute('01MISSING000000000000000AA');
+        $this->useCase(new FakeInvoiceClient())->execute('01MISSING000000000000000AA');
     }
 
     public function test_upstream_quote_failure_leaves_deal_unlinked(): void
@@ -98,7 +105,7 @@ final class InvoiceHandoffUseCaseTest extends TestCase
         $invoice = new FakeInvoiceClient(failOnQuote: true);
 
         try {
-            (new InvoiceHandoffUseCase($this->deals, $this->stages, $invoice))->execute('01DEALWON00000000000000000');
+            $this->useCase($invoice)->execute('01DEALWON00000000000000000');
             self::fail('Expected InvoiceHandoffException.');
         } catch (InvoiceHandoffException) {
             $deal = $this->deals->findById('01DEALWON00000000000000000');
@@ -114,7 +121,7 @@ final class InvoiceHandoffUseCaseTest extends TestCase
         $invoice = new FakeInvoiceClient(failOnClient: true);
 
         try {
-            (new InvoiceHandoffUseCase($this->deals, $this->stages, $invoice))->execute('01DEALWON00000000000000000');
+            $this->useCase($invoice)->execute('01DEALWON00000000000000000');
             self::fail('Expected InvoiceHandoffException.');
         } catch (InvoiceHandoffException) {
             self::assertSame(1, $invoice->clientCalls);
@@ -132,7 +139,7 @@ final class InvoiceHandoffUseCaseTest extends TestCase
         $invoice = new FakeInvoiceClient();
 
         $this->expectException(HandoffPreconditionException::class);
-        (new InvoiceHandoffUseCase($this->deals, $this->stages, $invoice))->execute('01DEALWON00000000000000000');
+        $this->useCase($invoice)->execute('01DEALWON00000000000000000');
 
         self::assertSame(0, $invoice->clientCalls);
     }
@@ -143,7 +150,7 @@ final class InvoiceHandoffUseCaseTest extends TestCase
         $invoice = new FakeInvoiceClient();
 
         $this->expectException(HandoffPreconditionException::class);
-        (new InvoiceHandoffUseCase($this->deals, $this->stages, $invoice))->execute('01DEALWON00000000000000000');
+        $this->useCase($invoice)->execute('01DEALWON00000000000000000');
     }
 
     public function test_amount_zero_is_precondition_failure(): void
@@ -152,14 +159,14 @@ final class InvoiceHandoffUseCaseTest extends TestCase
         $invoice = new FakeInvoiceClient();
 
         $this->expectException(HandoffPreconditionException::class);
-        (new InvoiceHandoffUseCase($this->deals, $this->stages, $invoice))->execute('01DEALWON00000000000000000');
+        $this->useCase($invoice)->execute('01DEALWON00000000000000000');
     }
 
     public function test_actor_user_id_recorded_on_result(): void
     {
         $this->deals->save($this->wonDeal());
 
-        $result = (new InvoiceHandoffUseCase($this->deals, $this->stages, new FakeInvoiceClient()))
+        $result = $this->useCase(new FakeInvoiceClient())
             ->execute('01DEALWON00000000000000000', '01ACTOR00000000000000000AA');
 
         self::assertSame('01ACTOR00000000000000000AA', $result->handoffActorUserId);

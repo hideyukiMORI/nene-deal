@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeneDeal\Auth\RequireRoleMiddleware;
 use NeneDeal\Deal\DealRepositoryInterface;
@@ -40,7 +41,7 @@ final readonly class PipelineServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Current organization service is invalid.');
                     }
 
-                    return new PdoPipelineStageRepository($query, $org);
+                    return new PdoPipelineStageRepository($query, $org, self::clock($c));
                 },
             )
             ->set(
@@ -120,7 +121,7 @@ final readonly class PipelineServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Current organization service is invalid.');
                     }
 
-                    return new CreateStageUseCase($stages, $org);
+                    return new CreateStageUseCase($stages, $org, self::clock($c));
                 },
             )
             ->set(
@@ -269,5 +270,16 @@ final readonly class PipelineServiceProvider implements ServiceProviderInterface
 
                 return new SlugAlreadyTakenExceptionHandler($p);
             });
+    }
+
+    private static function clock(ContainerInterface $c): ClockInterface
+    {
+        $clock = $c->get(ClockInterface::class);
+
+        if (!$clock instanceof ClockInterface) {
+            throw new LogicException('Clock service is invalid.');
+        }
+
+        return $clock;
     }
 }

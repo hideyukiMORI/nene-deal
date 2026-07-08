@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeneDeal\User;
 
+use Nene2\Http\ClockInterface;
 use NeneDeal\Tenancy\CurrentOrganization;
 use Symfony\Component\Uid\Ulid;
 
@@ -12,6 +13,7 @@ final readonly class CreateUserUseCase
     public function __construct(
         private UserRepositoryInterface $users,
         private CurrentOrganization $organization,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -24,7 +26,7 @@ final readonly class CreateUserUseCase
             throw new EmailAlreadyTakenException($input->email);
         }
 
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
         $user = new User(
             id: (string) new Ulid(),
             organizationId: $this->organization->id(),

@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeneDeal\Pipeline\PipelineStageRepositoryInterface;
 use NeneDeal\Tenancy\CurrentOrganization;
@@ -38,7 +39,13 @@ final readonly class DealServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Current organization service is invalid.');
                     }
 
-                    return new PdoDealRepository($query, $org);
+                    $clock = $c->get(ClockInterface::class);
+
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
+                    }
+
+                    return new PdoDealRepository($query, $org, $clock);
                 },
             )
             ->set(CreateDealUseCase::class, static fn (ContainerInterface $c): CreateDealUseCase => new CreateDealUseCase(self::deals($c), self::stages($c)))
