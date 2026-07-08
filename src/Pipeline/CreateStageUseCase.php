@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeneDeal\Pipeline;
 
+use Nene2\Http\ClockInterface;
 use NeneDeal\Tenancy\CurrentOrganization;
 use Symfony\Component\Uid\Ulid;
 
@@ -12,6 +13,7 @@ final readonly class CreateStageUseCase
     public function __construct(
         private PipelineStageRepositoryInterface $stages,
         private CurrentOrganization $organization,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -24,7 +26,7 @@ final readonly class CreateStageUseCase
             throw new SlugAlreadyTakenException($slug);
         }
 
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
         $stage = new PipelineStage(
             id: (string) new Ulid(),
             organizationId: $this->organization->id(),

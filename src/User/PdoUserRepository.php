@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\User;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 
 final readonly class PdoUserRepository implements UserRepositoryInterface
 {
@@ -12,6 +13,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
 
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -42,7 +44,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
 
     public function save(User $user): void
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $exists = $this->findById($user->id) !== null;
 

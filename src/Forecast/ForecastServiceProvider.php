@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeneDeal\Deal\DealRepositoryInterface;
 use NeneDeal\Pipeline\PipelineStageRepositoryInterface;
@@ -47,6 +48,7 @@ final readonly class ForecastServiceProvider implements ServiceProviderInterface
                     $settings = $c->get(OrganizationSettingsRepositoryInterface::class);
                     $json = $c->get(JsonResponseFactory::class);
                     $problem = $c->get(ProblemDetailsResponseFactory::class);
+                    $clock = $c->get(ClockInterface::class);
 
                     if (!$useCase instanceof ComputeForecastUseCase) {
                         throw new LogicException('Compute forecast use case service is invalid.');
@@ -64,7 +66,11 @@ final readonly class ForecastServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Problem details response factory service is invalid.');
                     }
 
-                    return new GetForecastHandler($useCase, $settings, $json, $problem);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
+                    }
+
+                    return new GetForecastHandler($useCase, $settings, $json, $problem, $clock);
                 },
             )
             ->set(

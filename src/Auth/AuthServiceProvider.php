@@ -9,6 +9,7 @@ use Nene2\Auth\TokenIssuerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeneDeal\User\UserRepositoryInterface;
 use Psr\Container\ContainerInterface;
@@ -31,7 +32,13 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Token issuer service is invalid.');
                     }
 
-                    return new LoginUseCase(self::users($c), $tokenIssuer);
+                    $clock = $c->get(ClockInterface::class);
+
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
+                    }
+
+                    return new LoginUseCase(self::users($c), $tokenIssuer, $clock);
                 },
             )
             ->set(

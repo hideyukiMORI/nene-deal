@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\Pipeline;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use NeneDeal\Tenancy\CurrentOrganization;
 
 final readonly class PdoPipelineStageRepository implements PipelineStageRepositoryInterface
@@ -14,6 +15,7 @@ final readonly class PdoPipelineStageRepository implements PipelineStageReposito
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private CurrentOrganization $organization,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -50,7 +52,7 @@ final readonly class PdoPipelineStageRepository implements PipelineStageReposito
 
     public function save(PipelineStage $stage): void
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         $exists = $this->findById($stage->id) !== null;
 

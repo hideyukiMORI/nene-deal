@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeneDeal\Tests\User;
 
+use NeneDeal\Tests\Support\FixedClock;
 use NeneDeal\Tests\Support\InMemoryUserRepository;
 use NeneDeal\Tests\Support\StubCurrentOrganization;
 use NeneDeal\User\CreateUserInput;
@@ -23,7 +24,7 @@ final class CreateUserUseCaseTest extends TestCase
     protected function setUp(): void
     {
         $this->users = new InMemoryUserRepository();
-        $this->useCase = new CreateUserUseCase($this->users, new StubCurrentOrganization(self::ORG_ID));
+        $this->useCase = new CreateUserUseCase($this->users, new StubCurrentOrganization(self::ORG_ID), new FixedClock());
     }
 
     public function test_creates_a_user_with_hashed_password(): void
@@ -38,6 +39,9 @@ final class CreateUserUseCaseTest extends TestCase
         self::assertSame(OperatorRole::Operator, $user->role);
         self::assertSame(self::ORG_ID, $user->organizationId);
         self::assertTrue(password_verify('securepassword', $user->passwordHash));
+        // Timestamps come from the injected fixed clock, not the wall clock.
+        self::assertSame('2026-06-01 10:00:00', $user->createdAt);
+        self::assertSame('2026-06-01 10:00:00', $user->updatedAt);
     }
 
     public function test_throws_when_email_already_taken(): void

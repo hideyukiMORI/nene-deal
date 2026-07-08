@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\Deal;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use NeneDeal\Tenancy\CurrentOrganization;
 use Symfony\Component\Uid\Ulid;
 
@@ -22,6 +23,7 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
         private CurrentOrganization $organization,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -91,7 +93,7 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
 
     public function save(Deal $deal): void
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->now();
 
         // The organization is forced from tenancy, never from the entity.
         $this->query->execute(
@@ -119,7 +121,7 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
 
     public function update(Deal $deal): void
     {
-        $now = date('Y-m-d H:i:s');
+        $now = $this->now();
 
         $affected = $this->query->execute(
             'UPDATE deals SET account_label = ?, amount_cents = ?, stage_id = ?, probability_percent = ?,
@@ -154,7 +156,7 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
             throw new DealNotFoundException($id);
         }
 
-        $now = date('Y-m-d H:i:s');
+        $now = $this->now();
         $this->query->execute(
             'UPDATE deals SET deleted_at = ?, deleted_by = ?, updated_at = ?
              WHERE id = ? AND organization_id = ? AND deleted_at IS NULL',
@@ -171,7 +173,7 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
         $this->query->execute(
             'UPDATE deals SET deleted_at = NULL, deleted_by = NULL, updated_at = ?
              WHERE id = ? AND organization_id = ?',
-            [date('Y-m-d H:i:s'), $id, $this->organization->id()],
+            [$this->now(), $id, $this->organization->id()],
         );
     }
 
@@ -180,7 +182,7 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
         $affected = $this->query->execute(
             'UPDATE deals SET invoice_client_id = ?, invoice_quote_id = ?, handoff_at = ?, updated_at = ?
              WHERE id = ? AND organization_id = ? AND deleted_at IS NULL',
-            [$invoiceClientId, $invoiceQuoteId, $handoffAt, date('Y-m-d H:i:s'), $id, $this->organization->id()],
+            [$invoiceClientId, $invoiceQuoteId, $handoffAt, $this->now(), $id, $this->organization->id()],
         );
 
         if ($affected === 0 && $this->findById($id) === null) {
@@ -201,7 +203,7 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
                 $activity->action,
                 $activity->changes !== null ? json_encode($activity->changes) : null,
                 $activity->actorUserId,
-                $activity->createdAt ?? date('Y-m-d H:i:s'),
+                $activity->createdAt ?? $this->now(),
             ],
         );
     }
@@ -281,6 +283,12 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
             },
             $rows,
         );
+    }
+
+    /** Current instant (UTC) formatted for the `Y-m-d H:i:s` timestamp columns. */
+    private function now(): string
+    {
+        return $this->clock->now()->format('Y-m-d H:i:s');
     }
 
     /** @param array<string, mixed> $row */

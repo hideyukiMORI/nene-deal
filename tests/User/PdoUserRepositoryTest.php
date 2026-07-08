@@ -7,6 +7,7 @@ namespace NeneDeal\Tests\User;
 use Nene2\Config\DatabaseConfig;
 use Nene2\Database\PdoConnectionFactory;
 use Nene2\Database\PdoDatabaseQueryExecutor;
+use NeneDeal\Tests\Support\FixedClock;
 use NeneDeal\User\OperatorRole;
 use NeneDeal\User\PdoUserRepository;
 use NeneDeal\User\User;
@@ -54,7 +55,7 @@ final class PdoUserRepositoryTest extends TestCase
             ],
         );
 
-        $this->repository = new PdoUserRepository($query);
+        $this->repository = new PdoUserRepository($query, new FixedClock());
     }
 
     public function test_finds_a_user_by_email(): void

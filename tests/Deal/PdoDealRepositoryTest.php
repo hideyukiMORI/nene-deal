@@ -12,6 +12,7 @@ use NeneDeal\Deal\DealActivity;
 use NeneDeal\Deal\DealFilter;
 use NeneDeal\Deal\PdoDealRepository;
 use NeneDeal\Tenancy\FixedOrganization;
+use NeneDeal\Tests\Support\FixedClock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -65,7 +66,7 @@ final class PdoDealRepositoryTest extends TestCase
             [$this->wonStageId, $this->orgId, 'won', 'Won', 5, 1, 1, $now, $now],
         );
 
-        $this->repository = new PdoDealRepository($this->query, new FixedOrganization($this->orgId));
+        $this->repository = new PdoDealRepository($this->query, new FixedOrganization($this->orgId), new FixedClock());
     }
 
     public function test_saves_and_reads_back_with_stage_slug(): void
@@ -101,7 +102,7 @@ final class PdoDealRepositoryTest extends TestCase
         $id = (string) new Ulid();
         $this->repository->save(new Deal($id, 'Acme', 1000, $this->leadStageId, 10));
 
-        $otherOrg = new PdoDealRepository($this->query, new FixedOrganization((string) new Ulid()));
+        $otherOrg = new PdoDealRepository($this->query, new FixedOrganization((string) new Ulid()), new FixedClock());
         self::assertNull($otherOrg->findById($id));
         self::assertNotNull($this->repository->findById($id));
     }

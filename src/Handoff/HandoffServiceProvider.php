@@ -8,6 +8,7 @@ use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeneDeal\Deal\DealRepositoryInterface;
 use NeneDeal\Pipeline\PipelineStageRepositoryInterface;
@@ -50,6 +51,7 @@ final readonly class HandoffServiceProvider implements ServiceProviderInterface
                     $deals = $c->get(DealRepositoryInterface::class);
                     $stages = $c->get(PipelineStageRepositoryInterface::class);
                     $invoice = $c->get(InvoiceClient::class);
+                    $clock = $c->get(ClockInterface::class);
 
                     if (!$deals instanceof DealRepositoryInterface) {
                         throw new LogicException('Deal repository service is invalid.');
@@ -63,7 +65,11 @@ final readonly class HandoffServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Invoice client service is invalid.');
                     }
 
-                    return new InvoiceHandoffUseCase($deals, $stages, $invoice);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
+                    }
+
+                    return new InvoiceHandoffUseCase($deals, $stages, $invoice, $clock);
                 },
             )
             ->set(

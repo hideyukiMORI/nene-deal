@@ -10,6 +10,7 @@ use Nene2\Database\PdoDatabaseQueryExecutor;
 use NeneDeal\Pipeline\PdoPipelineStageRepository;
 use NeneDeal\Pipeline\PipelineStage;
 use NeneDeal\Tenancy\FixedOrganization;
+use NeneDeal\Tests\Support\FixedClock;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -61,7 +62,7 @@ final class PdoPipelineStageRepositoryTest extends TestCase
             [(string) new Ulid(), $this->orgId, 'Seeded Deal', 1000, 50, $now, $now, 'lead', $this->orgId],
         );
 
-        $this->repository = new PdoPipelineStageRepository($query, new FixedOrganization($this->orgId));
+        $this->repository = new PdoPipelineStageRepository($query, new FixedOrganization($this->orgId), new FixedClock());
     }
 
     public function test_lists_in_sort_order(): void
