@@ -4,7 +4,8 @@ DirectoryIndex index.html index.php
 RewriteEngine On
 
 # API and infra routes always go to the front controller.
-RewriteRule ^(api/|health$|machine/) index.php [QSA,L]
+# demo/ is the disposable-demo start route (#69) — a backend route, not an SPA page.
+RewriteRule ^(api/|health$|machine/|demo/) index.php [QSA,L]
 
 # Existing files and directories are served as-is (SPA assets, openapi.php).
 RewriteCond %{REQUEST_FILENAME} -f [OR]
