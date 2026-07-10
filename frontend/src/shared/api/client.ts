@@ -27,9 +27,14 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   if (env.apiKey !== '') {
     headers['X-NENE2-API-Key'] = env.apiKey
   }
+  // The Bearer token rides on both `Authorization` and `X-Authorization`.
+  // Some shared-hosting front proxies (Tier A; observed on HETEML) strip the
+  // standard `Authorization` header before it reaches PHP, so the backend
+  // falls back to the mirror when the standard header is missing.
   const token = authStore.getToken()
   if (token !== null) {
     headers['Authorization'] = `Bearer ${token}`
+    headers['X-Authorization'] = `Bearer ${token}`
   }
 
   const response = await fetch(`${base}${path}`, {
