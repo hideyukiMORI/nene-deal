@@ -41,6 +41,7 @@
 
 - [x] Issue #61: Demo seed + reset — `tools/seed-demo.php` (T-relative dates, funnel spread, stage history, demo accounts; re-run = reset; `--org` ready for disposable orgs)
 - [x] Issue #62: Production-shaped container (`docker/php/Dockerfile.prod`, `compose.prod.yaml`, SPA served same-origin via `public_html/.htaccess`), phinx moved to runtime deps, HETEML artifact builder (`tools/build-heteml-artifact.sh`), demo runbook `docs/demo.md`
+- [x] Issue #65: Browser installer (invoice/clear/vault shape, vault #109/#120 Tier A form) — `public_html/install.php` + `installer.js`, NENE2 install toolkit (`EnvironmentWriter` 0640 / `ReInstallationGuard` marker+DB probe / in-process `DatabaseSchemaApplier`), `src/Install/` (`InstallEnvironment` / `DatabaseProvisioningProbe` / `AdminProvisioner`); deletes the dev-seeded `operator@nene-deal.test`, admin password memory-only, self-deletes on success
 
 ## Next
 

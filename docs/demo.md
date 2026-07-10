@@ -73,29 +73,40 @@ Cron example (nightly, 03:00):
 
 ## 5. Shared hosting (HETEML-style) install
 
-No installer exists yet; the manual path is short. Build machine needs
-PHP 8.4 + Composer + Node 22; the server only needs PHP 8.4 (CLI + web),
-Apache `.htaccess` support, MySQL, and rsync.
+Build machine needs PHP 8.4 + Composer + Node 22; the server only needs
+PHP 8.4 (CLI + web), Apache `.htaccess` support, MySQL, and rsync.
 
 ```bash
-# 1. Build the artifact locally (SPA + no-dev vendor + sources)
+# 1. Build the artifact locally (SPA + no-dev vendor + sources + installer)
 bash tools/build-heteml-artifact.sh          # → var/heteml-artifact/
 
 # 2. Upload — keep everything except public_html ABOVE the docroot
 rsync -az var/heteml-artifact/ user@host:~/apps/nene-deal/
 
 # 3. Point the (sub)domain docroot at ~/apps/nene-deal/public_html
+```
 
-# 4. Configure — on the server
-cp .env.example .env   # then set:
-#   APP_ENV=production / APP_DEBUG=false
-#   NENE2_LOCAL_JWT_SECRET=<openssl rand -hex 32>
-#   DB_ADAPTER=mysql + the product-specific MySQL database (1 product = 1 DB)
-#   NENE_DEAL_API_KEY=<random>            # optional, gates writes by header
+**4. Install in the browser (#65)** — open `https://<domain>/install.php` and
+follow the wizard (server requirements → DB connection test → organization
+name + admin account). The installer writes `.env` atomically via the NENE2
+`EnvironmentWriter` (0640 fail-closed, values escaped, JWT secret
+auto-generated; the admin password is handed over in memory only, never
+persisted), applies the phinx migrations in-process
+(`Nene2\Install\DatabaseSchemaApplier` — no CLI needed), **deletes the
+dev-seeded `operator@nene-deal.test` account** and creates the real admin.
+On success it self-deletes; a `var/.installed` marker plus a DB probe
+(`ReInstallationGuard`) refuse any later re-run. If a stray copy survives,
+delete `public_html/install.php` manually.
 
-# 5. Migrate + seed (CLI PHP must be 8.4)
-php8.4 vendor/bin/phinx migrate -c phinx.php
-NENE_DEAL_DEMO_PASSWORD=... php8.4 tools/seed-demo.php   # demo boxes only
+Manual alternative (no browser): `cp .env.example .env`, set
+`APP_ENV=production` / `APP_DEBUG=false` / `NENE2_LOCAL_JWT_SECRET` /
+`DB_*`, then `php8.4 vendor/bin/phinx migrate -c phinx.php`. The migrations
+seed `operator@nene-deal.test` / `password` (admin role) — change or delete
+that account immediately on any reachable box.
+
+```bash
+# 5. Demo boxes only: seed the presentation pipeline (CLI PHP must be 8.4)
+NENE_DEAL_DEMO_PASSWORD=... php8.4 tools/seed-demo.php
 ```
 
 Verify: `https://<domain>/health` → 200, `/` → SPA login, then a demo login.
