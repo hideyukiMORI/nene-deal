@@ -1,5 +1,5 @@
 import { env } from '@/shared/config/env'
-import { authStore } from '@/shared/auth'
+import { authStore, buildAuthHeaders } from '@/shared/auth'
 import { AppError, parseProblemDetails } from '@/shared/api/errors'
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -17,24 +17,12 @@ interface RequestOptions {
  */
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const base = env.apiBaseUrl.replace(/\/$/, '')
-  const headers: Record<string, string> = {}
+  // Auth headers (org slug, API key, Bearer + X-Authorization mirror for
+  // header-stripping proxies) come from the shared builder — see
+  // `auth-headers.ts` for the rationale.
+  const headers: Record<string, string> = buildAuthHeaders()
   if (options.body !== undefined) {
     headers['Content-Type'] = 'application/json'
-  }
-  if (env.orgSlug !== '') {
-    headers['X-Organization-Slug'] = env.orgSlug
-  }
-  if (env.apiKey !== '') {
-    headers['X-NENE2-API-Key'] = env.apiKey
-  }
-  // The Bearer token rides on both `Authorization` and `X-Authorization`.
-  // Some shared-hosting front proxies (Tier A; observed on HETEML) strip the
-  // standard `Authorization` header before it reaches PHP, so the backend
-  // falls back to the mirror when the standard header is missing.
-  const token = authStore.getToken()
-  if (token !== null) {
-    headers['Authorization'] = `Bearer ${token}`
-    headers['X-Authorization'] = `Bearer ${token}`
   }
 
   const response = await fetch(`${base}${path}`, {
