@@ -19,7 +19,7 @@ const SEAT_STORAGE_KEY = 'nene-deal-demo-seat'
  * Must run before the first render so the auth gate sees the session.
  */
 export function importDemoSeat(): void {
-  let token: string | null = null
+  let token: string | null
   try {
     token = sessionStorage.getItem(SEAT_STORAGE_KEY)
     if (token !== null) {
