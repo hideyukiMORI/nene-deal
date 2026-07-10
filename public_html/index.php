@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Nene2\Http\ResponseEmitter;
+use NeneDeal\Http\AuthorizationHeaderFallback;
 use NeneDeal\Http\RuntimeContainerFactory;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
@@ -22,7 +23,7 @@ $serverRequestCreator = new ServerRequestCreator(
     $psr17Factory,
 );
 
-$request = $serverRequestCreator->fromGlobals();
+$request = AuthorizationHeaderFallback::apply($serverRequestCreator->fromGlobals());
 
 $application = $container->get(RequestHandlerInterface::class);
 assert($application instanceof RequestHandlerInterface);
