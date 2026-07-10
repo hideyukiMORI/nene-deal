@@ -57,7 +57,11 @@ $records = [];
 foreach ($rows as $row) {
     $records[] = new DemoOrgRecord(
         orgId: $handles->register((string) $row['id']),
-        createdAt: new DateTimeImmutable((string) $row['created_at']),
+        // created_at is written in UTC (the app-wide UtcClock). Parse it as
+        // UTC explicitly: on a host whose default timezone is ahead of UTC
+        // (production runs Asia/Tokyo) a bare parse would read every fresh
+        // org as hours old and expire it on the spot.
+        createdAt: new DateTimeImmutable((string) $row['created_at'], new DateTimeZone('UTC')),
     );
 }
 
