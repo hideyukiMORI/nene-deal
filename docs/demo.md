@@ -3,11 +3,48 @@
 One page to get a presentable NeNe Deal demo running, hand out credentials,
 and reset it between prospects.
 
-**Model (current):** one pre-seeded, fixed demo organization (`default`) with
-shared credentials and a one-command reset. A disposable per-visitor
-organization model (NENE2 `Demo` module, as used by NeNe Invoice) is planned
-to replace this — the seed already takes `--org=<slug>` so that migration is
-cheap.
+**Two coexisting models** (#69):
+
+1. **Disposable per-visitor demo** — `GET /demo/standard` provisions a
+   throwaway `demo-…` organization, seeds the presentation pipeline and lands
+   the visitor on the kanban with no login. The link IS the demo; "reset"
+   means clicking it again. See section 0.
+2. **Fixed demo organization** (`default`) — pre-seeded, shared credentials,
+   one-command reset (`tools/seed-demo.php` / its cron). Use for guided demos
+   where handing out a login is part of the tour. Sections 1–4.
+
+Both draw the same dataset from `NeneDeal\Demo\DemoPipelineFixture`.
+
+## 0. Disposable demo (`/demo/{template}`)
+
+NENE2 `Nene2\Demo` consumer (framework v1.10.0). Strictly opt-in: with
+`DEMO_MODE` unset the route answers a plain 404, so the wiring ships dormant.
+
+```bash
+# .env — enable per deployment (only 1/true/yes enable it; fail-close)
+DEMO_MODE=1
+# DEMO_SLUG_PREFIX=demo-   DEMO_TTL_HOURS=3   DEMO_MAX_ORGS=200
+```
+
+- **Flow:** provision org + default stages + throwaway admin → seed 15
+  funnel-shaped deals (3 owners) → seat page parks a normal bearer token in
+  `sessionStorage` and `location.replace('/')`; the SPA boot imports it
+  one-shot. Token TTL = 1 h login TTL, no refresh; reload or expiry simply
+  means revisiting the URL for a brand-new org.
+- **Tenancy:** authenticated requests resolve their organization from the
+  signed `org` claim, so a demo session is locked to its own org and the
+  fixed org keeps working with organizations plural.
+- **Protection:** per-IP throttle 30 starts/h (file-backed under
+  `var/rate-limits/` — shared hosting has no cross-process memory) and an
+  instance-wide ceiling of 200 demo orgs. Browser-facing errors are branded
+  HTML (429 with live countdown); API-shaped clients get RFC 9457 JSON.
+- **Sweep (cron, hourly):** destroys `demo-…` orgs older than
+  `DEMO_TTL_HOURS` and overflow beyond `DEMO_MAX_ORGS`; the fixed org and
+  real tenants are never touched. Idempotent.
+
+```cron
+0 * * * * cd /path/to/nene-deal && php8.4 tools/sweep-demo.php >> var/log/sweep-demo.log 2>&1
+```
 
 ## 1. Start (production-shaped container)
 
@@ -117,9 +154,9 @@ way).
 
 - **Reload logs you out** — the bearer token lives in JS memory only (by
   design, no localStorage). Log in again after a refresh.
-- **One shared organization** — concurrent visitors see (and can disturb)
-  each other's changes; the reset restores deals only. Disposable per-visitor
-  orgs are the planned fix.
+- **One shared organization** (fixed-org model only) — concurrent visitors
+  see (and can disturb) each other's changes; the reset restores deals only.
+  Prefer the disposable demo link (section 0) for unattended prospects.
 - **Admin credentials are powerful** — demo admins can edit stages and users;
   those edits survive a reset (the seed re-upserts the demo users but does
   not rebuild stages). Hand out operator credentials unless the admin pages

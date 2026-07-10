@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AppProviders } from '@/app/providers'
 import { AppRouter } from '@/app/router'
+import { importDemoSeat } from '@/shared/auth'
 import { applyLocaleFontFamily, resolveLocale } from '@/shared/i18n'
 import { applyStoredTheme } from '@/shared/theme'
 import '@/shared/ui/theme/index.css'
@@ -21,6 +22,10 @@ const storedLocale = (() => {
 })()
 applyLocaleFontFamily(resolveLocale(storedLocale))
 applyStoredTheme()
+
+// Disposable demo (#69): adopt a seat token parked by /demo/{template}
+// before the first render, so the auth gate sees the seated session.
+importDemoSeat()
 
 async function enableMocking(): Promise<void> {
   if (import.meta.env.VITE_MOCK_API !== 'true') return

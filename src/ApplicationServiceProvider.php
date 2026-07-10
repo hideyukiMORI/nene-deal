@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal;
 
 use LogicException;
+use Nene2\Demo\DemoRouteRegistrar;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use NeneDeal\Audit\AuditRouteRegistrar;
@@ -54,6 +55,9 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $users = $container->get(UserRouteRegistrar::class);
                     $audit = $container->get(AuditRouteRegistrar::class);
                     $settings = $container->get(SettingsRouteRegistrar::class);
+                    // Disposable demo (#69): registered unconditionally — the framework
+                    // handler answers 404 while DEMO_MODE is off (fail-close).
+                    $demo = $container->get(DemoRouteRegistrar::class);
 
                     if (!$stages instanceof PipelineStageRouteRegistrar
                         || !$deals instanceof DealRouteRegistrar
@@ -63,11 +67,12 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$users instanceof UserRouteRegistrar
                         || !$audit instanceof AuditRouteRegistrar
                         || !$settings instanceof SettingsRouteRegistrar
+                        || !$demo instanceof DemoRouteRegistrar
                     ) {
                         throw new LogicException('Route registrar services are invalid.');
                     }
 
-                    return [$stages, $deals, $forecast, $handoff, $auth, $users, $audit, $settings];
+                    return [$stages, $deals, $forecast, $handoff, $auth, $users, $audit, $settings, $demo];
                 },
             )
             ->set(

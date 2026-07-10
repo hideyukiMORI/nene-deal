@@ -31,6 +31,7 @@ use NeneDeal\ApplicationServiceProvider;
 use NeneDeal\Audit\AuditServiceProvider;
 use NeneDeal\Auth\AuthServiceProvider;
 use NeneDeal\Deal\DealServiceProvider;
+use NeneDeal\Demo\DemoServiceProvider;
 use NeneDeal\Forecast\ForecastServiceProvider;
 use NeneDeal\Handoff\HandoffServiceProvider;
 use NeneDeal\Pipeline\PipelineServiceProvider;
@@ -82,6 +83,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
         $builder->addProvider(new AuthServiceProvider());
         $builder->addProvider(new AuditServiceProvider());
         $builder->addProvider(new SettingsServiceProvider());
+        $builder->addProvider(new DemoServiceProvider());
 
         $builder
             ->set(Psr17Factory::class, static fn (ContainerInterface $container): Psr17Factory => new Psr17Factory())
@@ -316,12 +318,14 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     }
 
                     // Operator JWT: the bearer middleware is always part of the
-                    // chain, protecting every route except /health, / and the public
-                    // login endpoint. The secret presence no longer gates the auth
-                    // stage — the verifier's secret fails closed in production and
-                    // uses the injected dev secret in local/test (only behind the
-                    // NENE2_ALLOW_DEV_SECRET opt-in, see GuardedJwtSecretResolver), so
-                    // an unset secret can never silently drop operator gating.
+                    // chain, protecting every route except /health, /, the public
+                    // login endpoint and the public demo start (#69; the handler
+                    // itself is 404 fail-closed while DEMO_MODE is off). The secret
+                    // presence no longer gates the auth stage — the verifier's
+                    // secret fails closed in production and uses the injected dev
+                    // secret in local/test (only behind the NENE2_ALLOW_DEV_SECRET
+                    // opt-in, see GuardedJwtSecretResolver), so an unset secret can
+                    // never silently drop operator gating.
                     $verifier = $container->get(TokenVerifierInterface::class);
                     $problemDetails = $container->get(ProblemDetailsResponseFactory::class);
 
@@ -333,13 +337,18 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Problem details response factory service is invalid.');
                     }
 
+                    // Bearer runs BEFORE org resolution: the org middleware reads
+                    // the verified `org` claim (authoritative tenant binding —
+                    // required once disposable demo orgs make organizations plural,
+                    // because the header-less SPA can no longer rely on the
+                    // sole-org fallback).
                     $authMiddlewares = [
-                        $orgMiddleware,
                         new BearerTokenMiddleware(
                             $problemDetails,
                             $verifier,
-                            excludedPaths: ['/', '/health', '/api/v1/auth/login'],
+                            excludedPaths: ['/', '/health', '/api/v1/auth/login', '/demo/standard'],
                         ),
+                        $orgMiddleware,
                     ];
 
                     // Machine API key gates mutating requests when configured.

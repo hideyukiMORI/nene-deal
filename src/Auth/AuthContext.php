@@ -29,6 +29,18 @@ final class AuthContext
         return is_string($value) && $value !== '' ? $value : null;
     }
 
+    /**
+     * The organization the token was issued for. Users belong to exactly one
+     * organization, so the signed claim is authoritative for tenant resolution
+     * ({@see \NeneDeal\Tenancy\RequestOrganizationMiddleware}).
+     */
+    public static function organizationId(ServerRequestInterface $request): ?string
+    {
+        $value = self::claim($request, 'org');
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
     private static function claim(ServerRequestInterface $request, string $key): mixed
     {
         $claims = $request->getAttribute(self::CLAIMS_ATTRIBUTE);
