@@ -1,0 +1,67 @@
+# Production-shaped stack for local verification and container-based demo
+# hosting: immutable image (no bind mount), APP_DEBUG=false, JWT secret
+# required (fail-close), SPA served same-origin from public_html.
+#
+#   docker compose -f compose.prod.yaml up -d --build
+#
+# Secrets come from the environment / an untracked .env; `:?` interpolation
+# makes the stack refuse to start without them. See docs/demo.md.
+#
+# The dev stack is compose.yaml (app 8110 / MySQL 3310). This stack uses 8111
+# from the family-unique 81** block; its MySQL is intentionally not published.
+# The distinct project name lets both stacks run side by side.
+name: nene-deal-prod
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile.prod
+    ports:
+      - '${NENE_DEAL_PROD_PORT:-8111}:80'
+    environment:
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      APP_NAME: 'NeNe Deal'
+      PROBLEM_DETAILS_BASE_URL: 'https://nene-deal.dev/problems/'
+      # Operator JWT secret — required, no default (fail-close).
+      NENE2_LOCAL_JWT_SECRET: ${NENE2_LOCAL_JWT_SECRET:?set a strong random secret, e.g. openssl rand -hex 32}
+      # Machine API key gating mutating requests (optional; see .env.example).
+      NENE_DEAL_API_KEY: ${NENE_DEAL_API_KEY:-}
+      # Demo seed password (tools/seed-demo.php refuses its built-in default
+      # in production, so set this before seeding a public demo).
+      NENE_DEAL_DEMO_PASSWORD: ${NENE_DEAL_DEMO_PASSWORD:-}
+      DB_ADAPTER: mysql
+      DB_HOST: mysql
+      DB_PORT: '3306'
+      DB_NAME: nene_deal
+      DB_USER: nene_deal
+      DB_PASSWORD: ${NENE_DEAL_DB_PASSWORD:?set the MySQL password}
+      NENE_DEAL_TRASH_RETENTION_DAYS: ${NENE_DEAL_TRASH_RETENTION_DAYS:-30}
+      # Won → Invoice handoff (optional; leave empty to disable).
+      NENE_DEAL_INVOICE_BASE_URL: ${NENE_DEAL_INVOICE_BASE_URL:-}
+      NENE_DEAL_INVOICE_BEARER_TOKEN: ${NENE_DEAL_INVOICE_BEARER_TOKEN:-}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.4
+    # No published host port: this database is reachable only from the app.
+    environment:
+      MYSQL_ROOT_PASSWORD: ${NENE_DEAL_DB_ROOT_PASSWORD:?set the MySQL root password}
+      MYSQL_DATABASE: nene_deal
+      MYSQL_USER: nene_deal
+      MYSQL_PASSWORD: ${NENE_DEAL_DB_PASSWORD:?set the MySQL password}
+    volumes:
+      - mysql-prod-data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  mysql-prod-data:
