@@ -27,6 +27,32 @@ Built on [NENE2](https://github.com/hideyukiMORI/NENE2).
 | **NeNe Vault** | `nene-vault` | Received-document archive |
 | **NeNe Records** | `nene-records` | Flexible CMS / catalog (optional upstream) |
 
+## Live demo
+
+Try it now — no sign-up. The link provisions a **brand-new disposable organization** seeded with 15 deals across the pipeline and drops you straight into its kanban board. Demo organizations are deleted automatically after about 3 hours. The bearer token is held in memory only, so reloading the page signs you out — hit the link again for a fresh organization.
+
+- <https://deal.ayane.co.jp/demo/standard>
+
+### Screenshots
+
+From a disposable demo organization. Japanese UI shown — the admin UI is bilingual (ja/en, one-click switch).
+
+**Pipeline board — open deals, pipeline total, probability-weighted forecast, and won-this-month KPI tiles above a funnel-shaped kanban.**
+
+![Pipeline kanban with four KPI tiles (open deals, pipeline total, weighted forecast, won this month) over Lead / Qualified / Proposal / Negotiation columns](./docs/images/demo-01-kanban.png)
+
+**Deal detail — amount, probability, expected close date, and stage edited inline; a won deal is pushed to NeNe Invoice as a draft client and quote.**
+
+![Deal detail with stage selector, inline edit form for amount / probability / close date / note, and a NeNe Invoice handoff section](./docs/images/demo-02-deal-detail.png)
+
+**Stage management — six default stages from Lead to Won / Lost with won and closed badges; rename, reorder, add, or remove stages to match your sales process.**
+
+![Stage management list with six default stages and won / closed badges on Won and Lost](./docs/images/demo-03-stages.png)
+
+**Audit export — every create, edit, stage move, delete, restore, and Invoice handoff recorded with actor and timestamp, downloadable as CSV for any date range.**
+
+![Audit log export with date range, recorded-operation chips including Invoice handoff, and CSV download](./docs/images/demo-04-audit-export.png)
+
 ## Goals
 
 - **Minimal input** — deal card: account label, amount, stage, probability, short note
