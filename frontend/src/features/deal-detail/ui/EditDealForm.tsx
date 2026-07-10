@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import type { Deal, UpdateDealInput } from '@/entities/deal'
 import { useTranslation } from '@/shared/i18n'
+import { centsToYen, yenToCents } from '@/shared/lib/format-money'
 import { Button, Input, Stack, Text } from '@/shared/ui'
 
 export interface EditDealFormProps {
@@ -14,7 +15,8 @@ export interface EditDealFormProps {
 
 interface EditDealFormValues {
   accountLabel: string
-  amountCents: number
+  /** Whole yen as entered by the user; converted to cents on submit. */
+  amountYen: number
   probabilityPercent: number
   note: string
   expectedCloseDate: string
@@ -25,7 +27,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
 
   const schema = z.object({
     accountLabel: z.string().trim().min(1, t('deal.validation.accountLabelRequired')),
-    amountCents: z
+    amountYen: z
       .number({ message: t('deal.validation.amountPositive') })
       .int(t('deal.validation.amountPositive'))
       .min(0, t('deal.validation.amountPositive')),
@@ -46,7 +48,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
     resolver: zodResolver(schema),
     defaultValues: {
       accountLabel: deal.accountLabel,
-      amountCents: deal.amountCents,
+      amountYen: centsToYen(deal.amountCents),
       probabilityPercent: deal.probabilityPercent,
       note: deal.note ?? '',
       expectedCloseDate: deal.expectedCloseDate ?? '',
@@ -56,7 +58,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
   const submit = handleSubmit(async (values) => {
     await onSubmit({
       accountLabel: values.accountLabel,
-      amountCents: values.amountCents,
+      amountCents: yenToCents(values.amountYen),
       probabilityPercent: values.probabilityPercent,
       note: values.note.trim() === '' ? null : values.note,
       expectedCloseDate: values.expectedCloseDate.trim() === '' ? null : values.expectedCloseDate,
@@ -95,8 +97,9 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
               label={t('deal.field.amount')}
               type="number"
               min={0}
-              error={errors.amountCents?.message}
-              {...register('amountCents', { valueAsNumber: true })}
+              step={1}
+              error={errors.amountYen?.message}
+              {...register('amountYen', { valueAsNumber: true })}
             />
           </div>
           <div className="grow">

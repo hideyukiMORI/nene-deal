@@ -7,10 +7,25 @@
  * @param locale BCP 47 locale tag (e.g. `ja`, `en`)
  */
 export function formatMoneyJpy(amountCents: number, locale: string): string {
-  const yen = Math.round(amountCents / 100)
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: 'JPY',
     maximumFractionDigits: 0,
-  }).format(yen)
+  }).format(centsToYen(amountCents))
+}
+
+/**
+ * Convert an integer cents amount to whole yen for form display.
+ * Rounding matches {@link formatMoneyJpy} (sub-yen amounts do not occur).
+ */
+export function centsToYen(amountCents: number): number {
+  return Math.round(amountCents / 100)
+}
+
+/**
+ * Convert a whole-yen form input back to integer cents for the API.
+ * Inputs are validated as integers; rounding guards against float artifacts.
+ */
+export function yenToCents(amountYen: number): number {
+  return Math.round(amountYen * 100)
 }

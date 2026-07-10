@@ -62,7 +62,7 @@ export const en: MessageCatalog = {
   'deal.field.owner': 'Owner',
   'deal.field.note': 'Note',
   'deal.validation.accountLabelRequired': 'Please enter an account name.',
-  'deal.validation.amountPositive': 'Amount must be 0 or greater.',
+  'deal.validation.amountPositive': 'Amount must be a whole number of yen, 0 or greater.',
   'deal.validation.probabilityRange': 'Probability must be between 0 and 100.',
 
   'common.actions.back': 'Back',
