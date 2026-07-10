@@ -78,7 +78,7 @@ function refuse_install(string $message): never
 function ico(string $name): string
 {
     return match ($name) {
-        'mark' => '<svg viewBox="0 0 34 34" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4.2" y="5" width="7.6" height="24" rx="1.8"/><rect x="13.2" y="5" width="7.6" height="16.5" rx="1.8"/><rect x="22.2" y="5" width="7.6" height="10.5" rx="1.8"/></svg>',
+        'mark' => '<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect class="lg-col" x="9" y="12" width="13.5" height="40" rx="3.5" fill="currentColor" opacity=".13"/><rect class="lg-col" x="25.25" y="12" width="13.5" height="40" rx="3.5" fill="currentColor" opacity=".13"/><rect class="lg-col" x="41.5" y="12" width="13.5" height="40" rx="3.5" fill="currentColor" opacity=".13"/><path class="lg-line" d="M15.75 43.3 L32 33 L48.25 22.7" fill="none" stroke="currentColor" stroke-width="2.4" opacity=".5" stroke-linecap="round" stroke-linejoin="round"/><rect class="lg-blk" x="11" y="39" width="9.5" height="8.6" rx="2.5" fill="#e9eef0"/><rect class="lg-blk" x="27.25" y="28.7" width="9.5" height="8.6" rx="2.5" fill="#e9eef0"/><rect class="lg-blk" x="43.5" y="18.4" width="9.5" height="8.6" rx="2.5" fill="currentColor"/></svg>',
         'check' => '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5l4 4 8-9"/></svg>',
         'x' => '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>',
         'arrow' => '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h11M11 5l5 5-5 5"/></svg>',
@@ -388,7 +388,7 @@ function render_installer_page(array $state): string
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>NeNe Deal — セットアップウィザード</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='7' fill='%23222a38'/%3E%3Crect x='6' y='7' width='6.4' height='20' rx='1.6' fill='none' stroke='%235b8def' stroke-width='1.9'/%3E%3Crect x='14.2' y='7' width='6.4' height='14' rx='1.6' fill='none' stroke='%235b8def' stroke-width='1.9'/%3E%3Crect x='22.4' y='7' width='6.4' height='9' rx='1.6' fill='none' stroke='%235b8def' stroke-width='1.9'/%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2048%2048%22%20role%3D%22img%22%20aria-label%3D%22NeNe%20Deal%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22dlg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%232f8475%22%3E%3C%2Fstop%3E%3Cstop%20offset%3D%220.55%22%20stop-color%3D%22%23236457%22%3E%3C%2Fstop%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23194d43%22%3E%3C%2Fstop%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%2248%22%20height%3D%2248%22%20rx%3D%2210.6%22%20fill%3D%22url(%23dlg)%22%3E%3C%2Frect%3E%3Crect%20width%3D%2248%22%20height%3D%2248%22%20rx%3D%2210.6%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-opacity%3D%220.10%22%20stroke-width%3D%221.00%22%3E%3C%2Frect%3E%3Crect%20x%3D%227.60%22%20y%3D%2229.50%22%20width%3D%229.50%22%20height%3D%229.00%22%20rx%3D%222.60%22%20fill%3D%22%230c3a33%22%20opacity%3D%220.15%22%3E%3C%2Frect%3E%3Crect%20x%3D%227.00%22%20y%3D%2228.50%22%20width%3D%229.50%22%20height%3D%229.00%22%20rx%3D%222.60%22%20fill%3D%22%23fff%22%20opacity%3D%220.55%22%3E%3C%2Frect%3E%3Crect%20x%3D%2219.85%22%20y%3D%2223.00%22%20width%3D%229.50%22%20height%3D%229.00%22%20rx%3D%222.60%22%20fill%3D%22%230c3a33%22%20opacity%3D%220.22%22%3E%3C%2Frect%3E%3Crect%20x%3D%2219.25%22%20y%3D%2222.00%22%20width%3D%229.50%22%20height%3D%229.00%22%20rx%3D%222.60%22%20fill%3D%22%23fff%22%20opacity%3D%220.8%22%3E%3C%2Frect%3E%3Crect%20x%3D%2232.10%22%20y%3D%2213.50%22%20width%3D%229.50%22%20height%3D%229.00%22%20rx%3D%222.60%22%20fill%3D%22%230c3a33%22%20opacity%3D%220.28%22%3E%3C%2Frect%3E%3Crect%20x%3D%2231.50%22%20y%3D%2212.50%22%20width%3D%229.50%22%20height%3D%229.00%22%20rx%3D%222.60%22%20fill%3D%22%23fff%22%20opacity%3D%221%22%3E%3C%2Frect%3E%3C%2Fsvg%3E">
     <style>{$css}</style>
     </head>
     <body data-view="{$viewAttr}" data-error="{$errFlag}">
@@ -432,66 +432,69 @@ function render_installer_page(array $state): string
     HTML;
 }
 
-/** Installer stylesheet — vault wizard chassis re-skinned to the Deal palette (calm blue + teal). */
+/** Installer stylesheet — the ClaudeDesign delivery: teal-primary Deal brand system, oklch tokens, uniform across all screen states. */
 function installer_css(): string
 {
     return <<<'CSS'
     :root{
-      /* ── fonts — system only (no web fonts permitted) ── */
-      --font-sans:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic","Noto Sans JP",sans-serif;
+      /* ── fonts — prefer IBM Plex if present on host, else system (no web-font load) ── */
+      --font-sans:"IBM Plex Sans","IBM Plex Sans JP",system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic","Noto Sans JP",sans-serif;
       --font-serif:var(--font-sans);
-      --font-num:ui-monospace,"SFMono-Regular","Menlo","Consolas",monospace;
+      --font-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular","Menlo","Consolas",monospace;
 
-      /* ── cool paper surfaces (Deal default theme) ── */
-      --bg:oklch(97.2% 0.005 250);--surface:oklch(99.6% 0.002 250);--surface-2:oklch(98.2% 0.004 250);
-      --sunk:oklch(95.2% 0.006 250);--sunk-2:oklch(93.4% 0.008 250);
+      /* ── cool paper surfaces (NeNe Deal light theme) ── */
+      --bg:oklch(97.5% 0.004 230);--surface:oklch(100% 0 0);--surface-2:oklch(98.5% 0.004 230);
+      --sunk:oklch(96% 0.006 235);--sunk-2:oklch(93.6% 0.008 238);
 
       /* ── ink — cool deep slate ── */
-      --ink:oklch(28% 0.022 260);--ink-2:oklch(23% 0.02 260);--text:oklch(30% 0.02 260);
-      --text-muted:oklch(49% 0.018 260);--text-faint:oklch(60% 0.015 260);
+      --ink:oklch(26% 0.02 245);--ink-2:oklch(21.5% 0.02 245);--text:oklch(30% 0.02 245);
+      --text-muted:oklch(48% 0.02 245);--text-faint:oklch(63% 0.016 245);
 
       /* ── borders ── */
-      --line:oklch(89% 0.008 255);--line-2:oklch(84% 0.01 255);--line-strong:oklch(76% 0.012 255);
+      --line:oklch(90.5% 0.008 235);--line-2:oklch(86% 0.01 235);--line-strong:oklch(82% 0.012 235);
 
-      /* ── navy → Deal accent blue (frontend --color-accent) ── */
-      --navy:oklch(55% 0.16 255);--navy-deep:oklch(45% 0.15 256);--navy-hover:oklch(49% 0.16 255);
-      --navy-soft:oklch(94.5% 0.025 255);--navy-line:oklch(86% 0.05 255);
+      /* ── PRIMARY = NeNe Deal teal accent (was navy) ── */
+      --navy:oklch(52% 0.1 188);--navy-deep:oklch(44% 0.1 188);--navy-hover:oklch(46% 0.1 188);
+      --navy-soft:oklch(95% 0.03 188);--navy-line:oklch(84% 0.05 188);
 
-      /* ── brass → Deal teal (brand secondary #2c7a6e) ── */
-      --brass:oklch(56% 0.085 178);--brass-deep:oklch(47% 0.08 178);--brass-hi:oklch(68% 0.09 178);
-      --brass-soft:oklch(93% 0.04 178);--brass-line:oklch(82% 0.05 178);
+      /* ── secondary teal (brand #2c7a6e) — eyebrows / section marks / links ── */
+      --brass:oklch(50% 0.088 178);--brass-deep:oklch(43% 0.082 178);--brass-hi:oklch(74% 0.11 182);
+      --brass-soft:oklch(94% 0.035 180);--brass-line:oklch(83% 0.05 180);
 
       /* ── status ── */
-      --success:oklch(53% 0.09 155);--success-soft:oklch(94% 0.03 155);
-      --danger:oklch(54% 0.16 27);--danger-soft:oklch(94.5% 0.035 27);--danger-hover:oklch(48% 0.16 27);
-      --warning:oklch(60% 0.1 75);--warning-soft:oklch(95% 0.045 82);
+      --success:oklch(52% 0.13 155);--success-soft:oklch(94% 0.045 155);
+      --danger:oklch(54% 0.18 25);--danger-soft:oklch(95% 0.04 25);--danger-hover:oklch(47% 0.18 25);
+      --warning:oklch(62% 0.13 72);--warning-soft:oklch(95.5% 0.06 84);
 
-      /* ── dark rail (brand panel) ── */
-      --rail:oklch(26% 0.02 260);--rail-2:oklch(30% 0.022 260);--rail-line:oklch(37% 0.02 260);
-      --rail-text:oklch(82% 0.012 258);--rail-faint:oklch(64% 0.014 258);
+      /* ── dark rail (brand panel) — NeNe Deal dark-console surfaces ── */
+      --rail:oklch(18.5% 0.018 245);--rail-2:oklch(23% 0.018 245);--rail-line:oklch(32% 0.018 245);
+      --rail-text:oklch(83% 0.012 240);--rail-faint:oklch(60% 0.016 242);
 
-      /* ── geometry ── */
-      --r:5px;--r-md:8px;--r-lg:10px;--r-full:999px;
-      --shadow-sm:0 1px 2px oklch(28% 0.02 256 / 7%);
-      --shadow:0 2px 6px oklch(28% 0.02 256 / 9%),0 1px 0 oklch(100% 0 0 / 40%) inset;
-      --shadow-lg:0 12px 36px oklch(25% 0.02 256 / 22%);
-      --ease:cubic-bezier(.22,.61,.36,1);--ease-out:cubic-bezier(.16,1,.3,1);
+      /* ── geometry (NeNe Deal: 4 / 6 / 10) ── */
+      --r:4px;--r-md:6px;--r-lg:10px;--r-full:999px;
+      --shadow-sm:0 1px 2px oklch(0% 0 0 / 6%);
+      --shadow:0 10px 28px -10px oklch(0% 0 0 / 12%),0 1px 0 oklch(100% 0 0 / 55%) inset;
+      --shadow-lg:0 20px 50px -14px oklch(0% 0 0 / 18%);
+      --ease:cubic-bezier(.22,.61,.36,1);--ease-out:cubic-bezier(.16,1,.3,1);--ease-spring:cubic-bezier(.16,.84,.44,1);
 
       /* ── aliases ── */
       --brand:var(--navy);--brand-strong:var(--navy-deep);--brand-deep:var(--rail);
-      --brand-soft:var(--navy-soft);--on-brand:oklch(98.5% 0.005 250);
+      --brand-soft:var(--navy-soft);--on-brand:oklch(99% 0 0);
       --border:var(--line);--border-strong:var(--line-2);
-      --fg:var(--text);--fg-muted:var(--text-muted);--fg-subtle:var(--text-faint);--fg-faint:oklch(68% 0.013 256);
+      --fg:var(--text);--fg-muted:var(--text-muted);--fg-subtle:var(--text-faint);--fg-faint:oklch(68% 0.014 246);
       --ok:var(--success);--ok-soft:var(--success-soft);
       --warn:var(--warning);--warn-soft:var(--warning-soft);
       --surface-sunk:var(--sunk);
       --radius:var(--r-md);--radius-sm:var(--r);
-      --ring:0 0 0 3px var(--navy-soft);
+      --ring:0 0 0 3px oklch(52% 0.1 188 / 32%);
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%}
     body{font-family:var(--font-sans);background:var(--bg);color:var(--fg);line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
     code{font-family:var(--font-num);background:var(--sunk);padding:.05em .35em;border-radius:var(--r);font-size:.92em;font-feature-settings:"zero" 1}
+    ::selection{background:var(--navy-soft)}
+    a{color:var(--brass-deep);text-decoration:none}
+    a:hover{color:var(--navy);text-decoration:underline;text-underline-offset:2px}
 
     /* ============================================================
        STAGE
@@ -500,57 +503,63 @@ function installer_css(): string
     .iz-stage{display:grid;grid-template-columns:minmax(380px,0.92fr) 1.08fr;min-height:100vh}
 
     .iz-aside{position:relative;overflow:hidden;color:var(--rail-text);display:flex;flex-direction:column;justify-content:space-between;padding:48px 46px 38px;
-      background:radial-gradient(125% 72% at 16% -12%,oklch(33% 0.03 258) 0%,transparent 58%),var(--rail)}
-    .iz-aside::before{content:"";position:absolute;inset:0;pointer-events:none;
-      background-image:linear-gradient(oklch(100% 0 0/0.045) 1px,transparent 1px),linear-gradient(90deg,oklch(100% 0 0/0.045) 1px,transparent 1px);
-      background-size:44px 44px;mask-image:linear-gradient(152deg,#000 6%,transparent 78%)}
+      background:radial-gradient(125% 96% at 100% 0%,color-mix(in srgb,oklch(60% 0.11 184) 20%,var(--rail)) 0%,transparent 56%),var(--rail)}
+    /* aurora sweep behind the grid */
+    .iz-aside::after{content:"";position:absolute;inset:-30% -10% auto -30%;height:70%;z-index:0;pointer-events:none;
+      background:radial-gradient(60% 60% at 30% 30%,oklch(60% 0.1 186/0.16),transparent 70%);
+      filter:blur(10px);animation:aurora 16s ease-in-out infinite alternate}
+    .iz-aside::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+      background-image:linear-gradient(oklch(100% 0 0/0.05) 1px,transparent 1px),linear-gradient(90deg,oklch(100% 0 0/0.05) 1px,transparent 1px);
+      background-size:32px 32px;-webkit-mask-image:radial-gradient(125% 95% at 82% 6%,#000 0%,transparent 72%);mask-image:radial-gradient(125% 95% at 82% 6%,#000 0%,transparent 72%)}
     .iz-aside>*{position:relative;z-index:1}
     .iz-bs-top{display:flex;align-items:center;gap:13px}
-    .mono-mark{width:40px;height:40px;flex:none;color:oklch(68% 0.13 255)}
+    .mono-mark{width:40px;height:40px;flex:none;color:var(--brass-hi);filter:drop-shadow(0 2px 8px oklch(60% 0.1 186/0.35))}
     .mono-mark svg{width:100%;height:100%;display:block}
-    .abt-name{font-size:21px;font-weight:700;letter-spacing:.008em;color:oklch(97% 0.005 250);white-space:nowrap;line-height:1.1}
-    .abt-sub{font-size:9px;color:var(--brass-hi);letter-spacing:.2em;text-transform:uppercase;margin-top:3px;font-weight:600}
+    .mono-mark svg .lg-blk{transform-origin:center;transform-box:fill-box}.mono-mark svg .lg-line{stroke-dasharray:44;stroke-dashoffset:44}
+    .abt-name{font-size:21px;font-weight:700;letter-spacing:-.01em;color:oklch(98% 0.004 240);white-space:nowrap;line-height:1.1}
+    .abt-sub{font-size:9px;color:var(--brass-hi);letter-spacing:.22em;text-transform:uppercase;margin-top:3px;font-weight:600}
     .iz-bs-mid{max-width:400px}
-    .iz-bs-mid h2{font-size:26px;font-weight:700;line-height:1.4;color:oklch(96% 0.005 250);letter-spacing:-.005em;text-wrap:balance}
+    .iz-bs-mid h2{font-size:27px;font-weight:600;line-height:1.35;color:oklch(97% 0.004 240);letter-spacing:-.02em;text-wrap:balance}
     .iz-bs-mid .lead{font-size:13px;color:var(--rail-text);opacity:.9;margin-top:15px;line-height:1.85}
 
     /* vertical stepper */
     .vstep{list-style:none;margin:32px 0 0}
     .vstep li{display:flex;gap:14px}
     .vs-rail{display:flex;flex-direction:column;align-items:center;flex:none}
-    .vs-dot{width:30px;height:30px;border-radius:var(--r);display:grid;place-items:center;font-family:var(--font-num);font-size:13px;font-weight:600;background:oklch(32% 0.022 260);color:var(--rail-faint);border:1px solid var(--rail-line);transition:background .3s var(--ease),color .3s,box-shadow .3s}
+    .vs-dot{width:30px;height:30px;border-radius:var(--r-md);display:grid;place-items:center;font-family:var(--font-num);font-size:13px;font-weight:600;background:oklch(24% 0.018 245);color:var(--rail-faint);border:1px solid var(--rail-line);transition:background .35s var(--ease),color .35s,border-color .35s,box-shadow .35s}
     .vs-dot svg{width:14px;height:14px}
-    .vs-line{width:2px;flex:1;min-height:22px;background:var(--rail-line);margin:5px 0;border-radius:1px}
+    .vs-line{width:2px;flex:1;min-height:22px;background:var(--rail-line);margin:5px 0;border-radius:1px;position:relative;overflow:hidden}
+    .vs-line::after{content:"";position:absolute;inset:0;transform:scaleY(0);transform-origin:top;background:var(--brass-hi);opacity:.55;transition:transform .5s var(--ease)}
     .vstep li:last-child .vs-line{display:none}
     .vs-body{padding-top:4px;padding-bottom:18px}
     .vs-t{font-size:13.5px;font-weight:600;color:var(--rail-text)}
     .vs-d{font-size:11.5px;color:var(--rail-faint);margin-top:2px}
-    .vstep li.active .vs-dot{background:oklch(68% 0.13 255);color:var(--rail);border-color:oklch(68% 0.13 255);box-shadow:0 0 0 4px oklch(68% 0.13 255/0.16)}
-    .vstep li.active .vs-t{color:oklch(96% 0.005 250)}
-    .vstep li.done .vs-dot{background:oklch(32% 0.022 260);color:var(--brass-hi);border-color:var(--rail-line)}
-    .vstep li.done .vs-line{background:var(--brass-hi);opacity:.5}
+    .vstep li.active .vs-dot{background:var(--brass-hi);color:oklch(20% 0.03 200);border-color:var(--brass-hi);box-shadow:0 0 0 4px oklch(74% 0.11 182/0.16)}
+    .vstep li.active .vs-t{color:oklch(97% 0.004 240)}
+    .vstep li.done .vs-dot{background:oklch(24% 0.018 245);color:var(--brass-hi);border-color:var(--brass-line);opacity:1}
+    .vstep li.done .vs-line::after{transform:scaleY(1)}
 
     /* trust row + copy */
     .iz-trust{display:flex;flex-wrap:wrap;gap:9px 16px}
     .tb{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--rail-faint)}
     .tb svg{width:13px;height:13px;stroke:var(--brass-hi);opacity:.9}
-    .copy{font-size:10.5px;color:var(--rail-faint);margin-top:16px;letter-spacing:.02em}
+    .copy{font-size:10.5px;color:var(--rail-faint);margin-top:16px;letter-spacing:.02em;font-family:var(--font-num)}
 
     /* ── form column ── */
     .iz-main{display:flex;align-items:flex-start;justify-content:center;padding:56px 48px;overflow-y:auto;
-      background:radial-gradient(120% 60% at 50% -10%,oklch(96% 0.008 250) 0%,var(--bg) 55%)}
+      background:radial-gradient(120% 60% at 50% -12%,oklch(98% 0.008 230) 0%,var(--bg) 55%)}
     .iz-form{width:100%;max-width:560px}
 
     /* horizontal stepper (mobile) */
     .hstep{display:none;gap:8px;margin-bottom:26px}
-    .hs{flex:1;text-align:center;font-size:11.5px;font-weight:600;padding:9px 4px;border-radius:var(--r);color:var(--fg-faint);background:var(--surface);border:1px solid var(--line-2);transition:background .2s,color .2s}
+    .hs{flex:1;text-align:center;font-size:11.5px;font-weight:600;padding:9px 4px;border-radius:var(--r);color:var(--fg-faint);background:var(--surface);border:1px solid var(--line-2);transition:background .2s,color .2s,border-color .2s}
     .hs.active{background:var(--navy);color:var(--on-brand);border-color:var(--navy)}
     .hs.done{background:var(--navy-soft);color:var(--navy-deep);border-color:var(--navy-line)}
     .hs.done::before{content:"✓ "}
 
     /* title */
-    .iz-head{font-size:25px;font-weight:700;letter-spacing:-.01em;color:var(--ink-2);position:relative;padding-left:16px}
-    .iz-head::before{content:"";position:absolute;left:0;top:2px;bottom:2px;width:3px;border-radius:1px;background:var(--brass)}
+    .iz-head{font-size:26px;font-weight:600;letter-spacing:-.02em;color:var(--ink-2);position:relative;padding-left:16px}
+    .iz-head::before{content:"";position:absolute;left:0;top:3px;bottom:3px;width:3px;border-radius:2px;background:var(--brass)}
     .iz-headsub{font-size:13px;color:var(--fg-muted);margin:11px 0 24px;line-height:1.85}
 
     /* ============================================================
@@ -558,9 +567,10 @@ function installer_css(): string
        ============================================================ */
     .alert{display:flex;gap:12px;padding:14px 16px;border-radius:var(--r-md);margin-bottom:20px;font-size:13px;line-height:1.55;border:1px solid}
     .alert>svg{width:18px;height:18px;flex:none;margin-top:1px;stroke:currentColor}
-    .alert.ok{background:var(--success-soft);border-color:var(--success);color:var(--success)}
-    .alert.error{background:var(--danger-soft);border-color:var(--danger);color:var(--danger-hover)}
-    .alert.warn{background:var(--warning-soft);border-color:var(--warning);color:oklch(40% 0.09 60)}
+    .alert.ok{background:var(--success-soft);border-color:color-mix(in oklch,var(--success) 40%,var(--line));color:var(--success)}
+    .alert.error{background:var(--danger-soft);border-color:color-mix(in oklch,var(--danger) 45%,var(--line));color:var(--danger-hover)}
+    .alert.warn{background:var(--warning-soft);border-color:color-mix(in oklch,var(--warning) 45%,var(--line));color:oklch(42% 0.1 62)}
+    .alert.ok>svg{animation:pop .4s var(--ease-out)}
     .a-title{font-weight:700}
     .a-text{margin-top:2px;color:inherit;opacity:.94;line-height:1.7}
     .alert details{margin-top:8px}
@@ -571,7 +581,7 @@ function installer_css(): string
        REQUIREMENTS LIST
        ============================================================ */
     .reqs{list-style:none;margin:0 0 24px;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--shadow-sm)}
-    .reqs li{display:flex;gap:13px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface);transition:background .15s}
+    .reqs li{display:flex;gap:13px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface);transition:background .16s}
     .reqs li:last-child{border-bottom:none}
     .reqs li:hover{background:var(--surface-2)}
     .reqs .ic{width:22px;height:22px;flex:none;border-radius:var(--r-full);display:grid;place-items:center;margin-top:1px}
@@ -586,21 +596,22 @@ function installer_css(): string
        FORM FIELDS
        ============================================================ */
     .field{margin-bottom:18px}
-    .label{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;margin-bottom:7px;color:var(--ink-2)}
+    .label{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;margin-bottom:7px;color:var(--ink-2)}
     .req{color:var(--danger)}
     .opt{font-size:11px;font-weight:500;color:var(--fg-subtle)}
-    .input,.select{width:100%;padding:10px 12px;font-size:14px;font-family:inherit;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r);transition:border-color .14s,box-shadow .14s}
+    .input,.select{width:100%;padding:9px 12px;font-size:14px;font-family:inherit;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r);transition:border-color .14s,box-shadow .14s,background .14s}
     .input::placeholder{color:var(--text-faint)}
+    .input:hover,.select:hover{border-color:var(--fg-faint)}
     .input:focus,.select:focus{outline:none;border-color:var(--navy);box-shadow:var(--ring)}
-    .input.mono{font-family:var(--font-num);font-size:13.5px}
-    .input.is-error{border-color:var(--danger);box-shadow:0 0 0 3px oklch(54% 0.16 27/0.15)}
-    .select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23697080' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+    .input.mono{font-family:var(--font-num);font-size:13.5px;font-variant-numeric:tabular-nums}
+    .input.is-error{border-color:var(--danger);box-shadow:0 0 0 3px oklch(54% 0.18 25/0.16)}
+    .select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--fg-faint) 50%),linear-gradient(135deg,var(--fg-faint) 50%,transparent 50%);background-position:calc(100% - 16px) 52%,calc(100% - 11px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:30px}
     .hint{font-size:11.5px;color:var(--fg-subtle);margin-top:6px;line-height:1.65}
     .err-text{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--danger-hover);font-weight:600;margin-top:6px;animation:shake .4s var(--ease)}
     .err-text svg{width:13px;height:13px}
     .form-row2{display:grid;grid-template-columns:1fr 140px;gap:14px}
     .tip{position:relative;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:var(--r-full);background:var(--sunk);border:1px solid var(--line-2);color:var(--fg-subtle);font-size:10.5px;font-weight:700;cursor:help}
-    .tip-body{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%) translateY(4px);width:260px;background:var(--rail);color:oklch(93% 0.008 255);font-size:11.5px;font-weight:400;line-height:1.7;padding:10px 12px;border-radius:var(--r-md);box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .16s,transform .16s var(--ease-out);z-index:10}
+    .tip-body{position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%) translateY(4px);width:260px;background:var(--rail);color:oklch(93% 0.008 240);font-size:11.5px;font-weight:400;line-height:1.7;padding:10px 12px;border-radius:var(--r-md);box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:opacity .16s,transform .16s var(--ease-out);z-index:10}
     .tip:hover .tip-body,.tip:focus .tip-body{opacity:1;transform:translateX(-50%) translateY(0)}
     .pw-wrap{position:relative}
     .pw-wrap .input{padding-right:42px}
@@ -612,17 +623,21 @@ function installer_css(): string
        BUTTONS
        ============================================================ */
     .btn-row{display:flex;gap:10px;margin-top:26px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;font-size:14px;font-weight:600;font-family:inherit;border-radius:var(--r);border:1px solid transparent;cursor:pointer;text-decoration:none;transition:background .14s,border-color .14s,box-shadow .14s,transform .05s}
+    .btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;font-size:14px;font-weight:600;font-family:inherit;letter-spacing:-.005em;border-radius:var(--r);border:1px solid transparent;cursor:pointer;text-decoration:none;transition:background .14s,border-color .14s,box-shadow .14s,transform .05s}
     .btn svg{width:16px;height:16px;stroke:currentColor;transition:transform .18s var(--ease-out)}
     .btn:active{transform:translateY(1px)}
+    .btn:focus-visible{outline:none;box-shadow:var(--ring)}
     .btn-primary{background:var(--navy);color:var(--on-brand);flex:1;box-shadow:var(--shadow-sm)}
+    .btn-primary::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,oklch(100% 0 0/0.28),transparent);transform:skewX(-18deg);opacity:0}
     .btn-primary:hover{background:var(--navy-hover);box-shadow:var(--shadow)}
+    .btn-primary:hover::after{animation:btn-sheen .6s var(--ease-out)}
     .btn-primary:hover svg:last-child{transform:translateX(3px)}
     .btn-ghost{background:var(--surface);border-color:var(--line-strong);color:var(--fg-muted)}
-    .btn-ghost:hover{background:var(--sunk);border-color:var(--text-faint);color:var(--ink-2)}
+    .btn-ghost:hover{background:var(--surface-2);border-color:var(--fg-faint);color:var(--ink-2)}
     .btn-block{width:100%}
     .btn-lg{padding:14px 24px;font-size:15px}
     .btn-back{flex:none;padding:11px 14px}
+    .btn-back:hover svg:first-child{transform:translateX(-3px)}
 
     /* ============================================================
        HOST HELP + CONTROL-PANEL DIAGRAM
@@ -632,14 +647,15 @@ function installer_css(): string
     .hh-q svg{width:15px;height:15px;color:var(--brass-deep);stroke:currentColor}
     .hh-sub{font-size:11.5px;color:var(--fg-subtle);margin:5px 0 11px;line-height:1.6}
     .host-chips{display:flex;flex-wrap:wrap;gap:7px}
-    .host-chip{padding:6px 13px;font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-full);color:var(--fg-muted);cursor:pointer;transition:background .14s,border-color .14s,color .14s,transform .06s}
-    .host-chip:hover{border-color:var(--line-strong);color:var(--ink-2);transform:translateY(-1px)}
-    .host-chip.on{background:var(--navy);border-color:var(--navy);color:var(--on-brand);transform:none}
+    .host-chip{padding:6px 13px;font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-full);color:var(--fg-muted);cursor:pointer;transition:background .14s,border-color .14s,color .14s,transform .1s var(--ease-spring)}
+    .host-chip:hover{border-color:var(--line-strong);color:var(--ink-2);transform:translateY(-2px)}
+    .host-chip:active{transform:translateY(0)}
+    .host-chip.on{background:var(--navy);border-color:var(--navy);color:var(--on-brand);transform:none;box-shadow:0 4px 12px -4px oklch(52% 0.1 188/0.5)}
     .linkbtn{background:none;border:0;padding:0;font-family:inherit;font-size:12px;font-weight:600;color:var(--brass-deep);cursor:pointer;margin-top:12px;display:inline-flex;align-items:center;gap:4px}
     .linkbtn:hover{color:var(--brass);text-decoration:underline;text-underline-offset:2px}
     .linkbtn svg{width:13px;height:13px;transition:transform .18s var(--ease)}
     .linkbtn.open svg{transform:rotate(180deg)}
-    .cp-diagram{margin-top:12px;border:1px solid var(--line-2);border-radius:var(--r-md);overflow:hidden;background:var(--surface);box-shadow:var(--shadow-sm);animation:reveal .28s var(--ease-out)}
+    .cp-diagram{margin-top:12px;border:1px solid var(--line-2);border-radius:var(--r-md);overflow:hidden;background:var(--surface);box-shadow:var(--shadow-sm);animation:reveal .3s var(--ease-out)}
     .cp-bar{display:flex;align-items:center;gap:5px;padding:8px 12px;background:var(--sunk);border-bottom:1px solid var(--line)}
     .cp-bar .dot{width:8px;height:8px;border-radius:50%;background:var(--line-strong)}
     .cp-url{font-family:var(--font-num);font-size:10.5px;color:var(--fg-faint);margin-left:8px}
@@ -659,17 +675,17 @@ function installer_css(): string
     /* section headers */
     .tenant-sec{margin-bottom:10px}
     .ts-h{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;margin-bottom:12px;color:var(--ink-2)}
-    .ts-h::before{content:"";width:3px;height:14px;border-radius:1px;background:var(--brass);flex:none}
+    .ts-h::before{content:"";width:3px;height:14px;border-radius:2px;background:var(--brass);flex:none}
     .ts-h svg{width:15px;height:15px;color:var(--brass-deep);stroke:currentColor}
 
     /* ============================================================
        LOADING / SUBSTEPS
        ============================================================ */
-    .ld-h{font-size:23px;font-weight:700;color:var(--ink-2)}
+    .ld-h{font-size:24px;font-weight:600;letter-spacing:-.02em;color:var(--ink-2)}
     .ld-sub{font-size:13px;color:var(--fg-muted);margin:9px 0 22px;line-height:1.75}
     .ld-bar{height:6px;border-radius:var(--r-full);background:var(--sunk);overflow:hidden;margin-bottom:20px;border:1px solid var(--line)}
-    .ld-bar span{display:block;height:100%;width:0;border-radius:var(--r-full);background:linear-gradient(90deg,var(--navy),var(--navy-hover));transition:width .55s var(--ease);position:relative;overflow:hidden}
-    .ld-bar span::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,oklch(100% 0 0/0.35),transparent);transform:translateX(-100%);animation:sheen 1.4s ease-in-out infinite}
+    .ld-bar span{display:block;height:100%;width:0;border-radius:var(--r-full);background:linear-gradient(90deg,var(--brass),var(--navy));transition:width .55s var(--ease);position:relative;overflow:hidden}
+    .ld-bar span::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,oklch(100% 0 0/0.45),transparent);transform:translateX(-100%);animation:sheen 1.4s ease-in-out infinite}
     .substeps{list-style:none}
     .substeps li{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line);transition:opacity .3s}
     .substeps li:last-child{border-bottom:none}
@@ -677,31 +693,32 @@ function installer_css(): string
     .ss-ic svg{width:12px;height:12px;stroke:currentColor}
     .ss-t{font-size:13.5px;font-weight:600;color:var(--ink-2)}
     .ss-d{font-size:11.5px;color:var(--fg-subtle)}
-    .ss-meta{margin-left:auto;font-size:11px;font-weight:600;color:var(--fg-faint)}
+    .ss-meta{margin-left:auto;font-size:11px;font-weight:600;color:var(--fg-faint);font-family:var(--font-num)}
     .ss-done .ss-ic{background:var(--success-soft)}
-    .ss-done .ss-ic svg{animation:pop .3s var(--ease-out)}
+    .ss-done .ss-ic svg{animation:pop .35s var(--ease-out)}
     .ss-done .ss-meta{color:var(--success)}
     .ss-active .ss-t{color:var(--ink-2)}
     .ss-active .ss-meta{color:var(--navy)}
     .ss-pending{opacity:.5}
     .spinner{width:13px;height:13px;border:2px solid var(--line-strong);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
-    .ld-warn{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--warning);margin-top:18px}
+    .ld-warn{display:flex;align-items:center;gap:8px;font-size:12px;color:oklch(52% 0.12 62);margin-top:18px}
     .ld-warn svg{width:14px;height:14px;stroke:currentColor}
 
     /* ============================================================
        COMPLETION
        ============================================================ */
-    .done-mark{position:relative;width:66px;height:66px;border-radius:var(--r-full);background:var(--success-soft);color:var(--success);display:grid;place-items:center;margin:8px 0 20px;animation:pop .4s var(--ease-out)}
-    .done-mark::before{content:"";position:absolute;inset:-8px;border-radius:var(--r-full);border:2px solid var(--success);opacity:0;animation:ring .7s var(--ease-out) .15s}
-    .done-mark svg{width:30px;height:30px;stroke:currentColor}
-    .done-title{font-size:25px;font-weight:700;color:var(--ink-2)}
+    .done-mark{position:relative;width:66px;height:66px;border-radius:var(--r-full);background:var(--success-soft);color:var(--success);display:grid;place-items:center;margin:8px 0 20px;animation:pop .45s var(--ease-out)}
+    .done-mark::before{content:"";position:absolute;inset:-8px;border-radius:var(--r-full);border:2px solid var(--success);opacity:0;animation:ring .8s var(--ease-out) .15s}
+    .done-mark::after{content:"";position:absolute;inset:-8px;border-radius:var(--r-full);border:2px solid var(--success);opacity:0;animation:ring .8s var(--ease-out) .42s}
+    .done-mark svg{width:30px;height:30px;stroke:currentColor;stroke-dasharray:32;stroke-dashoffset:32;animation:draw .5s var(--ease-out) .2s forwards}
+    .done-title{font-size:26px;font-weight:600;letter-spacing:-.02em;color:var(--ink-2)}
     .done-sub{font-size:13.5px;color:var(--fg-muted);margin:11px 0 22px;line-height:1.85}
-    .sec-warn{display:flex;gap:13px;background:var(--danger-soft);border:1px solid var(--danger);border-radius:var(--r-md);padding:15px 17px;margin-bottom:24px}
+    .sec-warn{display:flex;gap:13px;background:var(--danger-soft);border:1px solid color-mix(in oklch,var(--danger) 45%,var(--line));border-radius:var(--r-md);padding:15px 17px;margin-bottom:24px}
     .sw-ico{width:20px;height:20px;flex:none;color:var(--danger);margin-top:1px}
     .sw-ico svg{width:100%;height:100%;stroke:currentColor}
     .sw-t{font-size:13.5px;font-weight:700;color:var(--danger-hover)}
-    .sw-d{font-size:12.5px;color:oklch(40% 0.08 33);margin-top:3px;line-height:1.75}
-    .next-h{font-size:12px;font-weight:700;margin-bottom:10px;color:var(--brass-deep);text-transform:uppercase;letter-spacing:.1em}
+    .sw-d{font-size:12.5px;color:oklch(42% 0.1 30);margin-top:3px;line-height:1.75}
+    .next-h{font-size:12px;font-weight:700;margin-bottom:10px;color:var(--brass-deep);text-transform:uppercase;letter-spacing:.12em}
     .next-list{list-style:none;margin-bottom:26px;counter-reset:nl}
     .next-list li{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-2)}
     .next-list li:last-child{border-bottom:none}
@@ -715,19 +732,29 @@ function installer_css(): string
        ============================================================ */
     @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes pop{0%{transform:scale(.55);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
-    @keyframes ring{0%{opacity:.55;transform:scale(.7)}100%{opacity:0;transform:scale(1.15)}}
+    @keyframes ring{0%{opacity:.5;transform:scale(.7)}100%{opacity:0;transform:scale(1.25)}}
+    @keyframes draw{to{stroke-dashoffset:0}}
     @keyframes sheen{0%{transform:translateX(-100%)}55%,100%{transform:translateX(220%)}}
+    @keyframes btn-sheen{0%{left:-60%;opacity:1}100%{left:130%;opacity:1}}
     @keyframes reveal{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
     @keyframes shake{10%,90%{transform:translateX(-1px)}30%,70%{transform:translateX(2px)}50%{transform:translateX(-2px)}}
     @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
     @keyframes slideInAside{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
     @keyframes fadeInDot{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+    @keyframes blkIn{from{opacity:0;transform:translateY(6px) scale(.6)}to{opacity:1;transform:none}}@keyframes colIn{from{opacity:0}to{opacity:.13}}@keyframes lineDraw{to{stroke-dashoffset:0}}
+    @keyframes aurora{0%{transform:translate(0,0)}100%{transform:translate(18%,10%)}}
 
     @media (prefers-reduced-motion:no-preference){
       .iz-aside{animation:slideInAside .5s var(--ease-out) both}
       .iz-bs-top{animation:rise .5s var(--ease-out) .08s both}
       .iz-bs-mid{animation:rise .55s var(--ease-out) .16s both}
       .iz-bs-foot{animation:rise .55s var(--ease-out) .28s both}
+      .mono-mark svg .lg-col{animation:colIn .5s var(--ease-out) both}
+      .mono-mark svg .lg-line{animation:lineDraw .6s var(--ease-out) .34s both}
+      .mono-mark svg .lg-blk{animation:blkIn .5s var(--ease-spring) both}
+      .mono-mark svg rect.lg-blk:nth-of-type(4){animation-delay:.16s}
+      .mono-mark svg rect.lg-blk:nth-of-type(5){animation-delay:.28s}
+      .mono-mark svg rect.lg-blk:nth-of-type(6){animation-delay:.42s}
       .vstep li{animation:rise .5s var(--ease-out) both}
       .vstep li:nth-child(1){animation-delay:.22s}
       .vstep li:nth-child(2){animation-delay:.30s}
@@ -751,7 +778,7 @@ function installer_css(): string
       #izLoading:not([hidden]) .substeps li:nth-child(2){animation-delay:.06s}
       #izLoading:not([hidden]) .substeps li:nth-child(3){animation-delay:.12s}
 
-      @keyframes pulse{0%,100%{box-shadow:0 0 0 4px oklch(68% 0.13 255/0.16)}50%{box-shadow:0 0 0 7px oklch(68% 0.13 255/0.05)}}
+      @keyframes pulse{0%,100%{box-shadow:0 0 0 4px oklch(74% 0.11 182/0.18)}50%{box-shadow:0 0 0 8px oklch(74% 0.11 182/0.04)}}
     }
 
     /* ============================================================
@@ -765,7 +792,7 @@ function installer_css(): string
       .hstep{display:flex}
     }
     @media (max-width:520px){.form-row2{grid-template-columns:1fr}.iz-head,.done-title{font-size:22px}}
-    @media (prefers-reduced-motion:reduce){.done-mark{animation:none}.done-mark::before{display:none}.ld-bar span::after{display:none}}
+    @media (prefers-reduced-motion:reduce){.done-mark{animation:none}.done-mark::before,.done-mark::after{display:none}.done-mark svg{animation:none;stroke-dashoffset:0}.ld-bar span::after{display:none}.iz-aside::after{animation:none}.mono-mark svg .lg-line{stroke-dashoffset:0}}
     CSS;
 }
 
