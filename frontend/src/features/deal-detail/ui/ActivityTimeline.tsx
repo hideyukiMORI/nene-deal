@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import type { DealActivity, DealActivityAction } from '@/entities/deal'
 import type { PipelineStage } from '@/entities/pipeline-stage'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
+import { formatMoneyJpy } from '@/shared/lib/format-money'
 import {
   IconArrowRight,
   IconInvoice,
@@ -39,8 +40,9 @@ export interface ActivityTimelineProps {
   locale: string
 }
 
-function fmtValue(value: unknown): string {
+function fmtValue(field: string, value: unknown, locale: string): string {
   if (value === null || value === undefined || value === '') return '—'
+  if (field === 'amount_cents' && typeof value === 'number') return formatMoneyJpy(value, locale)
   if (typeof value === 'string') return value
   if (typeof value === 'number' || typeof value === 'boolean') return String(value)
   return JSON.stringify(value)
@@ -79,9 +81,9 @@ export function ActivityTimeline({ activity, stages, locale }: ActivityTimelineP
     return entry.changes.map((c) => (
       <span key={c.field} className="tl-change mono">
         {c.field in FIELD_LABEL ? `${t(FIELD_LABEL[c.field])} ` : `${c.field} `}
-        <span className="from">{fmtValue(c.from)}</span>
+        <span className="from">{fmtValue(c.field, c.from, locale)}</span>
         <IconArrowRight />
-        <span className="to">{fmtValue(c.to)}</span>
+        <span className="to">{fmtValue(c.field, c.to, locale)}</span>
       </span>
     ))
   }

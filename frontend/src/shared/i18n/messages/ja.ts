@@ -284,7 +284,7 @@ export const ja: MessageCatalog = {
   'deal.field.owner': '担当者',
   'deal.field.note': 'メモ',
   'deal.validation.accountLabelRequired': '取引先名を入力してください。',
-  'deal.validation.amountPositive': '金額は0以上で入力してください。',
+  'deal.validation.amountPositive': '金額は0以上の整数（円）で入力してください。',
   'deal.validation.probabilityRange': '確度は0〜100で入力してください。',
 
   'common.actions.back': '戻る',

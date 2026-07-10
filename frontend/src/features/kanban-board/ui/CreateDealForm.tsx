@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import type { CreateDealInput } from '@/entities/deal'
 import { useTranslation } from '@/shared/i18n'
+import { yenToCents } from '@/shared/lib/format-money'
 import { Button, Input, Select, Stack, Text, type SelectOption } from '@/shared/ui'
 
 export interface CreateDealFormProps {
@@ -15,7 +16,8 @@ export interface CreateDealFormProps {
 
 interface CreateDealFormValues {
   accountLabel: string
-  amountCents: number
+  /** Whole yen as entered by the user; converted to cents on submit. */
+  amountYen: number
   stageRef: string
   probabilityPercent: number
   expectedCloseDate: string
@@ -32,7 +34,7 @@ export function CreateDealForm({
 
   const schema = z.object({
     accountLabel: z.string().trim().min(1, t('deal.validation.accountLabelRequired')),
-    amountCents: z
+    amountYen: z
       .number({ message: t('deal.validation.amountPositive') })
       .int(t('deal.validation.amountPositive'))
       .min(0, t('deal.validation.amountPositive')),
@@ -54,7 +56,7 @@ export function CreateDealForm({
     resolver: zodResolver(schema),
     defaultValues: {
       accountLabel: '',
-      amountCents: 0,
+      amountYen: 0,
       stageRef: stageOptions[0]?.value ?? '',
       probabilityPercent: 50,
       expectedCloseDate: '',
@@ -64,7 +66,7 @@ export function CreateDealForm({
   const submit = handleSubmit(async (values) => {
     const created = await onSubmit({
       accountLabel: values.accountLabel,
-      amountCents: values.amountCents,
+      amountCents: yenToCents(values.amountYen),
       stageRef: values.stageRef,
       probabilityPercent: values.probabilityPercent,
       expectedCloseDate: values.expectedCloseDate.trim() === '' ? null : values.expectedCloseDate,
@@ -106,8 +108,9 @@ export function CreateDealForm({
               label={t('deal.field.amount')}
               type="number"
               min={0}
-              error={errors.amountCents?.message}
-              {...register('amountCents', { valueAsNumber: true })}
+              step={1}
+              error={errors.amountYen?.message}
+              {...register('amountYen', { valueAsNumber: true })}
             />
           </div>
           <div className="grow">
