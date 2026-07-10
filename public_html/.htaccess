@@ -1,5 +1,20 @@
+# Serve the SPA and the API from the same origin.
+# Order: API/infra routes → real files → SPA fallback → front controller.
+DirectoryIndex index.html index.php
 RewriteEngine On
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+# API and infra routes always go to the front controller.
+RewriteRule ^(api/|health$|machine/) index.php [QSA,L]
+
+# Existing files and directories are served as-is (SPA assets, openapi.php).
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# SPA fallback when the built frontend is deployed into this directory
+# (production). In development no index.html exists here and everything
+# falls through to the front controller, as before.
+RewriteCond %{DOCUMENT_ROOT}/index.html -f
+RewriteRule ^ index.html [L]
+
 RewriteRule ^ index.php [QSA,L]

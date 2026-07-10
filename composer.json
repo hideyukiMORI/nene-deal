@@ -7,6 +7,7 @@
         "php": ">=8.4.1 <9.0",
         "hideyukimori/nene2": "^1.8.2",
         "psr/http-client": "^1.0",
+        "robmorgan/phinx": "^0.16.11",
         "symfony/http-client": "^8.1",
         "symfony/uid": "^8.1"
     },
@@ -47,7 +48,6 @@
         "friendsofphp/php-cs-fixer": "^3.95",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^13.1",
-        "robmorgan/phinx": "^0.16.11",
         "symfony/yaml": "^8.1"
     }
 }
