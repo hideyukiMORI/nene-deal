@@ -46,4 +46,9 @@ final readonly class PdoOrganizationResolver implements OrganizationResolver
 
         return is_string($id) && $id !== '' ? $id : null;
     }
+
+    public function existsById(string $id): bool
+    {
+        return $this->query->fetchOne('SELECT 1 FROM organizations WHERE id = ? LIMIT 1', [$id]) !== null;
+    }
 }

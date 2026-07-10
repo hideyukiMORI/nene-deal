@@ -43,11 +43,12 @@
 - [x] Issue #62: Production-shaped container (`docker/php/Dockerfile.prod`, `compose.prod.yaml`, SPA served same-origin via `public_html/.htaccess`), phinx moved to runtime deps, HETEML artifact builder (`tools/build-heteml-artifact.sh`), demo runbook `docs/demo.md`
 - [x] Issue #65: Browser installer (invoice/clear/vault shape, vault #109/#120 Tier A form) — `public_html/install.php` + `installer.js`, NENE2 install toolkit (`EnvironmentWriter` 0640 / `ReInstallationGuard` marker+DB probe / in-process `DatabaseSchemaApplier`), `src/Install/` (`InstallEnvironment` / `DatabaseProvisioningProbe` / `AdminProvisioner`); deletes the dev-seeded `operator@nene-deal.test`, admin password memory-only, self-deletes on success
 
+- [x] Issue #69: NENE2 `Nene2\Demo` consumer (v1.10.0) — disposable per-visitor demo orgs: `GET /demo/standard` (fail-close `DEMO_MODE`), JWT seat page → `sessionStorage` one-shot import (clear #275 shape), `FileRateLimitStorage` throttle 30/h + 200-org ceiling, branded HTML error pages (invoice #617 shape), `tools/sweep-demo.php` (TTL 3h), claim-based tenant resolution (bearer before org middleware; signed `org` claim authoritative), shared `DemoPipelineFixture` with the fixed-org seed; fixed demo org + reseed kept coexisting
+
 ## Next
 
-- [ ] Adopt the NENE2 `Demo` module (disposable per-visitor demo orgs, as in nene-invoice/nene-clear) to replace the fixed demo org — planned once adopted fleet-wide
 - [ ] Suite catalog entry
-- [ ] Optional hardening for a public demo box: rate limiting on `/api/v1/auth/login`
+- [ ] Optional hardening for a public demo box: rate limiting on `/api/v1/auth/login` (deferred from #69: NENE2 `ThrottleMiddleware` has no path scoping — needs a login-scoped wrapper, and it would add `X-RateLimit-*` headers to login responses)
 
 ## Handoff
 

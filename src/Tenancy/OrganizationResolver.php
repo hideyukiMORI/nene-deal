@@ -15,4 +15,7 @@ interface OrganizationResolver
 
     /** The organization id for a slug, or null when no such organization exists. */
     public function findIdBySlug(string $slug): ?string;
+
+    /** Whether an organization with this id currently exists. */
+    public function existsById(string $id): bool;
 }
