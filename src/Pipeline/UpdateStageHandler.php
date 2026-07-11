@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace NeneDeal\Pipeline;
 
-use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Routing\Router;
+use Nene2\Validation\ValidationError;
+use Nene2\Validation\ValidationException;
 use NeneDeal\Auth\AuthContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -18,44 +20,47 @@ final readonly class UpdateStageHandler implements RequestHandlerInterface
     public function __construct(
         private UpdateStageUseCase $useCase,
         private JsonResponseFactory $json,
-        private ProblemDetailsResponseFactory $problemDetails,
     ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $body = json_decode((string) $request->getBody(), true);
+        $body = JsonRequestBodyParser::parse($request);
 
-        if (!is_array($body)) {
-            return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, 'Request body must be a JSON object.');
-        }
+        $errors = [];
 
         $label = null;
 
         if (array_key_exists('label', $body)) {
-            $label = $body['label'];
+            $value = $body['label'];
 
-            if (!is_string($label) || trim($label) === '') {
-                return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, '"label" must be a non-empty string.');
-            }
-
-            if (mb_strlen($label) > 64) {
-                return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, '"label" must be 64 characters or fewer.');
+            if (!is_string($value) || trim($value) === '') {
+                $errors[] = new ValidationError('label', '"label" must be a non-empty string.', 'invalid');
+            } elseif (mb_strlen($value) > 64) {
+                $errors[] = new ValidationError('label', '"label" must be 64 characters or fewer.', 'invalid');
+            } else {
+                $label = $value;
             }
         }
 
         $sortOrder = null;
 
         if (array_key_exists('sort_order', $body)) {
-            $sortOrder = $body['sort_order'];
+            $value = $body['sort_order'];
 
-            if (!is_int($sortOrder) || $sortOrder < 0) {
-                return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, '"sort_order" must be a non-negative integer.');
+            if (!is_int($value) || $value < 0) {
+                $errors[] = new ValidationError('sort_order', '"sort_order" must be a non-negative integer.', 'invalid');
+            } else {
+                $sortOrder = $value;
             }
         }
 
-        if ($label === null && $sortOrder === null) {
-            return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, 'At least one of "label" or "sort_order" is required.');
+        if ($errors === [] && $label === null && $sortOrder === null) {
+            $errors[] = new ValidationError('body', 'At least one of "label" or "sort_order" is required.', 'required');
+        }
+
+        if ($errors !== []) {
+            throw new ValidationException($errors);
         }
 
         $stageId = Router::param($request, 'stageId') ?? '';

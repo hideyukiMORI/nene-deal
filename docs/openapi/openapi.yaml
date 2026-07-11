@@ -111,6 +111,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Deal'
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
 
   /deals/{dealId}:
@@ -152,6 +153,7 @@ paths:
                 $ref: '#/components/schemas/Deal'
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
     delete:
       tags: [Deals]
@@ -190,6 +192,7 @@ paths:
                 $ref: '#/components/schemas/Deal'
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
 
   /deals/{dealId}/history:
@@ -330,6 +333,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '400': { $ref: '#/components/responses/BadRequest' }
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
       requestBody:
         required: true
@@ -364,6 +368,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
     delete:
       tags: [Pipeline]
@@ -472,6 +477,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '400': { $ref: '#/components/responses/BadRequest' }
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
         '429':
           description: |
@@ -545,6 +551,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '400': { $ref: '#/components/responses/BadRequest' }
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
 
   /users/{userId}:
@@ -596,6 +603,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
+        '400': { $ref: '#/components/responses/BadRequest' }
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
     delete:
       tags: [Users]
@@ -690,11 +698,15 @@ components:
           schema:
             $ref: '#/components/schemas/Problem'
     UnprocessableEntity:
-      description: Validation failed.
+      description: |
+        Validation failed. The Problem Details body carries a structured
+        `errors` array with one entry per failing field (NENE2
+        `Nene2\Validation` shape). Malformed or non-object JSON bodies are
+        rejected earlier with **400** `invalid-json` (BadRequest).
       content:
         application/problem+json:
           schema:
-            $ref: '#/components/schemas/Problem'
+            $ref: '#/components/schemas/ValidationProblem'
 
   schemas:
     Ulid:
@@ -1069,6 +1081,31 @@ components:
         instance:
           type: string
       additionalProperties: true
+
+    ValidationProblem:
+      description: |
+        Problem Details for `validation-failed` (422) with the NENE2
+        `Nene2\Validation` field-level `errors` array.
+      allOf:
+        - $ref: '#/components/schemas/Problem'
+        - type: object
+          required: [errors]
+          properties:
+            errors:
+              type: array
+              minItems: 1
+              items:
+                type: object
+                required: [field, message, code]
+                properties:
+                  field:
+                    type: string
+                    description: Failing field name (`body` for whole-body rules).
+                  message:
+                    type: string
+                  code:
+                    type: string
+                    description: Machine-readable code (e.g. `required`, `invalid`).
 
     LoginRequest:
       type: object

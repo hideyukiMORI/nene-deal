@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace NeneDeal\Auth;
 
-use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Validation\ValidationError;
+use Nene2\Validation\ValidationException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -22,24 +24,30 @@ final readonly class LoginHandler implements RequestHandlerInterface
     public function __construct(
         private LoginUseCase $useCase,
         private JsonResponseFactory $json,
-        private ProblemDetailsResponseFactory $problemDetails,
         private LoginThrottleInterface $throttle,
     ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $body = json_decode((string) $request->getBody(), true);
+        $body = JsonRequestBodyParser::parse($request);
 
-        if (!is_array($body)) {
-            return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, 'Request body must be a JSON object.');
-        }
+        $errors = [];
 
         $email = $body['email'] ?? null;
+
+        if (!is_string($email) || $email === '') {
+            $errors[] = new ValidationError('email', '"email" is required.', 'required');
+        }
+
         $password = $body['password'] ?? null;
 
-        if (!is_string($email) || $email === '' || !is_string($password) || $password === '') {
-            return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, 'Both "email" and "password" are required.');
+        if (!is_string($password) || $password === '') {
+            $errors[] = new ValidationError('password', '"password" is required.', 'required');
+        }
+
+        if ($errors !== []) {
+            throw new ValidationException($errors);
         }
 
         $identifier = strtolower($email) . '|' . $this->clientIp($request);

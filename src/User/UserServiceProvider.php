@@ -82,7 +82,7 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Create user use case service is invalid.');
                     }
 
-                    return new CreateUserHandler($useCase, self::json($c), self::problem($c));
+                    return new CreateUserHandler($useCase, self::json($c));
                 },
             )
             ->set(
@@ -100,7 +100,7 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Update user use case service is invalid.');
                     }
 
-                    return new UpdateUserHandler($useCase, self::json($c), self::problem($c));
+                    return new UpdateUserHandler($useCase, self::json($c));
                 },
             )
             ->set(

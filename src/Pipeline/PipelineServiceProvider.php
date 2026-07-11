@@ -160,11 +160,11 @@ final readonly class PipelineServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Create stage use case service is invalid.');
                     }
 
-                    if (!$json instanceof JsonResponseFactory || !$problem instanceof ProblemDetailsResponseFactory) {
-                        throw new LogicException('Response factory services are invalid.');
+                    if (!$json instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new CreateStageHandler($useCase, $json, $problem);
+                    return new CreateStageHandler($useCase, $json);
                 },
             )
             ->set(
@@ -178,11 +178,11 @@ final readonly class PipelineServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Update stage use case service is invalid.');
                     }
 
-                    if (!$json instanceof JsonResponseFactory || !$problem instanceof ProblemDetailsResponseFactory) {
-                        throw new LogicException('Response factory services are invalid.');
+                    if (!$json instanceof JsonResponseFactory) {
+                        throw new LogicException('JSON response factory service is invalid.');
                     }
 
-                    return new UpdateStageHandler($useCase, $json, $problem);
+                    return new UpdateStageHandler($useCase, $json);
                 },
             )
             ->set(

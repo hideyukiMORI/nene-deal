@@ -63,7 +63,7 @@ final readonly class DealServiceProvider implements ServiceProviderInterface
             )
             ->set(
                 CreateDealHandler::class,
-                static fn (ContainerInterface $c): CreateDealHandler => new CreateDealHandler(self::createUseCase($c), self::json($c), self::problem($c)),
+                static fn (ContainerInterface $c): CreateDealHandler => new CreateDealHandler(self::createUseCase($c), self::json($c)),
             )
             ->set(
                 GetDealHandler::class,
@@ -71,7 +71,7 @@ final readonly class DealServiceProvider implements ServiceProviderInterface
             )
             ->set(
                 UpdateDealHandler::class,
-                static fn (ContainerInterface $c): UpdateDealHandler => new UpdateDealHandler(self::updateUseCase($c), self::json($c), self::problem($c)),
+                static fn (ContainerInterface $c): UpdateDealHandler => new UpdateDealHandler(self::updateUseCase($c), self::json($c)),
             )
             ->set(
                 DeleteDealHandler::class,
@@ -83,7 +83,7 @@ final readonly class DealServiceProvider implements ServiceProviderInterface
             )
             ->set(
                 ChangeDealStageHandler::class,
-                static fn (ContainerInterface $c): ChangeDealStageHandler => new ChangeDealStageHandler(self::stageUseCase($c), self::json($c), self::problem($c)),
+                static fn (ContainerInterface $c): ChangeDealStageHandler => new ChangeDealStageHandler(self::stageUseCase($c), self::json($c)),
             )
             ->set(
                 ListDealHistoryHandler::class,

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace NeneDeal\Tests\Audit;
 
-use Nene2\Error\ProblemDetailsResponseFactory;
 use NeneDeal\Audit\AuditCsvHandler;
 use NeneDeal\Audit\AuditExportRepositoryInterface;
 use NeneDeal\Audit\AuditExportRow;
@@ -96,7 +95,6 @@ final class AuditCsvHandlerTest extends TestCase
         $handler = new AuditCsvHandler(
             new ExportAuditUseCase(new FakeAuditExportRepository($rows)),
             $psr17,
-            new ProblemDetailsResponseFactory($psr17, $psr17),
         );
 
         $request = $psr17->createServerRequest('GET', '/api/v1/audit/export')

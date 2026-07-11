@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace NeneDeal\Audit;
 
-use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Export\CsvWriter;
+use Nene2\Validation\ValidationError;
+use Nene2\Validation\ValidationException;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,7 +22,6 @@ final readonly class AuditCsvHandler implements RequestHandlerInterface
     public function __construct(
         private ExportAuditUseCase $useCase,
         private Psr17Factory $psr17,
-        private ProblemDetailsResponseFactory $problemDetails,
     ) {
     }
 
@@ -31,12 +31,22 @@ final readonly class AuditCsvHandler implements RequestHandlerInterface
         $from = is_string($params['from'] ?? null) ? $params['from'] : '';
         $to = is_string($params['to'] ?? null) ? $params['to'] : '';
 
-        if (!self::isDate($from) || !self::isDate($to)) {
-            return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, '"from" and "to" must be dates in YYYY-MM-DD format.');
+        $errors = [];
+
+        if (!self::isDate($from)) {
+            $errors[] = new ValidationError('from', '"from" must be a date in YYYY-MM-DD format.', 'invalid');
         }
 
-        if ($from > $to) {
-            return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, '"from" must not be after "to".');
+        if (!self::isDate($to)) {
+            $errors[] = new ValidationError('to', '"to" must be a date in YYYY-MM-DD format.', 'invalid');
+        }
+
+        if ($errors === [] && $from > $to) {
+            $errors[] = new ValidationError('from', '"from" must not be after "to".', 'invalid');
+        }
+
+        if ($errors !== []) {
+            throw new ValidationException($errors);
         }
 
         $rows = $this->useCase->execute($from . ' 00:00:00', $to . ' 23:59:59');
