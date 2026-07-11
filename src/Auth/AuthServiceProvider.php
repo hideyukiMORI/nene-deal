@@ -6,6 +6,7 @@ namespace NeneDeal\Auth;
 
 use LogicException;
 use Nene2\Auth\TokenIssuerInterface;
+use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
@@ -42,6 +43,24 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                LoginThrottleInterface::class,
+                static function (ContainerInterface $c): LoginThrottleInterface {
+                    $query = $c->get(DatabaseQueryExecutorInterface::class);
+
+                    if (!$query instanceof DatabaseQueryExecutorInterface) {
+                        throw new LogicException('Database query executor service is invalid.');
+                    }
+
+                    $clock = $c->get(ClockInterface::class);
+
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('Clock service is invalid.');
+                    }
+
+                    return new PdoLoginThrottle($query, $clock);
+                },
+            )
+            ->set(
                 LoginHandler::class,
                 static function (ContainerInterface $c): LoginHandler {
                     $useCase = $c->get(LoginUseCase::class);
@@ -50,7 +69,13 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Login use case service is invalid.');
                     }
 
-                    return new LoginHandler($useCase, self::json($c), self::problem($c));
+                    $throttle = $c->get(LoginThrottleInterface::class);
+
+                    if (!$throttle instanceof LoginThrottleInterface) {
+                        throw new LogicException('Login throttle service is invalid.');
+                    }
+
+                    return new LoginHandler($useCase, self::json($c), self::problem($c), $throttle);
                 },
             )
             ->set(
@@ -72,6 +97,10 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
             ->set(
                 InvalidCredentialsExceptionHandler::class,
                 static fn (ContainerInterface $c): InvalidCredentialsExceptionHandler => new InvalidCredentialsExceptionHandler(self::problem($c)),
+            )
+            ->set(
+                TooManyLoginAttemptsExceptionHandler::class,
+                static fn (ContainerInterface $c): TooManyLoginAttemptsExceptionHandler => new TooManyLoginAttemptsExceptionHandler(self::problem($c)),
             )
             ->set(
                 AuthRouteRegistrar::class,

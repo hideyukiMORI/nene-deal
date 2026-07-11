@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ServiceProviderInterface;
 use NeneDeal\Audit\AuditRouteRegistrar;
 use NeneDeal\Auth\AuthRouteRegistrar;
 use NeneDeal\Auth\InvalidCredentialsExceptionHandler;
+use NeneDeal\Auth\TooManyLoginAttemptsExceptionHandler;
 use NeneDeal\Deal\DealNotFoundExceptionHandler;
 use NeneDeal\Deal\DealRouteRegistrar;
 use NeneDeal\Deal\UnknownStageExceptionHandler;
@@ -84,6 +85,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $handoffPrecondition = $container->get(HandoffPreconditionExceptionHandler::class);
                     $invoiceUpstream = $container->get(InvoiceHandoffExceptionHandler::class);
                     $invalidCredentials = $container->get(InvalidCredentialsExceptionHandler::class);
+                    $tooManyLoginAttempts = $container->get(TooManyLoginAttemptsExceptionHandler::class);
                     $userNotFound = $container->get(UserNotFoundExceptionHandler::class);
                     $emailTaken = $container->get(EmailAlreadyTakenExceptionHandler::class);
                     $cannotModifySelf = $container->get(CannotModifySelfExceptionHandler::class);
@@ -98,6 +100,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         || !$handoffPrecondition instanceof HandoffPreconditionExceptionHandler
                         || !$invoiceUpstream instanceof InvoiceHandoffExceptionHandler
                         || !$invalidCredentials instanceof InvalidCredentialsExceptionHandler
+                        || !$tooManyLoginAttempts instanceof TooManyLoginAttemptsExceptionHandler
                         || !$userNotFound instanceof UserNotFoundExceptionHandler
                         || !$emailTaken instanceof EmailAlreadyTakenExceptionHandler
                         || !$cannotModifySelf instanceof CannotModifySelfExceptionHandler
@@ -116,6 +119,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                         $handoffPrecondition,
                         $invoiceUpstream,
                         $invalidCredentials,
+                        $tooManyLoginAttempts,
                         $userNotFound,
                         $emailTaken,
                         $cannotModifySelf,

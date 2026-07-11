@@ -60,6 +60,15 @@ CREATE INDEX idx_deals_org_stage ON deals (organization_id, stage_id);
 CREATE INDEX idx_deals_org_close_date ON deals (organization_id, expected_close_date);
 CREATE INDEX idx_deals_org_deleted ON deals (organization_id, deleted_at);
 
+CREATE TABLE login_attempts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    identifier_hash TEXT NOT NULL,
+    attempt_count INTEGER NOT NULL DEFAULT 0,
+    window_started_at TEXT NOT NULL,
+    locked_until TEXT DEFAULT NULL
+);
+CREATE UNIQUE INDEX uq_login_attempts_identifier ON login_attempts (identifier_hash);
+
 CREATE TABLE deal_stage_history (
     id TEXT PRIMARY KEY NOT NULL,
     deal_id TEXT NOT NULL,

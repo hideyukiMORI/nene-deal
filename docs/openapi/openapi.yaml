@@ -473,6 +473,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Problem'
         '422': { $ref: '#/components/responses/UnprocessableEntity' }
+        '429':
+          description: |
+            Too many failed login attempts for this email + client IP
+            (5 failures within 15 minutes lock the pair for 15 minutes).
+            `retry_after_seconds` reports the remaining lock time.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
 
   /auth/me:
     get:
