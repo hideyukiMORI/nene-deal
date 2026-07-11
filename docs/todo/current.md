@@ -57,6 +57,7 @@
 - [x] Issue #101 (#91 (g)): `.htaccess` hardening — `E=HTTP_AUTHORIZATION` re-delivery + HSTS/CSP/XFO/nosniff/Referrer-Policy/Permissions-Policy (invoice shape); CSP excludes `/demo/` routes via `expr=THE_REQUEST` so the seat page nonce CSP keeps working (verified on compose.prod.yaml); Dockerfile.prod enables mod_headers
 - [x] Issue #103 (#91 (h)): `tools/build-release.sh` (invoice #576 shape) replaces `build-heteml-artifact.sh` — allowlist staging, no-dev vendor pinned by composer.lock, zero-symlink check, `dist/nene-deal-<v>.zip` + SHA-256 sidecar; demo.md §5 updated
 - [x] Issue #105 (#91 (i)): sweep JST/UTC regression pin — real `tools/sweep-demo.php` run as a subprocess with `date.timezone=Asia/Tokyo` and `UTC` (clear #280 / vault #143 shape); fresh demo orgs survive, expired ones reaped, fixed org untouched
+- [x] Issue #107 (#91 (j)): ADR 0006 multi-tenancy — why the org PK is a ULID string(26) (vs fleet auto-int), claim → header → sole-org resolution order, and the fail-close `Tenancy/` seam (upstream scoped-repo seed)
 
 ## Next
 
