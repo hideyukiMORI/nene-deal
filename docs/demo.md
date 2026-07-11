@@ -110,15 +110,21 @@ Cron example (nightly, 03:00):
 
 ## 5. Shared hosting (HETEML-style) install
 
-Build machine needs PHP 8.4 + Composer + Node 22; the server only needs
-PHP 8.4 (CLI + web), Apache `.htaccess` support, MySQL, and rsync.
+Build machine needs PHP 8.4 + Composer + Node 22 + zip; the server only needs
+PHP 8.4 (CLI + web), Apache `.htaccess` support, MySQL, and rsync (or unzip).
 
 ```bash
-# 1. Build the artifact locally (SPA + no-dev vendor + sources + installer)
-bash tools/build-heteml-artifact.sh          # → var/heteml-artifact/
+# 1. Build the release ZIP locally (#103: allowlist staging + no-dev vendor
+#    pinned by composer.lock + zero-symlink check + SHA-256 sidecar)
+bash tools/build-release.sh 1.0.0
+#   → dist/nene-deal-1.0.0.zip + dist/nene-deal-1.0.0.zip.sha256
 
-# 2. Upload — keep everything except public_html ABOVE the docroot
-rsync -az var/heteml-artifact/ user@host:~/apps/nene-deal/
+# 2. Verify integrity, then upload — keep everything except public_html
+#    ABOVE the docroot
+(cd dist && sha256sum -c nene-deal-1.0.0.zip.sha256)
+unzip -q dist/nene-deal-1.0.0.zip -d /tmp/nene-deal-release
+rsync -az /tmp/nene-deal-release/ user@host:~/apps/nene-deal/
+#   (or upload the ZIP and unzip on the server — contents are top level)
 
 # 3. Point the (sub)domain docroot at ~/apps/nene-deal/public_html
 ```
