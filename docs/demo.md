@@ -144,8 +144,14 @@ delete `public_html/install.php` manually.
 Manual alternative (no browser): `cp .env.example .env`, set
 `APP_ENV=production` / `APP_DEBUG=false` / `NENE2_LOCAL_JWT_SECRET` /
 `DB_*`, then `php8.4 vendor/bin/phinx migrate -c phinx.php`. The migrations
-seed `operator@nene-deal.test` / `password` (admin role) — change or delete
-that account immediately on any reachable box.
+seed **no account** (#109 — the well-known dev operator is opt-in via
+`NENE_DEAL_SEED_DEV_OPERATOR=1` and must stay unset here). Create the first
+admin explicitly:
+
+```bash
+NENE_DEAL_ADMIN_PASSWORD=... php8.4 tools/create-admin.php admin@example.com "Your Org"
+# (omit the env var to get a hidden interactive prompt)
+```
 
 ```bash
 # 5. Demo boxes only: seed the presentation pipeline (CLI PHP must be 8.4)
