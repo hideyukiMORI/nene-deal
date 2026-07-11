@@ -17,8 +17,10 @@ use PHPUnit\Framework\TestCase;
  * `--no-dev` production build still autoloads it.
  *
  * Also pins the deal-specific installer premise: the migrations seed the default
- * organization AND the dev operator, which is why the provisioning probe must
- * ignore that account and why AdminProvisioner deletes it.
+ * organization AND — when the dev opt-in flag is set (#109) — the dev operator,
+ * which is why the provisioning probe must ignore that account and why
+ * AdminProvisioner deletes it. This test opts in so the seed-present premise
+ * stays covered; SeedDefaultOperatorGuardTest pins the flag-off (no seed) path.
  */
 final class DatabaseSchemaApplierMigrateTest extends TestCase
 {
@@ -32,6 +34,9 @@ final class DatabaseSchemaApplierMigrateTest extends TestCase
 
     protected function tearDown(): void
     {
+        putenv('NENE_DEAL_SEED_DEV_OPERATOR');
+        unset($_ENV['NENE_DEAL_SEED_DEV_OPERATOR']);
+
         foreach (glob($this->dir . '/*') ?: [] as $f) {
             @unlink($f);
         }
@@ -41,6 +46,11 @@ final class DatabaseSchemaApplierMigrateTest extends TestCase
     public function test_phinx_migrations_apply_in_process(): void
     {
         $dbPath = $this->dir . '/nene_deal.sqlite';
+
+        // Opt in to the dev-operator seed (#109) so the seed-present premise
+        // this test documents (AdminProvisioner's delete) stays covered.
+        putenv('NENE_DEAL_SEED_DEV_OPERATOR=1');
+        $_ENV['NENE_DEAL_SEED_DEV_OPERATOR'] = '1';
 
         $output = (new DatabaseSchemaApplier())->apply(new Config([
             'paths' => ['migrations' => dirname(__DIR__, 2) . '/database/migrations'],

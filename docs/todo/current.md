@@ -58,6 +58,7 @@
 - [x] Issue #103 (#91 (h)): `tools/build-release.sh` (invoice #576 shape) replaces `build-heteml-artifact.sh` — allowlist staging, no-dev vendor pinned by composer.lock, zero-symlink check, `dist/nene-deal-<v>.zip` + SHA-256 sidecar; demo.md §5 updated
 - [x] Issue #105 (#91 (i)): sweep JST/UTC regression pin — real `tools/sweep-demo.php` run as a subprocess with `date.timezone=Asia/Tokyo` and `UTC` (clear #280 / vault #143 shape); fresh demo orgs survive, expired ones reaped, fixed org untouched
 - [x] Issue #107 (#91 (j)): ADR 0006 multi-tenancy — why the org PK is a ULID string(26) (vs fleet auto-int), claim → header → sole-org resolution order, and the fail-close `Tenancy/` seam (upstream scoped-repo seed)
+- [x] Issue #109 (#91 (k)): dev-seed residual window closed — `operator@nene-deal.test` seed is opt-in (`NENE_DEAL_SEED_DEV_OPERATOR=1`, set by the dev compose stack only); manual installs create the first admin via `tools/create-admin.php` (AdminProvisioner CLI); phinx-subprocess regression test pins both paths
 
 ## Next
 

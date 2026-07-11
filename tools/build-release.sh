@@ -58,6 +58,7 @@ mkdir -p "$STAGE/tools"
 cp "$ROOT/tools/sweep-demo.php" "$STAGE/tools/sweep-demo.php"
 cp "$ROOT/tools/purge-trash.php" "$STAGE/tools/purge-trash.php"
 cp "$ROOT/tools/seed-demo.php" "$STAGE/tools/seed-demo.php"
+cp "$ROOT/tools/create-admin.php" "$STAGE/tools/create-admin.php"
 
 # var/ (empty, runtime writes: install marker, sqlite in dev setups)
 mkdir -p "$STAGE/var"
