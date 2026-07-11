@@ -72,4 +72,33 @@ This binds **product UI/runtime strings**, not repository docs (English; see `AG
 Register in migrations as `lead`, `qualified`, `proposal`, `negotiation`, `won`, `lost`
 — adjust via ADR if changed.
 
-Last updated: 2026-05-30
+## Audit actions (`audit_events.action` — ADR 0005)
+
+Canonical spellings; constants live in `NeneDeal\Audit\AuditAction`.
+
+| Action | Entity type | Recorded by |
+| --- | --- | --- |
+| `deal.created` | `deal` | CreateDealUseCase |
+| `deal.updated` | `deal` | UpdateDealUseCase (changed fields only) |
+| `deal.stage_changed` | `deal` | ChangeDealStageUseCase |
+| `deal.deleted` | `deal` | DeleteDealUseCase (soft delete) |
+| `deal.restored` | `deal` | RestoreDealUseCase |
+| `deal.invoice_handoff` | `deal` | InvoiceHandoffUseCase |
+| `stage.created` | `stage` | CreateStageUseCase |
+| `stage.updated` | `stage` | UpdateStageUseCase |
+| `stage.deleted` | `stage` | DeleteStageUseCase |
+| `user.created` | `user` | CreateUserUseCase |
+| `user.updated` | `user` | UpdateUserUseCase (email/role/status) |
+| `user.deleted` | `user` | DeleteUserUseCase |
+| `settings.updated` | `settings` | UpdateSettingsHandler |
+| `login_succeeded` | `user` | LoginUseCase |
+| `login_failed` | `user` | LoginUseCase (no actor/org — no enumeration) |
+
+## User account status (`users.status`, #90)
+
+| Value | Meaning |
+| --- | --- |
+| `active` | Account can log in (default) |
+| `disabled` | Login and bearer resolution rejected; row kept for history attribution |
+
+Last updated: 2026-07-11

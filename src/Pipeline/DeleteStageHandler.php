@@ -6,6 +6,7 @@ namespace NeneDeal\Pipeline;
 
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Routing\Router;
+use NeneDeal\Auth\AuthContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -22,7 +23,7 @@ final readonly class DeleteStageHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $stageId = Router::param($request, 'stageId') ?? '';
-        $this->useCase->execute($stageId);
+        $this->useCase->execute($stageId, AuthContext::userId($request));
 
         return $this->json->createEmpty(204);
     }

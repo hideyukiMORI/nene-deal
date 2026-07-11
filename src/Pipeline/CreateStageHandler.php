@@ -6,6 +6,7 @@ namespace NeneDeal\Pipeline;
 
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeneDeal\Auth\AuthContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -44,7 +45,7 @@ final readonly class CreateStageHandler implements RequestHandlerInterface
             return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, '"sort_order" must be a non-negative integer.');
         }
 
-        $stage = $this->useCase->execute(new CreateStageInput($label, $sortOrder));
+        $stage = $this->useCase->execute(new CreateStageInput($label, $sortOrder), AuthContext::userId($request));
 
         return $this->json->create(PipelineStageResponse::toArray($stage), 201);
     }

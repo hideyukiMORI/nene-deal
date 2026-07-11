@@ -5,12 +5,18 @@ declare(strict_types=1);
 namespace NeneDeal\Deal;
 
 use LogicException;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderInterface;
+use NeneDeal\Audit\AuditAction;
+use NeneDeal\Tenancy\CurrentOrganization;
 use Symfony\Component\Uid\Ulid;
 
 final readonly class UpdateDealUseCase
 {
     public function __construct(
         private DealRepositoryInterface $deals,
+        private AuditRecorderInterface $audit,
+        private CurrentOrganization $organization,
     ) {
     }
 
@@ -48,6 +54,16 @@ final readonly class UpdateDealUseCase
                 action: 'updated',
                 actorUserId: $actorUserId,
                 changes: $changes,
+            ));
+
+            $this->audit->record(new AuditEvent(
+                action: AuditAction::DEAL_UPDATED,
+                entityType: 'deal',
+                entityId: $deal->id,
+                actorId: $actorUserId,
+                organizationId: $this->organization->id(),
+                before: array_map(static fn (array $change): mixed => $change['from'], $changes),
+                after: array_map(static fn (array $change): mixed => $change['to'], $changes),
             ));
         }
 

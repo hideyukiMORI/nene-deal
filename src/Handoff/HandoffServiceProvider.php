@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\Handoff;
 
 use LogicException;
+use Nene2\Audit\AuditRecorderInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
@@ -12,6 +13,7 @@ use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
 use NeneDeal\Deal\DealRepositoryInterface;
 use NeneDeal\Pipeline\PipelineStageRepositoryInterface;
+use NeneDeal\Tenancy\CurrentOrganization;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpClient\HttpClient;
@@ -69,7 +71,19 @@ final readonly class HandoffServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Clock service is invalid.');
                     }
 
-                    return new InvoiceHandoffUseCase($deals, $stages, $invoice, $clock);
+                    $audit = $c->get(AuditRecorderInterface::class);
+
+                    if (!$audit instanceof AuditRecorderInterface) {
+                        throw new LogicException('Audit recorder service is invalid.');
+                    }
+
+                    $org = $c->get(CurrentOrganization::class);
+
+                    if (!$org instanceof CurrentOrganization) {
+                        throw new LogicException('Current organization service is invalid.');
+                    }
+
+                    return new InvoiceHandoffUseCase($deals, $stages, $invoice, $clock, $audit, $org);
                 },
             )
             ->set(

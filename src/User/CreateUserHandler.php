@@ -6,6 +6,7 @@ namespace NeneDeal\User;
 
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeneDeal\Auth\AuthContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -51,7 +52,7 @@ final readonly class CreateUserHandler implements RequestHandlerInterface
             email: $email,
             password: $password,
             role: $role,
-        ));
+        ), AuthContext::userId($request));
 
         return $this->json->create(UserResponse::toArray($user), 201);
     }

@@ -60,6 +60,24 @@ CREATE INDEX idx_deals_org_stage ON deals (organization_id, stage_id);
 CREATE INDEX idx_deals_org_close_date ON deals (organization_id, expected_close_date);
 CREATE INDEX idx_deals_org_deleted ON deals (organization_id, deleted_at);
 
+CREATE TABLE audit_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    action TEXT NOT NULL,
+    entity_type TEXT NOT NULL,
+    entity_id TEXT DEFAULT NULL,
+    actor_id TEXT DEFAULT NULL,
+    organization_id TEXT DEFAULT NULL,
+    before_json TEXT DEFAULT NULL,
+    after_json TEXT DEFAULT NULL,
+    metadata_json TEXT DEFAULT NULL,
+    occurred_at TEXT NOT NULL
+);
+CREATE INDEX idx_audit_events_org ON audit_events (organization_id);
+CREATE INDEX idx_audit_events_entity ON audit_events (entity_type, entity_id);
+CREATE INDEX idx_audit_events_action ON audit_events (action);
+CREATE INDEX idx_audit_events_actor ON audit_events (actor_id);
+CREATE INDEX idx_audit_events_occurred_at ON audit_events (occurred_at);
+
 CREATE TABLE login_attempts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     identifier_hash TEXT NOT NULL,

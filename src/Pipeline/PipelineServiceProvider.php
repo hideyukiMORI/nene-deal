@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\Pipeline;
 
 use LogicException;
+use Nene2\Audit\AuditRecorderInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
@@ -121,7 +122,7 @@ final readonly class PipelineServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Current organization service is invalid.');
                     }
 
-                    return new CreateStageUseCase($stages, $org, self::clock($c));
+                    return new CreateStageUseCase($stages, $org, self::clock($c), self::audit($c));
                 },
             )
             ->set(
@@ -133,7 +134,7 @@ final readonly class PipelineServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Pipeline stage repository service is invalid.');
                     }
 
-                    return new UpdateStageUseCase($stages);
+                    return new UpdateStageUseCase($stages, self::audit($c));
                 },
             )
             ->set(
@@ -145,7 +146,7 @@ final readonly class PipelineServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Pipeline stage repository service is invalid.');
                     }
 
-                    return new DeleteStageUseCase($stages);
+                    return new DeleteStageUseCase($stages, self::audit($c));
                 },
             )
             ->set(
@@ -281,5 +282,16 @@ final readonly class PipelineServiceProvider implements ServiceProviderInterface
         }
 
         return $clock;
+    }
+
+    private static function audit(ContainerInterface $c): AuditRecorderInterface
+    {
+        $audit = $c->get(AuditRecorderInterface::class);
+
+        if (!$audit instanceof AuditRecorderInterface) {
+            throw new LogicException('Audit recorder service is invalid.');
+        }
+
+        return $audit;
     }
 }

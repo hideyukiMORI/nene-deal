@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace NeneDeal\Pipeline;
 
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderInterface;
 use Nene2\Http\ClockInterface;
+use NeneDeal\Audit\AuditAction;
 use NeneDeal\Tenancy\CurrentOrganization;
 use Symfony\Component\Uid\Ulid;
 
@@ -14,11 +17,12 @@ final readonly class CreateStageUseCase
         private PipelineStageRepositoryInterface $stages,
         private CurrentOrganization $organization,
         private ClockInterface $clock,
+        private AuditRecorderInterface $audit,
     ) {
     }
 
     /** @throws SlugAlreadyTakenException */
-    public function execute(CreateStageInput $input): PipelineStage
+    public function execute(CreateStageInput $input, ?string $actorUserId = null): PipelineStage
     {
         $slug = $this->deriveSlug($input->label);
 
@@ -40,6 +44,15 @@ final readonly class CreateStageUseCase
         );
 
         $this->stages->save($stage);
+
+        $this->audit->record(new AuditEvent(
+            action: AuditAction::STAGE_CREATED,
+            entityType: 'stage',
+            entityId: $stage->id,
+            actorId: $actorUserId,
+            organizationId: $this->organization->id(),
+            after: ['slug' => $stage->slug, 'label' => $stage->label, 'sort_order' => $stage->sortOrder],
+        ));
 
         return $stage;
     }

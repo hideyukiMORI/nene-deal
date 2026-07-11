@@ -7,6 +7,7 @@ namespace NeneDeal\Pipeline;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Routing\Router;
+use NeneDeal\Auth\AuthContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -58,7 +59,7 @@ final readonly class UpdateStageHandler implements RequestHandlerInterface
         }
 
         $stageId = Router::param($request, 'stageId') ?? '';
-        $stage = $this->useCase->execute($stageId, new UpdateStageInput($label, $sortOrder));
+        $stage = $this->useCase->execute($stageId, new UpdateStageInput($label, $sortOrder), AuthContext::userId($request));
 
         return $this->json->create(PipelineStageResponse::toArray($stage));
     }

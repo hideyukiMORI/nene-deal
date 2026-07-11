@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\Auth;
 
 use LogicException;
+use Nene2\Audit\AuditRecorderInterface;
 use Nene2\Auth\TokenIssuerInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
@@ -39,7 +40,13 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Clock service is invalid.');
                     }
 
-                    return new LoginUseCase(self::users($c), $tokenIssuer, $clock);
+                    $audit = $c->get(AuditRecorderInterface::class);
+
+                    if (!$audit instanceof AuditRecorderInterface) {
+                        throw new LogicException('Audit recorder service is invalid.');
+                    }
+
+                    return new LoginUseCase(self::users($c), $tokenIssuer, $clock, $audit);
                 },
             )
             ->set(

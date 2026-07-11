@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace NeneDeal\Pipeline;
 
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderInterface;
+use NeneDeal\Audit\AuditAction;
+
 final readonly class DeleteStageUseCase
 {
-    public function __construct(private PipelineStageRepositoryInterface $stages)
-    {
+    public function __construct(
+        private PipelineStageRepositoryInterface $stages,
+        private AuditRecorderInterface $audit,
+    ) {
     }
 
     /**
@@ -15,7 +21,7 @@ final readonly class DeleteStageUseCase
      * @throws StageDeletionForbiddenException
      * @throws StageHasDealsException
      */
-    public function execute(string $stageId): void
+    public function execute(string $stageId, ?string $actorUserId = null): void
     {
         $stage = $this->stages->findById($stageId);
 
@@ -32,5 +38,14 @@ final readonly class DeleteStageUseCase
         }
 
         $this->stages->delete($stageId);
+
+        $this->audit->record(new AuditEvent(
+            action: AuditAction::STAGE_DELETED,
+            entityType: 'stage',
+            entityId: $stage->id,
+            actorId: $actorUserId,
+            organizationId: $stage->organizationId,
+            before: ['slug' => $stage->slug, 'label' => $stage->label, 'sort_order' => $stage->sortOrder],
+        ));
     }
 }

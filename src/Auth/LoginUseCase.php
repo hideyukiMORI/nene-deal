@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace NeneDeal\Auth;
 
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderInterface;
 use Nene2\Auth\TokenIssuerInterface;
 use Nene2\Http\ClockInterface;
+use NeneDeal\Audit\AuditAction;
 use NeneDeal\User\UserRepositoryInterface;
 use NeneDeal\User\UserStatus;
 
@@ -32,6 +35,7 @@ final readonly class LoginUseCase
         private UserRepositoryInterface $users,
         private TokenIssuerInterface $tokenIssuer,
         private ClockInterface $clock,
+        private AuditRecorderInterface $audit,
     ) {
     }
 
@@ -44,8 +48,26 @@ final readonly class LoginUseCase
         $passwordMatches = password_verify($input->password, $hash);
 
         if ($user === null || !$passwordMatches || $user->status !== UserStatus::Active) {
+            // Audit the rejected attempt. Actor and organization are left null:
+            // recording the would-be org — like recording the password — could
+            // leak whether the account exists (clear shape).
+            $this->audit->record(new AuditEvent(
+                action: AuditAction::LOGIN_FAILED,
+                entityType: 'user',
+                after: ['email' => $input->email, 'failure_reason' => 'invalid_credentials'],
+            ));
+
             throw new InvalidCredentialsException();
         }
+
+        $this->audit->record(new AuditEvent(
+            action: AuditAction::LOGIN_SUCCEEDED,
+            entityType: 'user',
+            entityId: $user->id,
+            actorId: $user->id,
+            organizationId: $user->organizationId,
+            after: ['email' => $user->email],
+        ));
 
         $now = $this->clock->now()->getTimestamp();
         $token = $this->tokenIssuer->issue([

@@ -10,6 +10,7 @@ use NeneDeal\Pipeline\StageDeletionForbiddenException;
 use NeneDeal\Pipeline\StageHasDealsException;
 use NeneDeal\Pipeline\StageNotFoundException;
 use NeneDeal\Tests\Support\InMemoryPipelineStageRepository;
+use NeneDeal\Tests\Support\RecordingAuditRecorder;
 use PHPUnit\Framework\TestCase;
 
 final class DeleteStageUseCaseTest extends TestCase
@@ -25,7 +26,7 @@ final class DeleteStageUseCaseTest extends TestCase
             new PipelineStage('01STAGELEAD0000000000000AA', self::ORG_ID, 'lead', 'Lead', 1, false, false),
             new PipelineStage('01STAGEWON00000000000000AA', self::ORG_ID, 'won', 'Won', 5, true, true),
         ]);
-        $this->useCase = new DeleteStageUseCase($this->stages);
+        $this->useCase = new DeleteStageUseCase($this->stages, new RecordingAuditRecorder());
     }
 
     public function test_deletes_empty_non_terminal_stage(): void

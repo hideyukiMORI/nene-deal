@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\Deal;
 
 use LogicException;
+use Nene2\Audit\AuditRecorderInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
@@ -48,13 +49,13 @@ final readonly class DealServiceProvider implements ServiceProviderInterface
                     return new PdoDealRepository($query, $org, $clock);
                 },
             )
-            ->set(CreateDealUseCase::class, static fn (ContainerInterface $c): CreateDealUseCase => new CreateDealUseCase(self::deals($c), self::stages($c)))
+            ->set(CreateDealUseCase::class, static fn (ContainerInterface $c): CreateDealUseCase => new CreateDealUseCase(self::deals($c), self::stages($c), self::audit($c), self::org($c)))
             ->set(ListDealsUseCase::class, static fn (ContainerInterface $c): ListDealsUseCase => new ListDealsUseCase(self::deals($c)))
             ->set(GetDealUseCase::class, static fn (ContainerInterface $c): GetDealUseCase => new GetDealUseCase(self::deals($c)))
-            ->set(UpdateDealUseCase::class, static fn (ContainerInterface $c): UpdateDealUseCase => new UpdateDealUseCase(self::deals($c)))
-            ->set(DeleteDealUseCase::class, static fn (ContainerInterface $c): DeleteDealUseCase => new DeleteDealUseCase(self::deals($c)))
-            ->set(RestoreDealUseCase::class, static fn (ContainerInterface $c): RestoreDealUseCase => new RestoreDealUseCase(self::deals($c)))
-            ->set(ChangeDealStageUseCase::class, static fn (ContainerInterface $c): ChangeDealStageUseCase => new ChangeDealStageUseCase(self::deals($c), self::stages($c)))
+            ->set(UpdateDealUseCase::class, static fn (ContainerInterface $c): UpdateDealUseCase => new UpdateDealUseCase(self::deals($c), self::audit($c), self::org($c)))
+            ->set(DeleteDealUseCase::class, static fn (ContainerInterface $c): DeleteDealUseCase => new DeleteDealUseCase(self::deals($c), self::audit($c), self::org($c)))
+            ->set(RestoreDealUseCase::class, static fn (ContainerInterface $c): RestoreDealUseCase => new RestoreDealUseCase(self::deals($c), self::audit($c), self::org($c)))
+            ->set(ChangeDealStageUseCase::class, static fn (ContainerInterface $c): ChangeDealStageUseCase => new ChangeDealStageUseCase(self::deals($c), self::stages($c), self::audit($c), self::org($c)))
             ->set(ListDealHistoryUseCase::class, static fn (ContainerInterface $c): ListDealHistoryUseCase => new ListDealHistoryUseCase(self::deals($c)))
             ->set(
                 ListDealsHandler::class,
@@ -145,6 +146,28 @@ final readonly class DealServiceProvider implements ServiceProviderInterface
         }
 
         return $repo;
+    }
+
+    private static function audit(ContainerInterface $c): AuditRecorderInterface
+    {
+        $audit = $c->get(AuditRecorderInterface::class);
+
+        if (!$audit instanceof AuditRecorderInterface) {
+            throw new LogicException('Audit recorder service is invalid.');
+        }
+
+        return $audit;
+    }
+
+    private static function org(ContainerInterface $c): CurrentOrganization
+    {
+        $org = $c->get(CurrentOrganization::class);
+
+        if (!$org instanceof CurrentOrganization) {
+            throw new LogicException('Current organization service is invalid.');
+        }
+
+        return $org;
     }
 
     private static function createUseCase(ContainerInterface $c): CreateDealUseCase
