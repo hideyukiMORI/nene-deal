@@ -13,6 +13,7 @@ use NeneDeal\User\UpdateUserInput;
 use NeneDeal\User\UpdateUserUseCase;
 use NeneDeal\User\User;
 use NeneDeal\User\UserNotFoundException;
+use NeneDeal\User\UserStatus;
 use PHPUnit\Framework\TestCase;
 
 final class UpdateUserUseCaseTest extends TestCase
@@ -55,5 +56,26 @@ final class UpdateUserUseCaseTest extends TestCase
     {
         $this->expectException(UserNotFoundException::class);
         $this->useCase->execute('01UNKNOWNUSER00000000000AA', self::ADMIN_ID, new UpdateUserInput(role: OperatorRole::Operator));
+    }
+
+    public function test_disables_an_account(): void
+    {
+        $updated = $this->useCase->execute(self::OPERATOR_ID, self::ADMIN_ID, new UpdateUserInput(status: UserStatus::Disabled));
+
+        self::assertSame(UserStatus::Disabled, $updated->status);
+    }
+
+    public function test_re_enables_a_disabled_account(): void
+    {
+        $this->useCase->execute(self::OPERATOR_ID, self::ADMIN_ID, new UpdateUserInput(status: UserStatus::Disabled));
+        $updated = $this->useCase->execute(self::OPERATOR_ID, self::ADMIN_ID, new UpdateUserInput(status: UserStatus::Active));
+
+        self::assertSame(UserStatus::Active, $updated->status);
+    }
+
+    public function test_throws_when_disabling_own_account(): void
+    {
+        $this->expectException(CannotModifySelfException::class);
+        $this->useCase->execute(self::ADMIN_ID, self::ADMIN_ID, new UpdateUserInput(status: UserStatus::Disabled));
     }
 }

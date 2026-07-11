@@ -1,5 +1,5 @@
 import { useCreateUser, useDeleteUser, useUpdateUser, useUsers } from '@/entities/user'
-import type { CreateUserInput, OperatorRole, OperatorUser } from '@/entities/user'
+import type { CreateUserInput, OperatorRole, OperatorUser, UserStatus } from '@/entities/user'
 import { mapProblemDetailsToMessageKey, type MessageKey } from '@/shared/i18n'
 
 export type UserManagementStatus = 'loading' | 'error' | 'ready'
@@ -12,6 +12,7 @@ export interface UserManagementPage {
   createPending: boolean
   createErrorKey: MessageKey | null
   updateRole: (userId: string, role: OperatorRole) => Promise<boolean>
+  updateStatus: (userId: string, status: UserStatus) => Promise<boolean>
   deleteUser: (userId: string) => Promise<boolean>
   retry: () => void
 }
@@ -49,6 +50,15 @@ export function useUserManagementPage(): UserManagementPage {
     updateRole: async (userId: string, role: OperatorRole): Promise<boolean> => {
       try {
         await updateMutation.mutateAsync({ userId, role })
+        return true
+      } catch {
+        return false
+      }
+    },
+
+    updateStatus: async (userId: string, status: UserStatus): Promise<boolean> => {
+      try {
+        await updateMutation.mutateAsync({ userId, status })
         return true
       } catch {
         return false

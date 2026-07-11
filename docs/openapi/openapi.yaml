@@ -560,8 +560,10 @@ paths:
       tags: [Users]
       summary: Update an operator account
       description: |
-        Updates role or email for an operator. **Admin role required.**
-        An admin cannot demote their own role.
+        Updates role, email or account status for an operator. **Admin role required.**
+        An admin cannot demote their own role or disable their own account.
+        Setting `status: disabled` is the supported way to off-board an operator
+        while keeping stage-history attribution (preferred over DELETE).
       operationId: updateUser
       requestBody:
         required: true
@@ -1098,9 +1100,18 @@ components:
         `admin` — can manage users and perform all deal operations.
         `operator` — deal and pipeline operations only.
 
+    UserStatus:
+      type: string
+      enum: [active, disabled]
+      description: |
+        `active` — the account can log in.
+        `disabled` — login and bearer-token resolution are rejected; the row
+        (and its stage-history attribution) is preserved. Preferred over DELETE
+        for off-boarding.
+
     OperatorUser:
       type: object
-      required: [id, organization_id, email, role, created_at, updated_at]
+      required: [id, organization_id, email, role, status, created_at, updated_at]
       properties:
         id:
           $ref: '#/components/schemas/Ulid'
@@ -1112,6 +1123,8 @@ components:
           format: email
         role:
           $ref: '#/components/schemas/OperatorRole'
+        status:
+          $ref: '#/components/schemas/UserStatus'
         created_at:
           type: string
           format: date-time
@@ -1147,3 +1160,5 @@ components:
           maxLength: 255
         role:
           $ref: '#/components/schemas/OperatorRole'
+        status:
+          $ref: '#/components/schemas/UserStatus'

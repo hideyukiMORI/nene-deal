@@ -12,6 +12,7 @@ use NeneDeal\Tests\Support\FixedClock;
 use NeneDeal\Tests\Support\InMemoryUserRepository;
 use NeneDeal\User\OperatorRole;
 use NeneDeal\User\User;
+use NeneDeal\User\UserStatus;
 use PHPUnit\Framework\TestCase;
 
 final class LoginUseCaseTest extends TestCase
@@ -69,5 +70,20 @@ final class LoginUseCaseTest extends TestCase
     {
         $this->expectException(InvalidCredentialsException::class);
         $this->useCase->execute(new LoginInput('nobody@nene-deal.test', 'password'));
+    }
+
+    public function test_rejects_a_disabled_account_even_with_the_correct_password(): void
+    {
+        $this->users->add(new User(
+            id: '01USERDISABLED0000000000AA',
+            organizationId: '01ORG00000000000000000000A',
+            email: 'disabled@nene-deal.test',
+            passwordHash: password_hash('password', PASSWORD_DEFAULT),
+            role: OperatorRole::Operator,
+            status: UserStatus::Disabled,
+        ));
+
+        $this->expectException(InvalidCredentialsException::class);
+        $this->useCase->execute(new LoginInput('disabled@nene-deal.test', 'password'));
     }
 }

@@ -7,6 +7,7 @@ namespace NeneDeal\User;
 /**
  * An operator account scoped to one organization.
  * `role` controls access: `admin` can manage users; `operator` is deal-only.
+ * `status` gates authentication: only `active` accounts can log in (#90).
  */
 final readonly class User
 {
@@ -18,6 +19,7 @@ final readonly class User
         public OperatorRole $role = OperatorRole::Operator,
         public ?string $createdAt = null,
         public ?string $updatedAt = null,
+        public UserStatus $status = UserStatus::Active,
     ) {
     }
 }

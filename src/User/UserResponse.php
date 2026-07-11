@@ -14,6 +14,7 @@ final class UserResponse
             'organization_id' => $user->organizationId,
             'email' => $user->email,
             'role' => $user->role->value,
+            'status' => $user->status->value,
             'created_at' => $user->createdAt,
             'updated_at' => $user->updatedAt,
         ];

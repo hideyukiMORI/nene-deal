@@ -332,8 +332,10 @@ export interface paths {
         head?: never;
         /**
          * Update an operator account
-         * @description Updates role or email for an operator. **Admin role required.**
-         *     An admin cannot demote their own role.
+         * @description Updates role, email or account status for an operator. **Admin role required.**
+         *     An admin cannot demote their own role or disable their own account.
+         *     Setting `status: disabled` is the supported way to off-board an operator
+         *     while keeping stage-history attribution (preferred over DELETE).
          */
         patch: operations["updateUser"];
         trace?: never;
@@ -552,12 +554,21 @@ export interface components {
          * @enum {string}
          */
         OperatorRole: "admin" | "operator";
+        /**
+         * @description `active` — the account can log in.
+         *     `disabled` — login and bearer-token resolution are rejected; the row
+         *     (and its stage-history attribution) is preserved. Preferred over DELETE
+         *     for off-boarding.
+         * @enum {string}
+         */
+        UserStatus: "active" | "disabled";
         OperatorUser: {
             id: components["schemas"]["Ulid"];
             readonly organization_id: string;
             /** Format: email */
             email: string;
             role: components["schemas"]["OperatorRole"];
+            status: components["schemas"]["UserStatus"];
             /** Format: date-time */
             readonly created_at: string;
             /** Format: date-time */
@@ -575,6 +586,7 @@ export interface components {
             /** Format: email */
             email?: string;
             role?: components["schemas"]["OperatorRole"];
+            status?: components["schemas"]["UserStatus"];
         };
     };
     responses: {

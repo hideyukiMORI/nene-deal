@@ -31,6 +31,10 @@ final readonly class UpdateUserUseCase
             throw new CannotModifySelfException('An admin cannot change their own role.');
         }
 
+        if ($input->status !== null && $targetUserId === $actorUserId) {
+            throw new CannotModifySelfException('An admin cannot change their own account status.');
+        }
+
         $email = $input->email ?? $user->email;
 
         if ($input->email !== null && $this->users->emailExistsExcluding($input->email, $targetUserId)) {
@@ -44,6 +48,7 @@ final readonly class UpdateUserUseCase
             passwordHash: $user->passwordHash,
             role: $input->role ?? $user->role,
             createdAt: $user->createdAt,
+            status: $input->status ?? $user->status,
         );
 
         $this->users->save($updated);
