@@ -82,7 +82,7 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Login throttle service is invalid.');
                     }
 
-                    return new LoginHandler($useCase, self::json($c), self::problem($c), $throttle);
+                    return new LoginHandler($useCase, self::json($c), $throttle);
                 },
             )
             ->set(

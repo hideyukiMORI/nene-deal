@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace NeneDeal\Tests\Auth;
 
 use Nene2\Auth\LocalBearerTokenVerifier;
-use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeneDeal\Auth\LoginHandler;
 use NeneDeal\Auth\LoginThrottleInterface;
@@ -73,7 +72,6 @@ final class LoginHandlerTest extends TestCase
         $this->handler = new LoginHandler(
             $useCase,
             new JsonResponseFactory($this->psr17, $this->psr17),
-            new ProblemDetailsResponseFactory($this->psr17, $this->psr17, 'https://nene-deal.dev/problems/'),
             $this->throttle,
         );
     }

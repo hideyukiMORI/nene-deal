@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace NeneDeal\Deal;
 
-use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Validation\ValidationError;
+use Nene2\Validation\ValidationException;
 use NeneDeal\Auth\AuthContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,22 +22,17 @@ final readonly class ChangeDealStageHandler implements RequestHandlerInterface
     public function __construct(
         private ChangeDealStageUseCase $useCase,
         private JsonResponseFactory $json,
-        private ProblemDetailsResponseFactory $problemDetails,
     ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $body = json_decode((string) $request->getBody(), true);
-
-        if (!is_array($body)) {
-            return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, 'Request body must be a JSON object.');
-        }
+        $body = JsonRequestBodyParser::parse($request);
 
         $toStageRef = $body['to_stage_id'] ?? null;
 
         if (!is_string($toStageRef) || $toStageRef === '') {
-            return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, '"to_stage_id" is required.');
+            throw new ValidationException([new ValidationError('to_stage_id', '"to_stage_id" is required.', 'required')]);
         }
 
         $deal = $this->useCase->execute(DealField::pathId($request), $toStageRef, AuthContext::userId($request));

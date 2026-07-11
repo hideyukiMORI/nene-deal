@@ -53,6 +53,7 @@
 - [x] Issue #90: `users.status` (active/disabled) + login status check + timing-equalized credential errors + disable/enable in user management (alternative to DELETE — preserves stage-history attribution)
 - [x] Issue #95: Login rate limiting — product-local port of clear's `PdoLoginThrottle` (email+IP, 5 failures / 15 min → 15 min lock, 429 `too-many-login-attempts`). Replaces the #69 deferral; swap for the NENE2 path-scoped ThrottleMiddleware when it ships upstream
 - [x] Issue #89: `Nene2\Audit` consumer — append-only `audit_events` (canonical shape, ULID string actor/org ids), every mutation use case records (deal CRUD/stage move/restore, handoff, stage CRUD, user CRUD, settings, login success/failure). `deal_stage_history` kept as domain history (ADR 0005); action vocabulary in terminology registry
+- [x] Issue #98 (#91 (d)): `Nene2\Validation` adoption — hand-rolled 422s across 10 handlers replaced with `ValidationException` + field-level `errors[]`; malformed JSON bodies now 400 `invalid-json` via `JsonRequestBodyParser` (fleet shape); OpenAPI `ValidationProblem` schema + 400 responses added
 
 ## Next
 

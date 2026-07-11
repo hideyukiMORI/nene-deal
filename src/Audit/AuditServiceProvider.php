@@ -13,7 +13,6 @@ use Nene2\Audit\PdoAuditEventRepository;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
-use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\ClockInterface;
 use NeneDeal\Auth\RequireRoleMiddleware;
 use NeneDeal\Tenancy\CurrentOrganization;
@@ -104,16 +103,14 @@ final readonly class AuditServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $c): AuditCsvHandler {
                     $useCase = $c->get(ExportAuditUseCase::class);
                     $psr17 = $c->get(Psr17Factory::class);
-                    $problem = $c->get(ProblemDetailsResponseFactory::class);
 
                     if (!$useCase instanceof ExportAuditUseCase
                         || !$psr17 instanceof Psr17Factory
-                        || !$problem instanceof ProblemDetailsResponseFactory
                     ) {
                         throw new LogicException('Audit CSV handler dependencies are invalid.');
                     }
 
-                    return new AuditCsvHandler($useCase, $psr17, $problem);
+                    return new AuditCsvHandler($useCase, $psr17);
                 },
             )
             ->set(
