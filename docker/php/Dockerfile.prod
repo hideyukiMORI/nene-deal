@@ -31,7 +31,7 @@ RUN apt-get update \
     # Expose the real container environment to $_ENV (NENE2 ConfigLoader reads
     # $_ENV/$_SERVER); hide PHP/Apache version details in production.
     && printf 'variables_order=EGPCS\nexpose_php=0\ndisplay_errors=0\nlog_errors=1\n' > /usr/local/etc/php/conf.d/zz-nene-deal.ini \
-    && a2enmod rewrite \
+    && a2enmod rewrite headers \
     && printf '<Directory /var/www/html/public_html>\n    AllowOverride All\n    Require all granted\n</Directory>\nServerTokens Prod\nServerSignature Off\n' > /etc/apache2/conf-available/nene-deal.conf \
     && a2enconf nene-deal \
     && sed -ri -e 's!/var/www/html!/var/www/html/public_html!g' /etc/apache2/sites-available/*.conf \

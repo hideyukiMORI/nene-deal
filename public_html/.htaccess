@@ -3,6 +3,12 @@
 DirectoryIndex index.html index.php
 RewriteEngine On
 
+# Some CGI/FastCGI shared hosts have Apache itself drop the Authorization
+# header; re-deliver it as an env var so PHP still sees it. Hosts whose *front
+# proxy* strips the header (e.g. HETEML) are covered separately by the SPA's
+# X-Authorization mirror + AuthorizationHeaderFallback (#67/#68/#83). (#101)
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 # API and infra routes always go to the front controller.
 # demo/ is the disposable-demo start route (#69) — a backend route, not an SPA page.
 RewriteRule ^(api/|health$|machine/|demo/) index.php [QSA,L]
@@ -19,3 +25,31 @@ RewriteCond %{DOCUMENT_ROOT}/index.html -f
 RewriteRule ^ index.html [L]
 
 RewriteRule ^ index.php [QSA,L]
+
+# Hardening (Apache + mod_headers, invoice shape — #101). `always` covers both
+# statically served SPA assets and PHP-generated responses (API + SPA shell).
+<IfModule mod_headers.c>
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
+    # HSTS only takes effect over HTTPS; harmless over plain HTTP.
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), geolocation=(), microphone=()"
+
+    # CSP tuned to the deal SPA: external module scripts only (script-src 'self'),
+    # dynamic inline style attributes need 'unsafe-inline', and the SPA shell
+    # loads Google Fonts (fonts.googleapis.com CSS + fonts.gstatic.com woff2).
+    #
+    # The disposable-demo routes (/demo/…) are EXCLUDED: the seat page ships its
+    # own page-specific CSP with a per-response script nonce (DemoSessionSeater),
+    # and the demo error pages use inline script/style. A second, stricter CSP
+    # from this layer would intersect with the page CSP and block the nonce'd
+    # seat script, breaking the public demo. The condition uses THE_REQUEST
+    # (the original request line), which — unlike SetEnvIf/Request_URI vars —
+    # survives the mod_rewrite internal redirect to index.php (verified against
+    # the compose.prod.yaml stack).
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'" "expr=%{THE_REQUEST} !~ m#^\S+ /demo/#"
+</IfModule>
+ServerSignature Off
