@@ -48,11 +48,15 @@
 
 - [x] Issue #69: NENE2 `Nene2\Demo` consumer (v1.10.0) — disposable per-visitor demo orgs: `GET /demo/standard` (fail-close `DEMO_MODE`), JWT seat page → `sessionStorage` one-shot import (clear #275 shape), `FileRateLimitStorage` throttle 30/h + 200-org ceiling, branded HTML error pages (invoice #617 shape), `tools/sweep-demo.php` (TTL 3h), claim-based tenant resolution (bearer before org middleware; signed `org` claim authoritative), shared `DemoPipelineFixture` with the fixed-org seed; fixed demo org + reseed kept coexisting
 
+### Structural audit remediation (2026-07-11, #89/#90/#91)
+
+- [x] Issue #90: `users.status` (active/disabled) + login status check + timing-equalized credential errors + disable/enable in user management (alternative to DELETE — preserves stage-history attribution)
+- [x] Issue #95: Login rate limiting — product-local port of clear's `PdoLoginThrottle` (email+IP, 5 failures / 15 min → 15 min lock, 429 `too-many-login-attempts`). Replaces the #69 deferral; swap for the NENE2 path-scoped ThrottleMiddleware when it ships upstream
+
 ## Next
 
 - [ ] Suite catalog entry
-- [ ] Optional hardening for a public demo box: rate limiting on `/api/v1/auth/login` (deferred from #69: NENE2 `ThrottleMiddleware` has no path scoping — needs a login-scoped wrapper, and it would add `X-RateLimit-*` headers to login responses)
-- [ ] Structural audit 2026-07-11 follow-ups: audit logging #89, account status #90, roll-up checklist #91 (summary: `docs/review/2026-07-11-structural-audit.md`, #92)
+- [ ] Structural audit 2026-07-11 follow-ups: audit logging #89, roll-up checklist #91 (summary: `docs/review/2026-07-11-structural-audit.md`, #92)
 
 ## Handoff
 

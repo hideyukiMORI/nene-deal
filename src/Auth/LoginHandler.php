@@ -12,6 +12,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * `POST /api/v1/auth/login` — public. Exchanges email + password for a bearer token.
+ *
+ * Guarded by a clear-shape brute-force throttle keyed on email + client IP:
+ * 5 failures within 15 minutes lock the identifier for 15 minutes (429). See
+ * {@see LoginThrottleInterface} for the upstream-replacement note (#95).
  */
 final readonly class LoginHandler implements RequestHandlerInterface
 {
@@ -19,6 +23,7 @@ final readonly class LoginHandler implements RequestHandlerInterface
         private LoginUseCase $useCase,
         private JsonResponseFactory $json,
         private ProblemDetailsResponseFactory $problemDetails,
+        private LoginThrottleInterface $throttle,
     ) {
     }
 
@@ -37,8 +42,31 @@ final readonly class LoginHandler implements RequestHandlerInterface
             return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, 'Both "email" and "password" are required.');
         }
 
-        $output = $this->useCase->execute(new LoginInput($email, $password));
+        $identifier = strtolower($email) . '|' . $this->clientIp($request);
+
+        $secondsUntilUnlocked = $this->throttle->secondsUntilUnlocked($identifier);
+
+        if ($secondsUntilUnlocked > 0) {
+            throw new TooManyLoginAttemptsException($secondsUntilUnlocked);
+        }
+
+        try {
+            $output = $this->useCase->execute(new LoginInput($email, $password));
+        } catch (InvalidCredentialsException $e) {
+            $this->throttle->recordFailure($identifier);
+
+            throw $e;
+        }
+
+        $this->throttle->clear($identifier);
 
         return $this->json->create(['token' => $output->token]);
+    }
+
+    private function clientIp(ServerRequestInterface $request): string
+    {
+        $params = $request->getServerParams();
+
+        return (string) ($params['REMOTE_ADDR'] ?? 'unknown');
     }
 }
