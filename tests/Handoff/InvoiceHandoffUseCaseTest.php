@@ -15,6 +15,8 @@ use NeneDeal\Tests\Support\FakeInvoiceClient;
 use NeneDeal\Tests\Support\FixedClock;
 use NeneDeal\Tests\Support\InMemoryDealRepository;
 use NeneDeal\Tests\Support\InMemoryPipelineStageRepository;
+use NeneDeal\Tests\Support\RecordingAuditRecorder;
+use NeneDeal\Tests\Support\StubCurrentOrganization;
 use PHPUnit\Framework\TestCase;
 
 final class InvoiceHandoffUseCaseTest extends TestCase
@@ -41,7 +43,7 @@ final class InvoiceHandoffUseCaseTest extends TestCase
 
     private function useCase(FakeInvoiceClient $invoice): InvoiceHandoffUseCase
     {
-        return new InvoiceHandoffUseCase($this->deals, $this->stages, $invoice, new FixedClock());
+        return new InvoiceHandoffUseCase($this->deals, $this->stages, $invoice, new FixedClock(), new RecordingAuditRecorder(), new StubCurrentOrganization('01ORG00000000000000000000A'));
     }
 
     public function test_creates_draft_client_and_quote_and_persists_link_ids(): void

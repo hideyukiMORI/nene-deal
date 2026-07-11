@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace NeneDeal\Deal;
 
 use LogicException;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderInterface;
+use NeneDeal\Audit\AuditAction;
 use NeneDeal\Pipeline\PipelineStageRepositoryInterface;
+use NeneDeal\Tenancy\CurrentOrganization;
 use Symfony\Component\Uid\Ulid;
 
 final readonly class ChangeDealStageUseCase
@@ -13,6 +17,8 @@ final readonly class ChangeDealStageUseCase
     public function __construct(
         private DealRepositoryInterface $deals,
         private PipelineStageRepositoryInterface $stages,
+        private AuditRecorderInterface $audit,
+        private CurrentOrganization $organization,
     ) {
     }
 
@@ -61,6 +67,16 @@ final readonly class ChangeDealStageUseCase
                 fromStageId: $fromStageId,
                 toStageId: $stage->id,
                 actorUserId: $actorUserId,
+            ));
+
+            $this->audit->record(new AuditEvent(
+                action: AuditAction::DEAL_STAGE_CHANGED,
+                entityType: 'deal',
+                entityId: $deal->id,
+                actorId: $actorUserId,
+                organizationId: $this->organization->id(),
+                before: ['stage_id' => $fromStageId],
+                after: ['stage_id' => $stage->id],
             ));
         }
 

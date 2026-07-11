@@ -10,6 +10,7 @@ use NeneDeal\Pipeline\PipelineStage;
 use NeneDeal\Pipeline\SlugAlreadyTakenException;
 use NeneDeal\Tests\Support\FixedClock;
 use NeneDeal\Tests\Support\InMemoryPipelineStageRepository;
+use NeneDeal\Tests\Support\RecordingAuditRecorder;
 use NeneDeal\Tests\Support\StubCurrentOrganization;
 use PHPUnit\Framework\TestCase;
 
@@ -23,7 +24,7 @@ final class CreateStageUseCaseTest extends TestCase
     protected function setUp(): void
     {
         $this->stages = new InMemoryPipelineStageRepository();
-        $this->useCase = new CreateStageUseCase($this->stages, new StubCurrentOrganization(self::ORG_ID), new FixedClock());
+        $this->useCase = new CreateStageUseCase($this->stages, new StubCurrentOrganization(self::ORG_ID), new FixedClock(), new RecordingAuditRecorder());
     }
 
     public function test_creates_stage_with_derived_slug(): void

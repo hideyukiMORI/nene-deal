@@ -13,6 +13,7 @@ use NeneDeal\Auth\LoginUseCase;
 use NeneDeal\Auth\TooManyLoginAttemptsException;
 use NeneDeal\Tests\Support\FixedClock;
 use NeneDeal\Tests\Support\InMemoryUserRepository;
+use NeneDeal\Tests\Support\RecordingAuditRecorder;
 use NeneDeal\User\OperatorRole;
 use NeneDeal\User\User;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -66,7 +67,7 @@ final class LoginHandlerTest extends TestCase
         ));
 
         $clock = new FixedClock();
-        $useCase = new LoginUseCase($users, new LocalBearerTokenVerifier('test-secret', $clock), $clock);
+        $useCase = new LoginUseCase($users, new LocalBearerTokenVerifier('test-secret', $clock), $clock, new RecordingAuditRecorder());
 
         $this->throttle = new SpyLoginThrottle();
         $this->handler = new LoginHandler(

@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace NeneDeal\Handoff;
 
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderInterface;
 use Nene2\Http\ClockInterface;
+use NeneDeal\Audit\AuditAction;
 use NeneDeal\Deal\DealActivity;
 use NeneDeal\Deal\DealNotFoundException;
 use NeneDeal\Deal\DealRepositoryInterface;
 use NeneDeal\Pipeline\PipelineStageRepositoryInterface;
+use NeneDeal\Tenancy\CurrentOrganization;
 use Symfony\Component\Uid\Ulid;
 
 /**
@@ -26,6 +30,8 @@ final readonly class InvoiceHandoffUseCase
         private PipelineStageRepositoryInterface $stages,
         private InvoiceClient $invoice,
         private ClockInterface $clock,
+        private AuditRecorderInterface $audit,
+        private CurrentOrganization $organization,
     ) {
     }
 
@@ -73,6 +79,15 @@ final readonly class InvoiceHandoffUseCase
             action: 'handoff',
             actorUserId: $actorUserId,
             changes: ['invoice_client_id' => ['from' => null, 'to' => $clientId], 'invoice_quote_id' => ['from' => null, 'to' => $quoteId]],
+        ));
+
+        $this->audit->record(new AuditEvent(
+            action: AuditAction::DEAL_INVOICE_HANDOFF,
+            entityType: 'deal',
+            entityId: $dealId,
+            actorId: $actorUserId,
+            organizationId: $this->organization->id(),
+            after: ['invoice_client_id' => $clientId, 'invoice_quote_id' => $quoteId],
         ));
 
         return new InvoiceHandoffResult($dealId, $clientId, $quoteId, $handoffAt, $actorUserId);

@@ -10,6 +10,8 @@ use NeneDeal\Deal\UnknownStageException;
 use NeneDeal\Pipeline\PipelineStage;
 use NeneDeal\Tests\Support\InMemoryDealRepository;
 use NeneDeal\Tests\Support\InMemoryPipelineStageRepository;
+use NeneDeal\Tests\Support\RecordingAuditRecorder;
+use NeneDeal\Tests\Support\StubCurrentOrganization;
 use PHPUnit\Framework\TestCase;
 
 final class CreateDealUseCaseTest extends TestCase
@@ -24,7 +26,7 @@ final class CreateDealUseCaseTest extends TestCase
             new PipelineStage('01STAGELEAD0000000000000AA', 'org', 'lead', 'Lead', 1, false, false),
             new PipelineStage('01STAGEWON00000000000000AA', 'org', 'won', 'Won', 5, true, true),
         ]);
-        $this->useCase = new CreateDealUseCase($this->deals, $stages);
+        $this->useCase = new CreateDealUseCase($this->deals, $stages, new RecordingAuditRecorder(), new StubCurrentOrganization('01ORG00000000000000000000A'));
     }
 
     public function test_creates_deal_resolving_stage_slug_and_records_history(): void

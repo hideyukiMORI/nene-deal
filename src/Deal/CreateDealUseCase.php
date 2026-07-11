@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace NeneDeal\Deal;
 
 use LogicException;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderInterface;
+use NeneDeal\Audit\AuditAction;
 use NeneDeal\Pipeline\PipelineStageRepositoryInterface;
+use NeneDeal\Tenancy\CurrentOrganization;
 use Symfony\Component\Uid\Ulid;
 
 final readonly class CreateDealUseCase
@@ -13,6 +17,8 @@ final readonly class CreateDealUseCase
     public function __construct(
         private DealRepositoryInterface $deals,
         private PipelineStageRepositoryInterface $stages,
+        private AuditRecorderInterface $audit,
+        private CurrentOrganization $organization,
     ) {
     }
 
@@ -55,6 +61,22 @@ final readonly class CreateDealUseCase
         if ($created === null) {
             throw new LogicException('Deal could not be loaded immediately after creation.');
         }
+
+        $this->audit->record(new AuditEvent(
+            action: AuditAction::DEAL_CREATED,
+            entityType: 'deal',
+            entityId: $id,
+            actorId: $actorUserId,
+            organizationId: $this->organization->id(),
+            after: [
+                'account_label' => $created->accountLabel,
+                'amount_cents' => $created->amountCents,
+                'stage_id' => $created->stageId,
+                'probability_percent' => $created->probabilityPercent,
+                'expected_close_date' => $created->expectedCloseDate,
+                'owner_user_id' => $created->ownerUserId,
+            ],
+        ));
 
         return $created;
     }

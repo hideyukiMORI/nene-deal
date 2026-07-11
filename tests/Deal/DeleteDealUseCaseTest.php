@@ -8,6 +8,8 @@ use NeneDeal\Deal\Deal;
 use NeneDeal\Deal\DealNotFoundException;
 use NeneDeal\Deal\DeleteDealUseCase;
 use NeneDeal\Tests\Support\InMemoryDealRepository;
+use NeneDeal\Tests\Support\RecordingAuditRecorder;
+use NeneDeal\Tests\Support\StubCurrentOrganization;
 use PHPUnit\Framework\TestCase;
 
 final class DeleteDealUseCaseTest extends TestCase
@@ -18,7 +20,7 @@ final class DeleteDealUseCaseTest extends TestCase
     protected function setUp(): void
     {
         $this->deals = new InMemoryDealRepository();
-        $this->useCase = new DeleteDealUseCase($this->deals);
+        $this->useCase = new DeleteDealUseCase($this->deals, new RecordingAuditRecorder(), new StubCurrentOrganization('01ORG00000000000000000000A'));
     }
 
     public function test_soft_deletes_so_the_deal_is_recoverable(): void

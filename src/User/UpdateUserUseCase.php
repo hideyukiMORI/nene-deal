@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NeneDeal\User;
 
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderInterface;
+use NeneDeal\Audit\AuditAction;
 use NeneDeal\Tenancy\CurrentOrganization;
 
 final readonly class UpdateUserUseCase
@@ -11,6 +14,7 @@ final readonly class UpdateUserUseCase
     public function __construct(
         private UserRepositoryInterface $users,
         private CurrentOrganization $organization,
+        private AuditRecorderInterface $audit,
     ) {
     }
 
@@ -52,6 +56,34 @@ final readonly class UpdateUserUseCase
         );
 
         $this->users->save($updated);
+
+        $before = [];
+        $after = [];
+
+        if ($updated->email !== $user->email) {
+            $before['email'] = $user->email;
+            $after['email'] = $updated->email;
+        }
+        if ($updated->role !== $user->role) {
+            $before['role'] = $user->role->value;
+            $after['role'] = $updated->role->value;
+        }
+        if ($updated->status !== $user->status) {
+            $before['status'] = $user->status->value;
+            $after['status'] = $updated->status->value;
+        }
+
+        if ($after !== []) {
+            $this->audit->record(new AuditEvent(
+                action: AuditAction::USER_UPDATED,
+                entityType: 'user',
+                entityId: $user->id,
+                actorId: $actorUserId,
+                organizationId: $user->organizationId,
+                before: $before,
+                after: $after,
+            ));
+        }
 
         return $this->users->findById($targetUserId) ?? $updated;
     }

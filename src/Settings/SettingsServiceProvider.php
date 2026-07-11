@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\Settings;
 
 use LogicException;
+use Nene2\Audit\AuditRecorderInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
@@ -58,7 +59,17 @@ final readonly class SettingsServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Problem details response factory service is invalid.');
                     }
 
-                    return new UpdateSettingsHandler(self::repo($c), self::json($c), $problem);
+                    $audit = $c->get(AuditRecorderInterface::class);
+                    if (!$audit instanceof AuditRecorderInterface) {
+                        throw new LogicException('Audit recorder service is invalid.');
+                    }
+
+                    $org = $c->get(CurrentOrganization::class);
+                    if (!$org instanceof CurrentOrganization) {
+                        throw new LogicException('Current organization service is invalid.');
+                    }
+
+                    return new UpdateSettingsHandler(self::repo($c), self::json($c), $problem, $audit, $org);
                 },
             )
             ->set(

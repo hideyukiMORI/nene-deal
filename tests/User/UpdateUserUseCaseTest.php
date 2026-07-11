@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\Tests\User;
 
 use NeneDeal\Tests\Support\InMemoryUserRepository;
+use NeneDeal\Tests\Support\RecordingAuditRecorder;
 use NeneDeal\Tests\Support\StubCurrentOrganization;
 use NeneDeal\User\CannotModifySelfException;
 use NeneDeal\User\EmailAlreadyTakenException;
@@ -30,7 +31,7 @@ final class UpdateUserUseCaseTest extends TestCase
         $this->users = new InMemoryUserRepository();
         $this->users->add(new User(self::ADMIN_ID, self::ORG_ID, 'admin@example.com', 'hash', OperatorRole::Admin));
         $this->users->add(new User(self::OPERATOR_ID, self::ORG_ID, 'op@example.com', 'hash', OperatorRole::Operator));
-        $this->useCase = new UpdateUserUseCase($this->users, new StubCurrentOrganization(self::ORG_ID));
+        $this->useCase = new UpdateUserUseCase($this->users, new StubCurrentOrganization(self::ORG_ID), new RecordingAuditRecorder());
     }
 
     public function test_updates_role(): void

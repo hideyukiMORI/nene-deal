@@ -52,11 +52,12 @@
 
 - [x] Issue #90: `users.status` (active/disabled) + login status check + timing-equalized credential errors + disable/enable in user management (alternative to DELETE — preserves stage-history attribution)
 - [x] Issue #95: Login rate limiting — product-local port of clear's `PdoLoginThrottle` (email+IP, 5 failures / 15 min → 15 min lock, 429 `too-many-login-attempts`). Replaces the #69 deferral; swap for the NENE2 path-scoped ThrottleMiddleware when it ships upstream
+- [x] Issue #89: `Nene2\Audit` consumer — append-only `audit_events` (canonical shape, ULID string actor/org ids), every mutation use case records (deal CRUD/stage move/restore, handoff, stage CRUD, user CRUD, settings, login success/failure). `deal_stage_history` kept as domain history (ADR 0005); action vocabulary in terminology registry
 
 ## Next
 
 - [ ] Suite catalog entry
-- [ ] Structural audit 2026-07-11 follow-ups: audit logging #89, roll-up checklist #91 (summary: `docs/review/2026-07-11-structural-audit.md`, #92)
+- [ ] Structural audit 2026-07-11 follow-ups: roll-up checklist #91 (summary: `docs/review/2026-07-11-structural-audit.md`, #92)
 
 ## Handoff
 

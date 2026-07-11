@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace NeneDeal\Settings;
 
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeneDeal\Audit\AuditAction;
+use NeneDeal\Auth\AuthContext;
+use NeneDeal\Tenancy\CurrentOrganization;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -21,6 +26,8 @@ final readonly class UpdateSettingsHandler implements RequestHandlerInterface
         private OrganizationSettingsRepositoryInterface $settings,
         private JsonResponseFactory $json,
         private ProblemDetailsResponseFactory $problemDetails,
+        private AuditRecorderInterface $audit,
+        private CurrentOrganization $organization,
     ) {
     }
 
@@ -38,7 +45,21 @@ final readonly class UpdateSettingsHandler implements RequestHandlerInterface
             return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, '"forecast_closing_day" must be null (calendar month) or an integer between 1 and 28.');
         }
 
+        $previous = $this->settings->forecastClosingDay();
+
         $this->settings->updateForecastClosingDay($value);
+
+        if ($value !== $previous) {
+            $this->audit->record(new AuditEvent(
+                action: AuditAction::SETTINGS_UPDATED,
+                entityType: 'settings',
+                entityId: $this->organization->id(),
+                actorId: AuthContext::userId($request),
+                organizationId: $this->organization->id(),
+                before: ['forecast_closing_day' => $previous],
+                after: ['forecast_closing_day' => $value],
+            ));
+        }
 
         return $this->json->create(['forecast_closing_day' => $this->settings->forecastClosingDay()]);
     }

@@ -10,6 +10,7 @@ use NeneDeal\Auth\LoginInput;
 use NeneDeal\Auth\LoginUseCase;
 use NeneDeal\Tests\Support\FixedClock;
 use NeneDeal\Tests\Support\InMemoryUserRepository;
+use NeneDeal\Tests\Support\RecordingAuditRecorder;
 use NeneDeal\User\OperatorRole;
 use NeneDeal\User\User;
 use NeneDeal\User\UserStatus;
@@ -37,7 +38,7 @@ final class LoginUseCaseTest extends TestCase
         // so iat/exp issuance and exp verification are deterministic.
         $this->clock = new FixedClock();
         $this->tokens = new LocalBearerTokenVerifier('test-secret', $this->clock);
-        $this->useCase = new LoginUseCase($this->users, $this->tokens, $this->clock);
+        $this->useCase = new LoginUseCase($this->users, $this->tokens, $this->clock, new RecordingAuditRecorder());
     }
 
     public function test_issues_a_verifiable_token_for_valid_credentials(): void

@@ -6,6 +6,7 @@ namespace NeneDeal\Tests\User;
 
 use NeneDeal\Tests\Support\FixedClock;
 use NeneDeal\Tests\Support\InMemoryUserRepository;
+use NeneDeal\Tests\Support\RecordingAuditRecorder;
 use NeneDeal\Tests\Support\StubCurrentOrganization;
 use NeneDeal\User\CreateUserInput;
 use NeneDeal\User\CreateUserUseCase;
@@ -24,7 +25,7 @@ final class CreateUserUseCaseTest extends TestCase
     protected function setUp(): void
     {
         $this->users = new InMemoryUserRepository();
-        $this->useCase = new CreateUserUseCase($this->users, new StubCurrentOrganization(self::ORG_ID), new FixedClock());
+        $this->useCase = new CreateUserUseCase($this->users, new StubCurrentOrganization(self::ORG_ID), new FixedClock(), new RecordingAuditRecorder());
     }
 
     public function test_creates_a_user_with_hashed_password(): void

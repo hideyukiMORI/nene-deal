@@ -9,6 +9,7 @@ use NeneDeal\Pipeline\StageNotFoundException;
 use NeneDeal\Pipeline\UpdateStageInput;
 use NeneDeal\Pipeline\UpdateStageUseCase;
 use NeneDeal\Tests\Support\InMemoryPipelineStageRepository;
+use NeneDeal\Tests\Support\RecordingAuditRecorder;
 use PHPUnit\Framework\TestCase;
 
 final class UpdateStageUseCaseTest extends TestCase
@@ -24,7 +25,7 @@ final class UpdateStageUseCaseTest extends TestCase
         $this->stages = new InMemoryPipelineStageRepository([
             new PipelineStage(self::STAGE_ID, self::ORG_ID, 'lead', 'Lead', 1, false, false),
         ]);
-        $this->useCase = new UpdateStageUseCase($this->stages);
+        $this->useCase = new UpdateStageUseCase($this->stages, new RecordingAuditRecorder());
     }
 
     public function test_updates_label_only(): void

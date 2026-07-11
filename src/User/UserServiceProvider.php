@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneDeal\User;
 
 use LogicException;
+use Nene2\Audit\AuditRecorderInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
@@ -45,19 +46,19 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
             ->set(
                 CreateUserUseCase::class,
                 static function (ContainerInterface $c): CreateUserUseCase {
-                    return new CreateUserUseCase(self::repo($c), self::org($c), self::clock($c));
+                    return new CreateUserUseCase(self::repo($c), self::org($c), self::clock($c), self::audit($c));
                 },
             )
             ->set(
                 UpdateUserUseCase::class,
                 static function (ContainerInterface $c): UpdateUserUseCase {
-                    return new UpdateUserUseCase(self::repo($c), self::org($c));
+                    return new UpdateUserUseCase(self::repo($c), self::org($c), self::audit($c));
                 },
             )
             ->set(
                 DeleteUserUseCase::class,
                 static function (ContainerInterface $c): DeleteUserUseCase {
-                    return new DeleteUserUseCase(self::repo($c), self::org($c));
+                    return new DeleteUserUseCase(self::repo($c), self::org($c), self::audit($c));
                 },
             )
             ->set(
@@ -169,6 +170,17 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
                 CannotModifySelfExceptionHandler::class,
                 static fn (ContainerInterface $c): CannotModifySelfExceptionHandler => new CannotModifySelfExceptionHandler(self::problem($c)),
             );
+    }
+
+    private static function audit(ContainerInterface $c): AuditRecorderInterface
+    {
+        $audit = $c->get(AuditRecorderInterface::class);
+
+        if (!$audit instanceof AuditRecorderInterface) {
+            throw new LogicException('Audit recorder service is invalid.');
+        }
+
+        return $audit;
     }
 
     private static function repo(ContainerInterface $c): UserRepositoryInterface

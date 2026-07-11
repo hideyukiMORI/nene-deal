@@ -9,6 +9,8 @@ use NeneDeal\Deal\DealNotFoundException;
 use NeneDeal\Deal\UpdateDealInput;
 use NeneDeal\Deal\UpdateDealUseCase;
 use NeneDeal\Tests\Support\InMemoryDealRepository;
+use NeneDeal\Tests\Support\RecordingAuditRecorder;
+use NeneDeal\Tests\Support\StubCurrentOrganization;
 use PHPUnit\Framework\TestCase;
 
 final class UpdateDealUseCaseTest extends TestCase
@@ -26,7 +28,7 @@ final class UpdateDealUseCaseTest extends TestCase
             ownerUserId: '01OWNERAAAAAAAAAAAAAAAAAAAA',
         ));
 
-        $useCase = new UpdateDealUseCase($deals);
+        $useCase = new UpdateDealUseCase($deals, new RecordingAuditRecorder(), new StubCurrentOrganization('01ORG00000000000000000000A'));
 
         // Change amount only; note untouched (absent), owner untouched.
         $updated = $useCase->execute('01DEALAAAAAAAAAAAAAAAAAAAAA', new UpdateDealInput(amountCents: 5000));
@@ -52,7 +54,7 @@ final class UpdateDealUseCaseTest extends TestCase
             ownerUserId: '01OWNER000000000000000000A',
         ));
 
-        $useCase = new UpdateDealUseCase($deals);
+        $useCase = new UpdateDealUseCase($deals, new RecordingAuditRecorder(), new StubCurrentOrganization('01ORG00000000000000000000A'));
         $cleared = $useCase->execute(
             '01DEALAAAAAAAAAAAAAAAAAAAAA',
             new UpdateDealInput(hasOwnerUserId: true, ownerUserId: null),
@@ -73,7 +75,7 @@ final class UpdateDealUseCaseTest extends TestCase
             expectedCloseDate: '2026-12-31',
         ));
 
-        $useCase = new UpdateDealUseCase($deals);
+        $useCase = new UpdateDealUseCase($deals, new RecordingAuditRecorder(), new StubCurrentOrganization('01ORG00000000000000000000A'));
         $cleared = $useCase->execute(
             '01DEALAAAAAAAAAAAAAAAAAAAAA',
             new UpdateDealInput(hasExpectedCloseDate: true, expectedCloseDate: null),
@@ -87,7 +89,7 @@ final class UpdateDealUseCaseTest extends TestCase
         $deals = new InMemoryDealRepository();
         $deals->save(new Deal('01DEALAAAAAAAAAAAAAAAAAAAAA', 'A', 1000, '01STAGE000000000000000000A', 50));
 
-        $useCase = new UpdateDealUseCase($deals);
+        $useCase = new UpdateDealUseCase($deals, new RecordingAuditRecorder(), new StubCurrentOrganization('01ORG00000000000000000000A'));
 
         $zero = $useCase->execute('01DEALAAAAAAAAAAAAAAAAAAAAA', new UpdateDealInput(probabilityPercent: 0));
         self::assertSame(0, $zero->probabilityPercent);
@@ -109,7 +111,7 @@ final class UpdateDealUseCaseTest extends TestCase
             invoiceQuoteId: 77,
         ));
 
-        $useCase = new UpdateDealUseCase($deals);
+        $useCase = new UpdateDealUseCase($deals, new RecordingAuditRecorder(), new StubCurrentOrganization('01ORG00000000000000000000A'));
         $updated = $useCase->execute('01DEALAAAAAAAAAAAAAAAAAAAAA', new UpdateDealInput(accountLabel: 'Acme Updated'));
 
         self::assertSame(42, $updated->invoiceClientId);
@@ -118,7 +120,7 @@ final class UpdateDealUseCaseTest extends TestCase
 
     public function test_unknown_deal_throws(): void
     {
-        $useCase = new UpdateDealUseCase(new InMemoryDealRepository());
+        $useCase = new UpdateDealUseCase(new InMemoryDealRepository(), new RecordingAuditRecorder(), new StubCurrentOrganization('01ORG00000000000000000000A'));
 
         $this->expectException(DealNotFoundException::class);
         $useCase->execute('01MISSING000000000000000AA', new UpdateDealInput(amountCents: 1));
