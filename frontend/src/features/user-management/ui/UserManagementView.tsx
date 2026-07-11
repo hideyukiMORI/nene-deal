@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { CreateUserInput, OperatorRole, OperatorUser } from '@/entities/user'
+import type { CreateUserInput, OperatorRole, OperatorUser, UserStatus } from '@/entities/user'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { EmptyState, Select, type SelectOption } from '@/shared/ui'
 import { IconChevron, IconClose, IconPlus } from '@/shared/ui/icons'
@@ -16,6 +16,7 @@ export interface UserManagementViewProps {
   createPending: boolean
   createErrorKey: MessageKey | null
   updateRole: (userId: string, role: OperatorRole) => Promise<boolean>
+  updateStatus: (userId: string, status: UserStatus) => Promise<boolean>
   deleteUser: (userId: string) => Promise<boolean>
 }
 
@@ -29,6 +30,7 @@ export function UserManagementView({
   createPending,
   createErrorKey,
   updateRole,
+  updateStatus,
   deleteUser,
 }: UserManagementViewProps) {
   const { t } = useTranslation()
@@ -60,6 +62,30 @@ export function UserManagementView({
       setOpenUser(null)
     }
   }
+
+  const toggleStatus = (user: OperatorUser) => {
+    if (user.status === 'active') {
+      if (window.confirm(t('users.disable.confirm'))) {
+        void updateStatus(user.id, 'disabled')
+        setOpenUser(null)
+      }
+      return
+    }
+    void updateStatus(user.id, 'active')
+    setOpenUser(null)
+  }
+
+  const statusButton = (user: OperatorUser) => (
+    <button
+      type="button"
+      className="btn btn-secondary"
+      onClick={() => {
+        toggleStatus(user)
+      }}
+    >
+      {user.status === 'active' ? t('users.disable.label') : t('users.enable.label')}
+    </button>
+  )
 
   return (
     <section className="content content-narrow stack g6">
@@ -135,6 +161,9 @@ export function UserManagementView({
                       <span className="row g2">
                         <span className="medium">{user.email}</span>
                         {you ? <span className="badge badge-accent">{t('users.you')}</span> : null}
+                        {user.status === 'disabled' ? (
+                          <span className="badge badge-muted">{t('users.status.disabled')}</span>
+                        ) : null}
                       </span>
                       <span className="faint t-tiny mono">{user.id}</span>
                     </div>
@@ -144,6 +173,7 @@ export function UserManagementView({
                   </button>
                   <div className="row g3 user-ctrls">
                     {roleSelect(user, true)}
+                    {you ? null : statusButton(user)}
                     {you ? null : (
                       <button
                         type="button"
@@ -217,6 +247,7 @@ export function UserManagementView({
               <label>{t('users.field.role')}</label>
               {roleSelect(openUser, true)}
             </div>
+            {openUser.id === currentUserId ? null : statusButton(openUser)}
             {openUser.id === currentUserId ? null : (
               <button
                 type="button"

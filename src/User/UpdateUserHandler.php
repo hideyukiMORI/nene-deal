@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-/** `PATCH /api/v1/users/{userId}` — updates role or email. Admin only. */
+/** `PATCH /api/v1/users/{userId}` — updates role, email or status. Admin only. */
 final readonly class UpdateUserHandler implements RequestHandlerInterface
 {
     public function __construct(
@@ -50,14 +50,24 @@ final readonly class UpdateUserHandler implements RequestHandlerInterface
             }
         }
 
-        if ($email === null && $role === null) {
-            return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, 'At least one of "email" or "role" is required.');
+        $status = null;
+
+        if (array_key_exists('status', $body)) {
+            $status = is_string($body['status']) ? UserStatus::tryFrom($body['status']) : null;
+
+            if ($status === null) {
+                return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, '"status" must be one of: active, disabled.');
+            }
+        }
+
+        if ($email === null && $role === null && $status === null) {
+            return $this->problemDetails->create($request, 'validation-failed', 'Validation Failed', 422, 'At least one of "email", "role" or "status" is required.');
         }
 
         $targetUserId = Router::param($request, 'userId') ?? '';
         $actorUserId = AuthContext::userId($request) ?? '';
 
-        $user = $this->useCase->execute($targetUserId, $actorUserId, new UpdateUserInput($email, $role));
+        $user = $this->useCase->execute($targetUserId, $actorUserId, new UpdateUserInput($email, $role, $status));
 
         return $this->json->create(UserResponse::toArray($user));
     }

@@ -7,6 +7,7 @@ export function mapUserDto(dto: OperatorUserDto): OperatorUser {
     organizationId: dto.organization_id,
     email: dto.email,
     role: dto.role,
+    status: dto.status,
     createdAt: dto.created_at,
     updatedAt: dto.updated_at,
   }
@@ -20,5 +21,6 @@ export function mapUpdateUserInput(input: UpdateUserInput): Record<string, unkno
   const body: Record<string, unknown> = {}
   if (input.email !== undefined) body.email = input.email
   if (input.role !== undefined) body.role = input.role
+  if (input.status !== undefined) body.status = input.status
   return body
 }

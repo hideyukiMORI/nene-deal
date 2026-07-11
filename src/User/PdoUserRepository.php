@@ -9,7 +9,7 @@ use Nene2\Http\ClockInterface;
 
 final readonly class PdoUserRepository implements UserRepositoryInterface
 {
-    private const COLUMNS = 'id, organization_id, email, password_hash, role, created_at, updated_at';
+    private const COLUMNS = 'id, organization_id, email, password_hash, role, status, created_at, updated_at';
 
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
@@ -50,22 +50,23 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
 
         if (!$exists) {
             $this->query->execute(
-                'INSERT INTO users (id, organization_id, email, password_hash, role, created_at, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)',
+                'INSERT INTO users (id, organization_id, email, password_hash, role, status, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 [
                     $user->id,
                     $user->organizationId,
                     $user->email,
                     $user->passwordHash,
                     $user->role->value,
+                    $user->status->value,
                     $user->createdAt ?? $now,
                     $now,
                 ],
             );
         } else {
             $this->query->execute(
-                'UPDATE users SET email = ?, password_hash = ?, role = ?, updated_at = ? WHERE id = ?',
-                [$user->email, $user->passwordHash, $user->role->value, $now, $user->id],
+                'UPDATE users SET email = ?, password_hash = ?, role = ?, status = ?, updated_at = ? WHERE id = ?',
+                [$user->email, $user->passwordHash, $user->role->value, $user->status->value, $now, $user->id],
             );
         }
     }
@@ -96,6 +97,7 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
             role: OperatorRole::from((string) $row['role']),
             createdAt: isset($row['created_at']) ? (string) $row['created_at'] : null,
             updatedAt: isset($row['updated_at']) ? (string) $row['updated_at'] : null,
+            status: UserStatus::from((string) ($row['status'] ?? UserStatus::Active->value)),
         );
     }
 }

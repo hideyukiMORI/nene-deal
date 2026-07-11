@@ -11,6 +11,7 @@ use NeneDeal\Tests\Support\FixedClock;
 use NeneDeal\User\OperatorRole;
 use NeneDeal\User\PdoUserRepository;
 use NeneDeal\User\User;
+use NeneDeal\User\UserStatus;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Ulid;
 
@@ -114,5 +115,34 @@ final class PdoUserRepositoryTest extends TestCase
         self::assertNotNull($found);
         self::assertSame('updated@nene-deal.test', $found->email);
         self::assertSame(OperatorRole::Admin, $found->role);
+    }
+
+    public function test_existing_rows_default_to_active_status(): void
+    {
+        $user = $this->repository->findById($this->userId);
+        self::assertNotNull($user);
+        self::assertSame(UserStatus::Active, $user->status);
+    }
+
+    public function test_save_persists_a_status_change(): void
+    {
+        $existing = $this->repository->findById($this->userId);
+        self::assertNotNull($existing);
+
+        $disabled = new User(
+            id: $existing->id,
+            organizationId: $existing->organizationId,
+            email: $existing->email,
+            passwordHash: $existing->passwordHash,
+            role: $existing->role,
+            createdAt: $existing->createdAt,
+            status: UserStatus::Disabled,
+        );
+
+        $this->repository->save($disabled);
+
+        $found = $this->repository->findById($this->userId);
+        self::assertNotNull($found);
+        self::assertSame(UserStatus::Disabled, $found->status);
     }
 }

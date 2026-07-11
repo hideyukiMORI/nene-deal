@@ -192,6 +192,10 @@ export interface MessageCatalog {
   'users.role.operator': string
   'users.delete.confirm': string
   'users.delete.error': string
+  'users.status.disabled': string
+  'users.disable.label': string
+  'users.enable.label': string
+  'users.disable.confirm': string
   'users.edit.title': string
   'users.edit.error': string
   'users.validation.emailRequired': string
@@ -416,6 +420,10 @@ export const ja: MessageCatalog = {
   'users.role.operator': 'オペレーター',
   'users.delete.confirm': 'このユーザーを削除しますか？',
   'users.delete.error': 'ユーザーを削除できませんでした。',
+  'users.status.disabled': '無効',
+  'users.disable.label': 'このユーザーを無効化',
+  'users.enable.label': 'このユーザーを有効化',
+  'users.disable.confirm': 'このユーザーを無効化しますか？ サインインできなくなります。',
   'users.edit.title': 'ロールを変更',
   'users.edit.error': 'ユーザーを更新できませんでした。',
   'users.validation.emailRequired': 'メールアドレスを入力してください。',
