@@ -52,10 +52,11 @@
 
 - [ ] Suite catalog entry
 - [ ] Optional hardening for a public demo box: rate limiting on `/api/v1/auth/login` (deferred from #69: NENE2 `ThrottleMiddleware` has no path scoping — needs a login-scoped wrapper, and it would add `X-RateLimit-*` headers to login responses)
+- [ ] Structural audit 2026-07-11 follow-ups: audit logging #89, account status #90, roll-up checklist #91 (summary: `docs/review/2026-07-11-structural-audit.md`, #92)
 
 ## Handoff
 
 Public repo `hideyukiMORI/nene-deal`. Pipeline SSOT only — Clear docs must not be copied here.
 Demo operations (start, credentials, reset, shared-hosting install): `docs/demo.md`.
 
-Last updated: 2026-07-10
+Last updated: 2026-07-11
