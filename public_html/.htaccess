@@ -1,6 +1,18 @@
 # Serve the SPA and the API from the same origin.
 # Order: API/infra routes → real files → SPA fallback → front controller.
-DirectoryIndex index.html index.php
+#
+# `index.php` is the ONLY directory index — index.html is deliberately excluded.
+# The release build layers the Vite `index.html` into this document root
+# (tools/build-release.sh), so listing it here would make Apache serve the bare
+# `/` statically and skip PHP — exactly where the disposable-demo seat page lands
+# (DemoSessionSeater's `location.replace('/')`), silently dropping the env-gated
+# analytics injection (#114). Routing `/` through index.php instead lets
+# SpaShellFallback serve the same shell *through* PHP (matching siblings, whose
+# shells live outside the doc root — NeNe Clear `assets/index.html`, NeNe Invoice
+# `admin/index.html` — so their `/` already resolves to index.php). On non-demo
+# installs the shell is emitted byte-for-byte and PHP sets no CSP, so the static
+# and PHP-served bodies are identical and the `.htaccess` default CSP still applies.
+DirectoryIndex index.php
 RewriteEngine On
 
 # Some CGI/FastCGI shared hosts have Apache itself drop the Authorization
