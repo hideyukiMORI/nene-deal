@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Nene2\Config\AppConfig;
 use Nene2\Http\ResponseEmitter;
 use NeneDeal\Http\AuthorizationHeaderFallback;
 use NeneDeal\Http\DemoAnalyticsInjection;
@@ -37,6 +38,23 @@ $request = AuthorizationHeaderFallback::apply($serverRequestCreator->fromGlobals
 $shellPath = SpaShellFallback::shellPath($request, __DIR__);
 
 if ($shellPath !== null) {
+    // Resolve AppConfig before reading $_ENV. The demo analytics endpoint lives
+    // in the disposable-demo host's `.env`, and NENE2's ConfigLoader is what loads
+    // `.env` into $_ENV (loadDotenvIfAvailable → Dotenv safeLoad). Without this the
+    // shell branch never triggers config resolution, so on shared hosting (HETEML,
+    // where the value is in `.env`) $_ENV['DEMO_ANALYTICS_ENDPOINT'] is absent and
+    // the beacon silently never fires — while Docker/CI, which pass it as a process
+    // env var, kept working. This mirrors the proven sibling NeNe Invoice
+    // (public_html/index.php: `$container->get(AppConfig::class);` before it reads
+    // env). A malformed `.env` must not take the public shell down, so a config
+    // failure falls through to a disabled (no-beacon) injection, byte-identical to
+    // the OSS default. AppConfig resolution is pure config/dotenv — no DB access.
+    try {
+        $container->get(AppConfig::class);
+    } catch (\Throwable) {
+        // Degraded: serve the shell without analytics (endpoint stays unset).
+    }
+
     $analytics = DemoAnalyticsInjection::fromEnv($_ENV);
     $html = (string) file_get_contents($shellPath);
 
