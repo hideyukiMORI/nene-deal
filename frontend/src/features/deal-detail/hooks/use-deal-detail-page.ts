@@ -98,12 +98,21 @@ export function useDealDetailPage(dealId: string | undefined): DealDetailPage {
   const deleteDeal = useCallback(async (): Promise<boolean> => {
     try {
       await deleteMutation.mutateAsync(id)
-      await invalidatePipelineViews()
+      // The deleted deal disappears from the list views — refresh those.
+      await queryClient.invalidateQueries({ queryKey: boardKeys.all })
+      await queryClient.invalidateQueries({ queryKey: forecastKeys.all })
+      // Deliberately leave this deal's own detail/activity queries untouched.
+      // The detail page is still mounted here, so invalidating them (as the
+      // shared invalidatePipelineViews does) would immediately refetch a
+      // resource that no longer exists and surface a 404 in the console
+      // (issue #84); evicting them refetches too, because the observer is
+      // still active. The page navigates away right after delete, which
+      // unmounts the observers and lets React Query garbage-collect the cache.
       return true
     } catch {
       return false
     }
-  }, [deleteMutation, id, invalidatePipelineViews])
+  }, [deleteMutation, id, queryClient])
 
   let status: DealDetailStatus
   if (dealId === undefined || dealId === '') {
