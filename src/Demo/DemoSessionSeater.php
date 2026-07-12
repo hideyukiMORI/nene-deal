@@ -48,16 +48,37 @@ final readonly class DemoSessionSeater implements DemoSessionSeaterInterface
     /** Must match `SEAT_STORAGE_KEY` in `frontend/src/shared/auth/demo-seat.ts`. */
     private const string SEAT_STORAGE_KEY = 'nene-deal-demo-seat';
 
+    /** @var \Closure(string): void Where the demo-entry attribution line goes; defaults to `error_log`. */
+    private \Closure $logSink;
+
+    /**
+     * @param (\Closure(string): void)|null $logSink Sink for the demo-entry
+     *        attribution line (#112). Defaults to PHP's `error_log`, matching the
+     *        product's existing `error_log('NeNe Deal: …')` convention;
+     *        overridable in tests so the recorded line can be asserted without
+     *        depending on the global `error_log` ini.
+     */
     public function __construct(
         private TokenIssuerInterface $tokenIssuer,
         private ClockInterface $clock,
         private DemoOrgHandles $handles,
         private Psr17Factory $psr17,
+        ?\Closure $logSink = null,
     ) {
+        $this->logSink = $logSink ?? static function (string $line): void {
+            error_log($line);
+        };
     }
 
     public function seatAndRedirect(ServerRequestInterface $request, ProvisionedDemoOrg $org): ResponseInterface
     {
+        // Attribution layer 1 (#112): record channel/campaign here — the last
+        // moment they exist. The seat page's `location.replace('/')` drops the
+        // query, and the browser's next request to the SPA is same-origin (no
+        // UTM, a self Referer). No PII: only Referer + utm_* + the disposable
+        // slug are logged; never the client IP or any personal field.
+        $this->logDemoEntry($request, $org);
+
         $now = $this->clock->now()->getTimestamp();
 
         // Same claims shape as a real login (sub / role / org / iat / exp) so
@@ -104,5 +125,54 @@ final readonly class DemoSessionSeater implements DemoSessionSeaterInterface
         $response->getBody()->write($html);
 
         return $response;
+    }
+
+    /**
+     * Emits one `error_log` line per demo entry with the referer and UTM tags,
+     * matching the product's existing `error_log('NeNe Deal: …')` convention.
+     * Values are sanitised (control chars stripped, length-capped) so a crafted
+     * Referer / query cannot forge log lines, and missing tags render as `-` so
+     * a UTM-less entry still logs cleanly instead of breaking the seat page.
+     */
+    private function logDemoEntry(ServerRequestInterface $request, ProvisionedDemoOrg $org): void
+    {
+        $query = $request->getQueryParams();
+
+        $fields = [
+            'slug' => $org->slug,
+            'utm_source' => $query['utm_source'] ?? null,
+            'utm_medium' => $query['utm_medium'] ?? null,
+            'utm_campaign' => $query['utm_campaign'] ?? null,
+            'referer' => $request->getHeaderLine('Referer'),
+        ];
+
+        $parts = [];
+
+        foreach ($fields as $key => $value) {
+            $parts[] = $key . '=' . self::sanitiseLogValue(is_string($value) ? $value : null);
+        }
+
+        ($this->logSink)('NeNe Deal: demo-entry ' . implode(' ', $parts));
+    }
+
+    /**
+     * Renders a log field value: `-` when absent/empty, otherwise the value with
+     * CR/LF and other control characters removed (log-injection defence) and
+     * capped at 256 chars so a long crafted URL cannot bloat the log.
+     */
+    private static function sanitiseLogValue(?string $value): string
+    {
+        if ($value === null || $value === '') {
+            return '-';
+        }
+
+        $clean = preg_replace('/[\x00-\x1F\x7F]+/', ' ', $value) ?? '';
+        $clean = trim($clean);
+
+        if ($clean === '') {
+            return '-';
+        }
+
+        return mb_substr($clean, 0, 256);
     }
 }

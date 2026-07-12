@@ -18,12 +18,12 @@ RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# SPA fallback when the built frontend is deployed into this directory
-# (production). In development no index.html exists here and everything
-# falls through to the front controller, as before.
-RewriteCond %{DOCUMENT_ROOT}/index.html -f
-RewriteRule ^ index.html [L]
-
+# Everything else — including SPA navigations — goes to the front controller.
+# The built index.html shell is served *through* index.php (SpaShellFallback),
+# not statically, so the disposable-demo host can inject its env-gated cookieless
+# analytics beacon (#112) without baking it into the committed build. On every
+# other install the shell is emitted byte-for-byte. In development no index.html
+# exists here and requests still fall through to the front controller, as before.
 RewriteRule ^ index.php [QSA,L]
 
 # Hardening (Apache + mod_headers, invoice shape — #101). `always` covers both
@@ -50,6 +50,15 @@ RewriteRule ^ index.php [QSA,L]
     # (the original request line), which — unlike SetEnvIf/Request_URI vars —
     # survives the mod_rewrite internal redirect to index.php (verified against
     # the compose.prod.yaml stack).
-    Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'" "expr=%{THE_REQUEST} !~ m#^\S+ /demo/#"
+    #
+    # The added `-z resp('Content-Security-Policy')` guard makes this default
+    # yield whenever the response already carries a CSP set by PHP. Only the
+    # disposable-demo SPA shell does that (env-gated cookieless analytics, #112):
+    # there DemoAnalyticsInjection emits a CSP widened for the analytics origin,
+    # and this line must not clobber it into two intersecting CSPs. Every other
+    # response (static assets, JSON API, and the SPA shell on non-demo installs,
+    # none of which set a CSP) is unchanged — the expr is true and the default
+    # CSP below is applied exactly as before.
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'" "expr=%{THE_REQUEST} !~ m#^\S+ /demo/# && -z resp('Content-Security-Policy')"
 </IfModule>
 ServerSignature Off
