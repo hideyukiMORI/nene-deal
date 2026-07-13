@@ -60,12 +60,14 @@ describe('deal mapper', () => {
         amountCents: 2000,
         stageRef: 'lead',
         probabilityPercent: 25,
+        expectedCloseDate: null,
       }),
     ).toEqual({
       account_label: 'Globex',
       amount_cents: 2000,
       stage_id: 'lead',
       probability_percent: 25,
+      expected_close_date: null,
     })
   })
 })

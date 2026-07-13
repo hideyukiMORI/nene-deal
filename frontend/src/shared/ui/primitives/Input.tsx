@@ -12,8 +12,11 @@ export interface InputProps {
   disabled?: boolean
   error?: string | undefined
   placeholder?: string
-  min?: number
-  max?: number
+  /** Native `<input min>`; HTML allows a number or a string (e.g. date bounds). */
+  min?: number | string
+  /** Native `<input max>`; HTML allows a number or a string (e.g. date bounds). */
+  max?: number | string
+  step?: number | string
 }
 
 /**
@@ -36,6 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     placeholder,
     min,
     max,
+    step,
   },
   ref,
 ) {
@@ -57,6 +61,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         placeholder={placeholder}
         min={min}
         max={max}
+        step={step}
         aria-invalid={error !== undefined}
         aria-describedby={errorId}
         className="input"

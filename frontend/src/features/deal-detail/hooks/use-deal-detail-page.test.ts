@@ -37,6 +37,7 @@ describe('useDealDetailPage', () => {
         amountCents: 200_000_000,
         probabilityPercent: 100,
         note: 'updated',
+        expectedCloseDate: null,
       })
     })
 
