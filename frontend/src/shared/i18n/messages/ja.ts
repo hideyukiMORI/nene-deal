@@ -202,8 +202,6 @@ export interface MessageCatalog {
   'users.validation.passwordMin': string
   'users.validation.roleRequired': string
 
-  'common.actions.edit': string
-
   'stages.title': string
   'stages.subtitle': string
   'stages.loading': string

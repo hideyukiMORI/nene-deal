@@ -25,13 +25,19 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     headers['Content-Type'] = 'application/json'
   }
 
-  const response = await fetch(`${base}${path}`, {
+  // Built conditionally (rather than with explicit `undefined` values) so the
+  // optional `body`/`signal` keys are only present when set — required under
+  // `exactOptionalPropertyTypes` since `RequestInit` doesn't accept `undefined`
+  // for them explicitly.
+  const init: RequestInit = {
     method: options.method ?? 'GET',
     headers,
-    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
     credentials: 'include',
-    signal: options.signal,
-  })
+    ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
+    ...(options.signal !== undefined ? { signal: options.signal } : {}),
+  }
+
+  const response = await fetch(`${base}${path}`, init)
 
   if (!response.ok) {
     // An expired/invalid session clears the token; the auth gate reacts and

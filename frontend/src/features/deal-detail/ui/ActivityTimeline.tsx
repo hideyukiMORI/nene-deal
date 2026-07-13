@@ -78,14 +78,17 @@ export function ActivityTimeline({ activity, stages, locale }: ActivityTimelineP
       )
     }
     if (entry.changes.length === 0) return null
-    return entry.changes.map((c) => (
-      <span key={c.field} className="tl-change mono">
-        {c.field in FIELD_LABEL ? `${t(FIELD_LABEL[c.field])} ` : `${c.field} `}
-        <span className="from">{fmtValue(c.field, c.from, locale)}</span>
-        <IconArrowRight />
-        <span className="to">{fmtValue(c.field, c.to, locale)}</span>
-      </span>
-    ))
+    return entry.changes.map((c) => {
+      const fieldLabel = FIELD_LABEL[c.field]
+      return (
+        <span key={c.field} className="tl-change mono">
+          {fieldLabel ? `${t(fieldLabel)} ` : `${c.field} `}
+          <span className="from">{fmtValue(c.field, c.from, locale)}</span>
+          <IconArrowRight />
+          <span className="to">{fmtValue(c.field, c.to, locale)}</span>
+        </span>
+      )
+    })
   }
 
   function item(entry: DealActivity): ReactNode {

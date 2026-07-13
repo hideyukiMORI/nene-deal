@@ -40,7 +40,9 @@ export function dismissToast(id: number): void {
 
 export function pushToast(title: string, sub: string | undefined, variant: ToastVariant): number {
   const id = nextId++
-  toasts = [...toasts, { id, title, sub, variant }]
+  // `sub` is an optional field with `exactOptionalPropertyTypes`, so omit the
+  // key entirely rather than assign it an explicit `undefined` value.
+  toasts = [...toasts, { id, title, variant, ...(sub !== undefined ? { sub } : {}) }]
   emit()
   return id
 }

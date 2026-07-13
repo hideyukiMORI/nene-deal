@@ -9,7 +9,11 @@ interface CreateDealBody {
 
 let nextId = 1
 
-function dealResponse(id: string, body: CreateDealBody, stageSlug: string): unknown {
+function dealResponse(
+  id: string,
+  body: CreateDealBody,
+  stageSlug: string,
+): Record<string, unknown> {
   const now = '2026-05-31 00:00:00'
   return {
     id,

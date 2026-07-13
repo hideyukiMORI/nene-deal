@@ -45,6 +45,9 @@ export function useKanbanDnd(
     let targetStage: string | null = null
 
     function begin(): void {
+      // boardEl/card are already checked non-null above; nested closures don't
+      // retain that narrowing, so re-guard here (never actually null at runtime).
+      if (boardEl === null || card === null) return
       started = true
       // Drop any text selection that began before the drag threshold was met.
       window.getSelection()?.removeAllRanges()
@@ -65,6 +68,8 @@ export function useKanbanDnd(
     }
 
     function updateTarget(x: number, y: number): void {
+      // boardEl is already checked non-null above; see note in begin().
+      if (boardEl === null) return
       let colEl: HTMLElement | null = null
       for (const el of document.elementsFromPoint(x, y)) {
         if (el instanceof HTMLElement && el.classList.contains('col')) {
@@ -101,6 +106,8 @@ export function useKanbanDnd(
       document.removeEventListener('pointercancel', onPointerUp)
       clone?.remove()
       marker?.remove()
+      // boardEl/card are already checked non-null above; see note in begin().
+      if (boardEl === null || card === null) return
       boardEl.classList.remove('is-dragging')
       boardEl.querySelectorAll('.col.drop-ok').forEach((c) => {
         c.classList.remove('drop-ok')

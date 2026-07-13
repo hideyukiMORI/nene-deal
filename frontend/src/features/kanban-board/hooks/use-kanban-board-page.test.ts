@@ -31,6 +31,7 @@ describe('useKanbanBoardPage', () => {
         amountCents: 2_000_000,
         stageRef: 'lead',
         probabilityPercent: 25,
+        expectedCloseDate: null,
       })
     })
 
@@ -50,6 +51,7 @@ describe('useKanbanBoardPage', () => {
         amountCents: 0,
         stageRef: 'lead',
         probabilityPercent: 0,
+        expectedCloseDate: null,
       })
     })
 
