@@ -90,6 +90,7 @@ final readonly class DemoServiceProvider implements ServiceProviderInterface
                         self::clock($c),
                         self::handles($c),
                         self::psr17($c),
+                        FileDemoEntryLogSink::toFile(self::projectRoot($c) . '/var'),
                     );
                 },
             )
@@ -105,11 +106,7 @@ final readonly class DemoServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $c): CountingDemoCapacityGuard {
                     $config = self::demoConfig($c);
                     $query = self::query($c);
-
-                    $projectRoot = $c->get(RuntimeServiceProvider::PROJECT_ROOT);
-                    if (!is_string($projectRoot) || $projectRoot === '') {
-                        throw new LogicException('Project root service is invalid.');
-                    }
+                    $projectRoot = self::projectRoot($c);
 
                     return new CountingDemoCapacityGuard(
                         demoOrgCount: static function () use ($query, $config): int {
@@ -224,6 +221,16 @@ final readonly class DemoServiceProvider implements ServiceProviderInterface
         }
 
         return $handles;
+    }
+
+    private static function projectRoot(ContainerInterface $c): string
+    {
+        $projectRoot = $c->get(RuntimeServiceProvider::PROJECT_ROOT);
+        if (!is_string($projectRoot) || $projectRoot === '') {
+            throw new LogicException('Project root service is invalid.');
+        }
+
+        return $projectRoot;
     }
 
     private static function psr17(ContainerInterface $c): Psr17Factory
