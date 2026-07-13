@@ -19,6 +19,7 @@ export, headers/CORS and info-leak can be exercised with live traffic.
 | `seed.sql` | org-a / org-b + admin/operator each + stages + deals (incl. an org-b secret) |
 | `mint.php` | HS256 JWT minter for the alg / exp / signature / org-claim tests |
 | `run.sh` | one-shot: up → migrate → seed → wait for `/health` |
+| `probe.sh` | **self-contained** one-shot (boot → migrate → seed → battery → assert → `down -v`). Ported from the nene-records canonical harness; runs the F-01 (unauthenticated-route) and F-02 (JWT-replay/org-binding) matrices. No `.env.app` needed — it generates one with a throwaway secret. |
 
 Seed passwords are all `Passw0rd!23` (test-only, bcrypt cost 12).
 

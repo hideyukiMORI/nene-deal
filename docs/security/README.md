@@ -8,6 +8,7 @@ NeNe Deal に対して実施した**認可された自己/maintainer-run 診断*
 | 日付 | レポート | 概要 |
 | --- | --- | --- |
 | 2026-07-13 | [Assessment](2026-07-13-assessment.md) | 全面診断（テナント分離・JWT/認証・状態遷移・数値境界・CSV・ヘッダ/CORS・情報漏洩）。実アプリ+MySQL で実弾。Finding 3 件（入力最大長/日付 500・owner 越境 email 漏洩・X-Powered-By）を修正し EXPOSED 0 を確認 |
+| 2026-07-14 | [Red-team round](2026-07-14-assessment-redteam.md) | nene-records の実在 finding（F-01 未認証 admin GET Critical / F-02 JWT 越境 replay Medium）と同型が無いか全ルート行列で live 実証。blocklist 認可＋データ層 org バインディングにより構造的に不在（PASS=34 / EXPOSED=0・新規修正なし） |
 
 各レポートは Finding（深刻度 / 証拠 / 推奨）、検証済みの堅牢性、Remediation、未実施の明記を含みます。
 
