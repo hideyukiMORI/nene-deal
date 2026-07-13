@@ -14,6 +14,14 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
+// Strip the PHP version banner from every PHP-served response. The `.htaccess`
+// `Header always unset X-Powered-By` only fires where mod_headers can act on the
+// response, which does not cover PHP's `expose_php` header under every SAPI
+// (verified leaking under mod_php). `header_remove()` is authoritative and
+// portable across Docker and shared hosting (HETEML). Static assets are served
+// by the web server and never carry this header.
+header_remove('X-Powered-By');
+
 $container = (new RuntimeContainerFactory(dirname(__DIR__)))->create();
 
 $psr17Factory = $container->get(Psr17Factory::class);

@@ -1,0 +1,29 @@
+name: nene-deal-sectest
+# Disposable, isolated stack for the authorized self/maintainer-run assessment.
+# Ports 8119 / 3319 sit in NeNe Deal's fixed 81** block (AGENTS.md) and avoid the
+# dev stack's 8110 / 3310. `down -v` destroys the volume — nothing persists.
+services:
+  db:
+    image: mysql:8.4          # matches compose.yaml; strict mode = production shape
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpw
+      MYSQL_DATABASE: nene_deal
+      MYSQL_USER: nene
+      MYSQL_PASSWORD: nene_pw
+    ports: ["3319:3306"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-prootpw"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: ["8119:80"]
+    volumes:
+      - ../../..:/var/www/html
+      - ./.env.app:/var/www/html/.env:ro
+    depends_on:
+      db:
+        condition: service_healthy

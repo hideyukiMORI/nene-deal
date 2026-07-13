@@ -36,6 +36,8 @@ final readonly class UpdateDealHandler implements RequestHandlerInterface
 
             if (!is_string($value) || trim($value) === '') {
                 $errors[] = new ValidationError('account_label', '"account_label" must be a non-empty string.', 'invalid');
+            } elseif (mb_strlen($value) > DealField::MAX_ACCOUNT_LABEL) {
+                $errors[] = new ValidationError('account_label', '"account_label" must be ' . DealField::MAX_ACCOUNT_LABEL . ' characters or fewer.', 'invalid');
             } else {
                 $accountLabel = $value;
             }
@@ -63,6 +65,24 @@ final readonly class UpdateDealHandler implements RequestHandlerInterface
             }
         }
 
+        $note = DealField::optionalString($body, 'note');
+
+        if ($note !== null && mb_strlen($note) > DealField::MAX_NOTE) {
+            $errors[] = new ValidationError('note', '"note" must be ' . DealField::MAX_NOTE . ' characters or fewer.', 'invalid');
+        }
+
+        $expectedCloseDate = DealField::optionalString($body, 'expected_close_date');
+
+        if ($expectedCloseDate !== null && !DealField::isValidDate($expectedCloseDate)) {
+            $errors[] = new ValidationError('expected_close_date', '"expected_close_date" must be a date in YYYY-MM-DD format.', 'invalid');
+        }
+
+        $ownerUserId = DealField::optionalString($body, 'owner_user_id');
+
+        if ($ownerUserId !== null && !DealField::isValidUlid($ownerUserId)) {
+            $errors[] = new ValidationError('owner_user_id', '"owner_user_id" must be a valid user id.', 'invalid');
+        }
+
         if ($errors !== []) {
             throw new ValidationException($errors);
         }
@@ -72,11 +92,11 @@ final readonly class UpdateDealHandler implements RequestHandlerInterface
             amountCents: $amountCents,
             probabilityPercent: $probability,
             hasExpectedCloseDate: array_key_exists('expected_close_date', $body),
-            expectedCloseDate: DealField::optionalString($body, 'expected_close_date'),
+            expectedCloseDate: $expectedCloseDate,
             hasOwnerUserId: array_key_exists('owner_user_id', $body),
-            ownerUserId: DealField::optionalString($body, 'owner_user_id'),
+            ownerUserId: $ownerUserId,
             hasNote: array_key_exists('note', $body),
-            note: DealField::optionalString($body, 'note'),
+            note: $note,
         ), AuthContext::userId($request));
 
         return $this->json->create(DealResponse::toArray($deal));

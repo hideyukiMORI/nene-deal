@@ -18,7 +18,10 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
 
     private const FROM = ' FROM deals d'
         . ' LEFT JOIN pipeline_stages s ON s.id = d.stage_id AND s.organization_id = d.organization_id'
-        . ' LEFT JOIN users u ON u.id = d.owner_user_id';
+        // Scope the owner join to the deal's organization so a foreign
+        // owner_user_id (a ULID from another tenant) can never surface that
+        // user's email as owner_label. Mirrors the org-scoped stage join above.
+        . ' LEFT JOIN users u ON u.id = d.owner_user_id AND u.organization_id = d.organization_id';
 
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
@@ -255,7 +258,7 @@ final readonly class PdoDealRepository implements DealRepositoryInterface
                     h.created_at, u.email AS actor_label
              FROM deal_stage_history h
              JOIN deals d ON d.id = h.deal_id
-             LEFT JOIN users u ON u.id = h.actor_user_id
+             LEFT JOIN users u ON u.id = h.actor_user_id AND u.organization_id = d.organization_id
              WHERE h.deal_id = ? AND d.organization_id = ?
              ORDER BY h.created_at DESC, h.id DESC',
             [$dealId, $this->organization->id()],
