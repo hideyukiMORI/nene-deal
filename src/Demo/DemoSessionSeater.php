@@ -56,7 +56,12 @@ final readonly class DemoSessionSeater implements DemoSessionSeaterInterface
      *        attribution line (#112). Defaults to PHP's `error_log`, matching the
      *        product's existing `error_log('NeNe Deal: …')` convention;
      *        overridable in tests so the recorded line can be asserted without
-     *        depending on the global `error_log` ini.
+     *        depending on the global `error_log` ini. Production wiring
+     *        ({@see DemoServiceProvider}) overrides this default with
+     *        {@see FileDemoEntryLogSink}, which lands the line in
+     *        `var/demo-entry.log` — visible over SSH on the Tier A HETEML
+     *        target, where plain `error_log` goes to the control panel only —
+     *        and falls back to `error_log` if the file cannot be written.
      */
     public function __construct(
         private TokenIssuerInterface $tokenIssuer,
