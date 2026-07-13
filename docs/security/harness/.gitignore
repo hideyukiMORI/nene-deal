@@ -1,0 +1,5 @@
+# Real secrets / captured artifacts — never commit.
+.env.app
+tokens.env
+*.log
+*.out

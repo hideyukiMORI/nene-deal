@@ -107,6 +107,40 @@ final class PdoDealRepositoryTest extends TestCase
         self::assertNotNull($this->repository->findById($id));
     }
 
+    public function test_owner_label_never_leaks_a_foreign_organization_user(): void
+    {
+        $now = '2026-05-30 00:00:00';
+        $sameOrgUser = (string) new Ulid();
+        $foreignOrg = (string) new Ulid();
+        $foreignUser = (string) new Ulid();
+
+        $this->query->execute(
+            'INSERT INTO organizations (id, slug, name, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
+            [$foreignOrg, 'other', 'Other', $now, $now],
+        );
+        $this->query->execute(
+            'INSERT INTO users (id, organization_id, email, password_hash, role, status, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [$sameOrgUser, $this->orgId, 'owner@a.test', 'x', 'operator', 'active', $now, $now],
+        );
+        $this->query->execute(
+            'INSERT INTO users (id, organization_id, email, password_hash, role, status, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [$foreignUser, $foreignOrg, 'secret@b.test', 'x', 'operator', 'active', $now, $now],
+        );
+
+        $ownDeal = (string) new Ulid();
+        $this->repository->save(new Deal($ownDeal, 'Own', 1000, $this->leadStageId, 10, ownerUserId: $sameOrgUser));
+
+        $crossDeal = (string) new Ulid();
+        $this->repository->save(new Deal($crossDeal, 'Cross', 1000, $this->leadStageId, 10, ownerUserId: $foreignUser));
+
+        // Same-org owner resolves its label; a foreign-org owner id must not
+        // surface that user's email (org-scoped owner join).
+        self::assertSame('owner@a.test', $this->repository->findById($ownDeal)?->ownerLabel);
+        self::assertNull($this->repository->findById($crossDeal)?->ownerLabel);
+    }
+
     public function test_delete_is_soft_and_keeps_the_activity_trail(): void
     {
         $id = (string) new Ulid();
