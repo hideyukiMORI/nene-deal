@@ -10,9 +10,13 @@ import { authStore } from './auth-store'
  * standard `Authorization` header before it reaches PHP, so the backend falls
  * back to the mirror when the standard header is missing (#67/#68).
  *
- * Every fetch path — the JSON api client and binary downloads alike — must
- * build its auth headers here rather than hand-rolling them, so no caller can
- * drop the `X-Authorization` mirror again (#83).
+ * The JSON api client (`shared/api/client.ts`) moved onto
+ * `@hideyukimori/nene2-client`'s `createNene2Transport` (issue #102), which
+ * packages this same choke-point pattern — see that file's header comment.
+ * This function is kept only for `features/audit-export/download-audit-csv.ts`,
+ * the one remaining caller that cannot import `shared/api` (ESLint zone;
+ * see that file's note) without a layout change out of scope for the
+ * transport migration.
  */
 export function buildAuthHeaders(): Record<string, string> {
   const headers: Record<string, string> = {}
