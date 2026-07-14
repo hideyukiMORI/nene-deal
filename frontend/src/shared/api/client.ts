@@ -1,72 +1,108 @@
+import {
+  createNene2Transport,
+  isNene2ClientError,
+  isValidationProblemDetails,
+  type Nene2ClientError,
+  type TokenStore,
+} from '@hideyukimori/nene2-client'
 import { env } from '@/shared/config/env'
-import { authStore, buildAuthHeaders } from '@/shared/auth'
-import { AppError, parseProblemDetails } from '@/shared/api/errors'
+import { AppError, type ProblemDetails } from '@/shared/api/errors'
+import { authStore } from '@/shared/auth'
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-
-interface RequestOptions {
-  method?: HttpMethod
-  body?: unknown
-  signal?: AbortSignal
+/**
+ * Adapts deal's existing in-memory `authStore` (deliberately not persisted —
+ * see `shared/auth/auth-store.ts`) to the transport's minimal `TokenStore`
+ * contract. Deal keeps its memory-only session on purpose (no reload
+ * survival), so this does *not* switch to the fleet-default
+ * `createSessionTokenStore` (sessionStorage) — same adapter pattern the
+ * migration guide documents for vault's session object
+ * (`migrate-product-client.md`).
+ */
+const tokenStore: TokenStore = {
+  getToken: () => authStore.getToken(),
+  clearToken: () => {
+    authStore.clear()
+  },
 }
 
 /**
- * Single transport surface. No domain logic: builds the request, attaches JSON
- * headers, parses the body, and throws {@link AppError} from Problem Details on
- * non-2xx. Authentication is added here when it lands (single-org for now).
+ * Fleet-standard transport (`@hideyukimori/nene2-client`, issue #102): every
+ * request mirrors the bearer token onto `Authorization` *and*
+ * `X-Authorization` so shared-hosting proxies that strip the standard header
+ * still authenticate (HETEML; #67/#68) — this is the packaged form of deal's
+ * own choke point (`buildAuthHeaders`, now removed here; the package's
+ * `headers.ts` doc comment credits deal's #83 by name as the origin pattern).
+ * `apiClient` below is a thin adapter that keeps this product's existing
+ * surface (`get/post/patch/delete`) verbatim so call sites did not need to
+ * change. (The audit CSV export in `features/audit-export/` is not routed
+ * through this transport yet — see that file's note — so `getBlob` is not
+ * added here per A-2's "add only with real consumption".)
  */
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const base = env.apiBaseUrl.replace(/\/$/, '')
-  // Auth headers (org slug, API key, Bearer + X-Authorization mirror for
-  // header-stripping proxies) come from the shared builder — see
-  // `auth-headers.ts` for the rationale.
-  const headers: Record<string, string> = buildAuthHeaders()
-  if (options.body !== undefined) {
-    headers['Content-Type'] = 'application/json'
+const transport = createNene2Transport({
+  baseUrl: env.apiBaseUrl,
+  tokenStore,
+  // Only set when non-empty — matches the removed `buildAuthHeaders()`,
+  // which omitted the header entirely for single-tenant/open deployments
+  // rather than sending it with an empty value.
+  headers: env.orgSlug !== '' ? { 'X-Organization-Slug': env.orgSlug } : {},
+  apiKey: env.apiKey !== '' ? env.apiKey : undefined,
+  credentials: 'include',
+  // Look up `fetch` at call time (not bind it once at module load): tests
+  // patch `globalThis.fetch` via msw's `server.listen()`, which can run
+  // after this module is first imported.
+  fetch: (input, init) => globalThis.fetch(input, init),
+})
+
+/** Maps the package's `Nene2ClientError` to this product's `AppError` (unchanged public shape/behavior for callers). */
+function toAppError(error: Nene2ClientError): AppError {
+  const problem = error.problem
+  if (problem === undefined) {
+    return new AppError({
+      type: 'about:blank',
+      title: error.message !== '' ? error.message : 'Request failed',
+      status: error.status,
+      instance: error.url,
+    })
   }
 
-  // Built conditionally (rather than with explicit `undefined` values) so the
-  // optional `body`/`signal` keys are only present when set — required under
-  // `exactOptionalPropertyTypes` since `RequestInit` doesn't accept `undefined`
-  // for them explicitly.
-  const init: RequestInit = {
-    method: options.method ?? 'GET',
-    headers,
-    credentials: 'include',
-    ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
-    ...(options.signal !== undefined ? { signal: options.signal } : {}),
+  const mapped: ProblemDetails = {
+    type: problem.type,
+    title: problem.title,
+    status: problem.status,
+    instance: problem.instance ?? error.url,
   }
+  if (problem.detail !== undefined) {
+    mapped.detail = problem.detail
+  }
+  if (isValidationProblemDetails(problem)) {
+    mapped.errors = problem.errors
+  }
+  return new AppError(mapped)
+}
 
-  const response = await fetch(`${base}${path}`, init)
-
-  if (!response.ok) {
-    // An expired/invalid session clears the token; the auth gate reacts and
-    // routes back to login. The login request itself is exempt.
-    if (response.status === 401 && !path.includes('/auth/login')) {
-      authStore.clear()
+async function unwrap<T>(promise: Promise<T>): Promise<T> {
+  try {
+    return await promise
+  } catch (error) {
+    if (isNene2ClientError(error)) {
+      throw toAppError(error)
     }
-    throw await parseProblemDetails(response)
+    throw error
   }
-
-  if (response.status === 204) {
-    return undefined as T
-  }
-
-  return (await response.json()) as T
 }
 
 export const apiClient = {
   get<T>(path: string, signal?: AbortSignal): Promise<T> {
-    return request<T>(path, signal !== undefined ? { signal } : {})
+    return unwrap(transport.get<T>(path, signal !== undefined ? { signal } : {}))
   },
   post<T>(path: string, body: unknown): Promise<T> {
-    return request<T>(path, { method: 'POST', body })
+    return unwrap(transport.post<T>(path, body))
   },
   patch<T>(path: string, body: unknown): Promise<T> {
-    return request<T>(path, { method: 'PATCH', body })
+    return unwrap(transport.patch<T>(path, body))
   },
   delete(path: string): Promise<undefined> {
-    return request<undefined>(path, { method: 'DELETE' })
+    return unwrap(transport.delete<undefined>(path))
   },
 }
 
