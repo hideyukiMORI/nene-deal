@@ -368,6 +368,14 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         authMiddleware: $authMiddlewares,
                         healthChecks: [$databaseHealthCheck],
                         debug: $config->debug,
+                        // Opt-in の X-Authorization フォールバック受け口（NENE2 #1558・ADR 0019）。
+                        // 前段 proxy が標準 Authorization を PHP に渡す前に剥がす共有ホスティング
+                        // （HETEML 型 Tier A — custom ヘッダは通るが Authorization は通らず、
+                        // `.htaccess` 側の対策も `CGIPassAuth` も効かないことを invoice #597 /
+                        // vault #118 で確認済み）向け。SPA が全リクエストに付与する
+                        // `X-Authorization: Bearer` ミラーを、Authorization 不在/空のときのみ
+                        // 採用する。標準ヘッダが届く環境ではバイト不変。
+                        enableAuthorizationHeaderFallback: true,
                         machineApiKeyProtectedPaths: $gated ? [] : ['/machine/health'],
                         machineApiKeyProtectedMethods: $gated ? ['POST', 'PATCH', 'PUT', 'DELETE'] : [],
                     );
