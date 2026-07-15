@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Nene2\Config\AppConfig;
 use Nene2\Http\ResponseEmitter;
-use NeneDeal\Http\AuthorizationHeaderFallback;
 use NeneDeal\Http\DemoAnalyticsInjection;
 use NeneDeal\Http\RuntimeContainerFactory;
 use NeneDeal\Http\SpaShellFallback;
@@ -34,7 +33,7 @@ $serverRequestCreator = new ServerRequestCreator(
     $psr17Factory,
 );
 
-$request = AuthorizationHeaderFallback::apply($serverRequestCreator->fromGlobals());
+$request = $serverRequestCreator->fromGlobals();
 
 // Browser navigations receive the built SPA shell (public_html/index.html)
 // through the front controller — not as a static Apache file — so the
