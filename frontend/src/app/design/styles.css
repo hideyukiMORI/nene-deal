@@ -387,7 +387,7 @@
   }
   .input:focus,
   .select:focus,
-  textarea.input:focus {
+  :where(textarea.input):focus {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--focus);
@@ -515,7 +515,7 @@
     flex: none;
     display: block;
   }
-  .brandmark .logo svg {
+  :where(.brandmark) .logo svg {
     width: 100%;
     height: 100%;
     display: block;
@@ -574,7 +574,7 @@
     color: var(--fg);
     font-weight: 600;
   }
-  .nav-item.active::before {
+  :where(.nav-item.active)::before {
     content: '';
     position: absolute;
     left: -16px;
@@ -584,7 +584,7 @@
     border-radius: 0 2px 2px 0;
     background: var(--accent);
   }
-  .nav-item.active .ico {
+  :where(.nav-item.active) .ico {
     opacity: 1;
     color: var(--accent);
   }
@@ -665,25 +665,25 @@
     flex-direction: column;
     gap: 6px;
   }
-  .forecast .stat .label {
+  :where(.forecast) .stat .label {
     font-size: 11.5px;
     color: var(--fg-faint);
     font-weight: 500;
     letter-spacing: 0.03em;
   }
-  .forecast .stat .val {
+  :where(.forecast) .stat .val {
     font-family: var(--mono);
     font-variant-numeric: tabular-nums;
     font-size: 22px;
     font-weight: 600;
     letter-spacing: -0.02em;
   }
-  .forecast .stat .val .unit {
+  :where(.forecast .stat) .val .unit {
     font-size: 13px;
     color: var(--fg-muted);
     margin-right: 1px;
   }
-  .forecast .stat .delta {
+  :where(.forecast) .stat .delta {
     font-size: 11.5px;
   }
   @media (max-width: 900px) {
@@ -1027,10 +1027,10 @@
       background 0.12s,
       color 0.12s;
   }
-  .theme-switch button:hover {
+  :where(.theme-switch) button:hover {
     color: var(--fg);
   }
-  .theme-switch button.active {
+  :where(.theme-switch) button.active {
     background: var(--accent);
     color: var(--on-accent);
   }
@@ -1085,7 +1085,7 @@
     padding: var(--s5) var(--s3);
   }
   /* Hide the "no deals" placeholder as soon as the column holds a card. */
-  .col-body:has(.deal) > .col-empty {
+  :where(.col-body:has(.deal)) > .col-empty {
     display: none;
   }
 
@@ -1122,37 +1122,37 @@
     border-radius: 50%;
     background: var(--fg-faint);
   }
-  .deal:hover .deal-grip {
+  :where(.deal:hover) .deal-grip {
     opacity: 0.55;
   }
-  .deal[data-won] .deal-grip,
-  .deal[data-lost] .deal-grip {
+  :where(.deal[data-won]) .deal-grip,
+  :where(.deal[data-lost]) .deal-grip {
     display: none;
   }
 
   /* ---------- Drag & drop ---------- */
   .board.is-dragging,
-  .board.is-dragging .deal {
+  :where(.board.is-dragging) .deal {
     cursor: grabbing;
   }
-  .board.is-dragging .col {
+  :where(.board.is-dragging) .col {
     transition: opacity 0.16s ease;
   }
-  .board.is-dragging .col:not(.drop-ok) {
+  :where(.board.is-dragging) .col:not(.drop-ok) {
     opacity: 0.6;
   }
-  .board.is-dragging .col-body {
+  :where(.board.is-dragging) .col-body {
     border-color: var(--line-strong);
   }
   .col.drop-ok {
     opacity: 1 !important;
   }
-  .col.drop-ok .col-body {
+  :where(.col.drop-ok) .col-body {
     border-color: var(--accent);
     background: color-mix(in srgb, var(--accent) 14%, var(--surface));
     box-shadow: 0 0 0 3px var(--accent-weak);
   }
-  .board.is-dragging .col-empty {
+  :where(.board.is-dragging) .col-empty {
     color: var(--accent);
     border-color: var(--accent);
   }
@@ -1391,7 +1391,7 @@
   /* ============================================================
    Design spec v3 — filter chips, activity timeline, audit
    ============================================================ */
-  .forecast .stat .delta {
+  :where(.forecast) .stat .delta {
     font-size: 11.5px;
   }
 
@@ -1478,7 +1478,7 @@
       border-color 0.12s,
       color 0.12s;
   }
-  .fchip .fchip-box svg {
+  :where(.fchip) .fchip-box svg {
     width: 11px;
     height: 11px;
   }
@@ -1487,15 +1487,15 @@
     border-color: var(--accent-line);
     background: var(--accent-weak);
   }
-  .fchip.on .stage-dot {
+  :where(.fchip.on) .stage-dot {
     opacity: 1;
   }
-  .fchip.on .fchip-box {
+  :where(.fchip.on) .fchip-box {
     background: var(--accent);
     border-color: var(--accent);
     color: var(--on-accent);
   }
-  .fchip.on .fchip-count {
+  :where(.fchip.on) .fchip-count {
     color: var(--fg-muted);
     background: color-mix(in srgb, var(--accent) 14%, var(--surface));
   }
@@ -1508,7 +1508,7 @@
     color: var(--fg-muted);
     transition: opacity 0.12s;
   }
-  .fchip-plain.on .fchip-ic {
+  :where(.fchip-plain.on) .fchip-ic {
     opacity: 1;
   }
   @media (max-width: 560px) {
@@ -1567,7 +1567,7 @@
     justify-content: center;
     width: 28px;
   }
-  .tl-item:not(:last-child) .tl-rail::after {
+  :where(.tl-item:not(:last-child)) .tl-rail::after {
     content: '';
     position: absolute;
     top: 28px;
@@ -1638,7 +1638,7 @@
     font-size: 11px;
     color: var(--fg-faint);
   }
-  .tl-gap .tl-rail::before {
+  :where(.tl-gap) .tl-rail::before {
     content: '';
     position: absolute;
     top: 0;
@@ -1671,7 +1671,7 @@
     width: 14px;
     height: 14px;
   }
-  .tl-gap:hover .tl-gapnode {
+  :where(.tl-gap:hover) .tl-gapnode {
     color: var(--accent);
     border-color: var(--accent-line);
     background: var(--accent-weak);

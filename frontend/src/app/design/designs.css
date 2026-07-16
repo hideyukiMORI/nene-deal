@@ -71,7 +71,7 @@
   .main-inner {
     min-width: 0;
   }
-  .icon-btn.neutral:hover {
+  :where(.icon-btn.neutral):hover {
     background: var(--surface-2);
     color: var(--fg);
     border-color: var(--line-strong);
@@ -86,7 +86,7 @@
     display: block;
   }
   .brand-logo svg,
-  .m-brand .logo svg {
+  :where(.m-brand) .logo svg {
     width: 100%;
     height: 100%;
     display: block;
@@ -121,7 +121,7 @@
   .nav-item.nav-error {
     margin-top: auto;
   }
-  .nav-item.nav-error + .sidebar-foot {
+  :where(.nav-item.nav-error) + .sidebar-foot {
     margin-top: var(--s4);
   }
 
@@ -166,11 +166,11 @@
       background 0.12s,
       color 0.12s;
   }
-  .shell-calm .topnav-link:hover {
+  :where(.shell-calm) .topnav-link:hover {
     color: var(--fg);
     background: var(--surface-2);
   }
-  .shell-calm .topnav-link.active {
+  :where(.shell-calm) .topnav-link.active {
     color: var(--accent);
     background: var(--accent-weak);
     font-weight: 600;
@@ -186,7 +186,7 @@
     color: var(--fg-muted);
     cursor: pointer;
   }
-  .shell-calm .nav-pill:hover {
+  :where(.shell-calm) .nav-pill:hover {
     color: var(--fg);
   }
   .shell-calm .avatar {
@@ -307,7 +307,7 @@
   .m-tab.active {
     color: var(--accent);
   }
-  .m-tab.active::before {
+  :where(.m-tab.active)::before {
     content: '';
     position: absolute;
     top: 0;
@@ -416,31 +416,31 @@
     gap: var(--s3);
     min-width: 0;
   }
-  .list-row > .row:first-child {
+  :where(.list-row) > .row:first-child {
     flex: 1 1 auto;
     min-width: 0;
   }
-  .list-row > .row:last-child {
+  :where(.list-row) > .row:last-child {
     flex: 0 0 auto;
   }
   .list-row .stack {
     min-width: 0;
   }
-  .list-row .stack > .row {
+  :where(.list-row) .stack > .row {
     min-width: 0;
   }
-  .list-row .stack .medium {
+  :where(.list-row) .stack .medium {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 0;
   }
-  .list-row .stack .mono {
+  :where(.list-row) .stack .mono {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .list-row .stack .badge {
+  :where(.list-row) .stack .badge {
     flex: none;
   }
   .list-row select {
@@ -529,14 +529,14 @@
     border: none;
     border-radius: 0;
   }
-  [data-design='calm'] .forecast .stat {
+  :where([data-design='calm']) .forecast .stat {
     background: var(--surface);
     border: none;
     box-shadow: none;
     border-radius: var(--radius-lg);
     padding: var(--s5) var(--s6);
   }
-  [data-design='calm'] .forecast .stat .val {
+  :where([data-design='calm'] .forecast) .stat .val {
     font-size: 26px;
   }
   [data-design='calm'] .col {
@@ -555,7 +555,7 @@
     padding: var(--s4);
     box-shadow: none;
   }
-  [data-design='calm'] .deal:hover {
+  :where([data-design='calm']) .deal:hover {
     transform: translateY(-2px);
     background: var(--surface-2);
   }
@@ -576,7 +576,7 @@
     padding-bottom: 0;
     margin-bottom: var(--s2);
   }
-  [data-design='calm'] .panel-title::before {
+  :where([data-design='calm']) .panel-title::before {
     display: none;
   }
   [data-design='calm'] .list-row {
@@ -618,7 +618,7 @@
   .shell-ent .brandmark {
     padding: 0;
   }
-  .shell-ent .brandmark .logo {
+  :where(.shell-ent) .brandmark .logo {
     width: 28px;
     height: 28px;
   }
@@ -627,7 +627,7 @@
     align-items: center;
     gap: var(--s2);
   }
-  .shell-ent .ent-user .avatar {
+  :where(.shell-ent) .ent-user .avatar {
     width: 28px;
     height: 28px;
     font-size: 11px;
@@ -666,19 +666,19 @@
       border-color 0.12s,
       background 0.12s;
   }
-  .shell-ent .tab .ico {
+  :where(.shell-ent) .tab .ico {
     width: 15px;
     height: 15px;
   }
-  .shell-ent .tab:hover {
+  :where(.shell-ent) .tab:hover {
     color: var(--fg);
     background: var(--surface-2);
   }
-  .shell-ent .tab.active {
+  :where(.shell-ent) .tab.active {
     color: var(--accent);
     border-bottom-color: var(--accent);
   }
-  .shell-ent .toolbar .crumb {
+  :where(.shell-ent) .toolbar .crumb {
     font-family: var(--mono);
     font-size: 11.5px;
     color: var(--fg-faint);
@@ -708,7 +708,7 @@
   [data-design='enterprise'] .card-pad {
     padding: var(--s5);
   }
-  [data-design='enterprise'] .field > label {
+  :where([data-design='enterprise']) .field > label {
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -723,20 +723,20 @@
     gap: 0;
     border-color: var(--line-strong);
   }
-  [data-design='enterprise'] .forecast .stat {
+  :where([data-design='enterprise']) .forecast .stat {
     border-right: 1px solid var(--line-strong);
     padding: var(--s3) var(--s4);
   }
-  [data-design='enterprise'] .forecast .stat:last-child {
+  :where([data-design='enterprise'] .forecast) .stat:last-child {
     border-right: none;
   }
-  [data-design='enterprise'] .forecast .stat .label {
+  :where([data-design='enterprise'] .forecast) .stat .label {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-size: 10px;
     font-weight: 700;
   }
-  [data-design='enterprise'] .forecast .stat .val {
+  :where([data-design='enterprise'] .forecast) .stat .val {
     font-size: 19px;
   }
   [data-design='enterprise'] .col {
@@ -760,7 +760,7 @@
   [data-design='enterprise'] .rows > * {
     border-color: var(--line);
   }
-  [data-design='enterprise'] .panel-title::before {
+  :where([data-design='enterprise']) .panel-title::before {
     height: 14px;
   }
   [data-design='enterprise'] .btn {
@@ -773,7 +773,7 @@
 
   /* enterprise の予測バーが2列になる時の境界調整 */
   @media (max-width: 900px) {
-    [data-design='enterprise'] .forecast .stat:nth-child(2) {
+    :where([data-design='enterprise'] .forecast) .stat:nth-child(2) {
       border-right: none;
     }
   }
@@ -795,10 +795,10 @@
     .shell-calm .m-fab {
       display: grid;
     }
-    .shell-calm .m-sheet-wrap.open {
+    :where(.shell-calm) .m-sheet-wrap.open {
       display: block;
     }
-    [data-design='calm'] .m-sheet-wrap.open {
+    :where([data-design='calm']) .m-sheet-wrap.open {
       display: block;
     }
     /* 下部タブバー＋FAB の高さ分、本文に余白 */
@@ -818,7 +818,7 @@
       align-items: flex-start;
       gap: var(--s3);
     }
-    [data-design='calm'] .page-head .btn-primary {
+    :where([data-design='calm']) .page-head .btn-primary {
       padding: 8px 14px;
     }
     /* 予測は横スクロールの要約ストリップ（左端はコンテンツ余白に揃える） */
@@ -831,20 +831,20 @@
       padding: 2px 0 8px;
       -webkit-overflow-scrolling: touch;
     }
-    [data-design='calm'] .forecast::after {
+    :where([data-design='calm']) .forecast::after {
       content: '';
       flex: 0 0 2px;
     }
-    [data-design='calm'] .forecast::-webkit-scrollbar {
+    :where([data-design='calm']) .forecast::-webkit-scrollbar {
       display: none;
     }
-    [data-design='calm'] .forecast .stat {
+    :where([data-design='calm']) .forecast .stat {
       flex: 0 0 auto;
       min-width: 152px;
       scroll-snap-align: start;
       padding: var(--s4) var(--s5);
     }
-    [data-design='calm'] .forecast .stat .val {
+    :where([data-design='calm'] .forecast) .stat .val {
       font-size: 22px;
     }
     /* カンバンは縦のステージ別リスト */
@@ -866,13 +866,13 @@
     [data-design='calm'] .user-id {
       cursor: pointer;
     }
-    [data-design='calm'] .user-id .row-chevron {
+    :where([data-design='calm']) .user-id .row-chevron {
       display: inline-flex;
     }
     [data-design='calm'] .user-ctrls {
       display: none;
     }
-    [data-design='calm'] .user-row:active {
+    :where([data-design='calm']) .user-row:active {
       background: var(--surface-2);
     }
 
@@ -936,7 +936,7 @@
     border-radius: 9px;
     padding: 2px;
   }
-  .proto-controls .seg button {
+  :where(.proto-controls) .seg button {
     border: none;
     background: none;
     cursor: pointer;
@@ -951,10 +951,10 @@
       color 0.12s;
     white-space: nowrap;
   }
-  .proto-controls .seg button:hover {
+  :where(.proto-controls .seg) button:hover {
     color: var(--fg);
   }
-  .proto-controls .seg button.active {
+  :where(.proto-controls .seg) button.active {
     background: var(--accent);
     color: var(--on-accent);
   }
@@ -992,10 +992,10 @@
       color 0.12s;
     white-space: nowrap;
   }
-  .lang-toggle button:hover {
+  :where(.lang-toggle) button:hover {
     color: var(--fg);
   }
-  .lang-toggle button.active {
+  :where(.lang-toggle) button.active {
     background: var(--accent);
     color: var(--on-accent);
   }
@@ -1041,7 +1041,7 @@
   .nav-item.nav-signout {
     color: var(--fg-faint);
   }
-  .nav-item.nav-signout:hover {
+  :where(.nav-item.nav-signout):hover {
     color: var(--fg);
   }
 
@@ -1081,10 +1081,10 @@
       background 0.12s,
       color 0.12s;
   }
-  .mode-toggle button:hover {
+  :where(.mode-toggle) button:hover {
     color: var(--fg);
   }
-  .mode-toggle button.active {
+  :where(.mode-toggle) button.active {
     background: var(--accent);
     color: var(--on-accent);
   }
@@ -1136,13 +1136,13 @@
     flex: 1 1 auto;
     min-width: 0;
   }
-  .m-sheet-link svg:first-child {
+  :where(.m-sheet-link) svg:first-child {
     width: 18px;
     height: 18px;
     flex: none;
     opacity: 0.8;
   }
-  .m-sheet-link svg:last-child {
+  :where(.m-sheet-link) svg:last-child {
     flex: none;
     color: var(--fg-faint);
   }
