@@ -3,7 +3,7 @@ import type { CreateUserInput, OperatorRole, OperatorUser, UserStatus } from '@/
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { EmptyState, Select, type SelectOption } from '@/shared/ui'
 import { IconChevron, IconClose, IconPlus } from '@/shared/ui/icons'
-import type { UserManagementStatus } from '../hooks/use-user-management-page'
+import type { UserManagementStatus } from '../model/use-user-management-page'
 import { CreateUserForm } from './CreateUserForm'
 
 export interface UserManagementViewProps {

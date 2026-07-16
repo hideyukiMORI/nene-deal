@@ -6,8 +6,8 @@ import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { formatMoneyJpy } from '@/shared/lib/format-money'
 import { EmptyState, useToast, type SelectOption } from '@/shared/ui'
 import { IconAccount, IconBack, IconCheck, IconChevron, IconEye, IconPlus } from '@/shared/ui/icons'
-import { useKanbanDnd } from '../hooks/use-kanban-dnd'
-import type { BoardStatus } from '../hooks/use-kanban-board-page'
+import { useKanbanDnd } from '../model/use-kanban-dnd'
+import type { BoardStatus } from '../model/use-kanban-board-page'
 import { CreateDealForm } from './CreateDealForm'
 
 export interface KanbanBoardViewProps {

@@ -3,7 +3,7 @@ import type { CreateStageInput, PipelineStage, UpdateStageInput } from '@/entiti
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { Button, EmptyState, Input } from '@/shared/ui'
 import { IconPlus } from '@/shared/ui/icons'
-import type { StageManagementStatus } from '../hooks/use-stage-management-page'
+import type { StageManagementStatus } from '../model/use-stage-management-page'
 import { CreateStageForm } from './CreateStageForm'
 
 export interface StageManagementViewProps {
