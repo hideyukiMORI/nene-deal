@@ -1,2 +1,6 @@
+/* canonical cascade header（フリート共通 — AM-8(a)。層順の正本＝nene2 スターター同現物）
+   app/design/*.css は @layer legacy に包む（legacy manifest 対象）。base(Preflight) より後ろなので
+   既存 app CSS のリセット優先は不変。app は utilities を使わないため utilities との勝敗も不変。 */
+@layer theme, base, vendor, legacy, components, utilities;
 @import 'tailwindcss';
 @import './active.css';
