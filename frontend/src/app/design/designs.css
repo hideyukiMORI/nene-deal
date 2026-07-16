@@ -7,21 +7,21 @@
    ============================================================ */
 
   /* ---------- デザイン・トークン ---------- */
-  html[data-design='console'] {
+  [data-design='console'] {
     --font: 'IBM Plex Sans', 'IBM Plex Sans JP', system-ui, sans-serif;
     --mono: 'IBM Plex Mono', ui-monospace, monospace;
     --radius: 6px;
     --radius-sm: 4px;
     --radius-lg: 10px;
   }
-  html[data-design='calm'] {
+  [data-design='calm'] {
     --font: 'Hanken Grotesk', 'Zen Kaku Gothic New', system-ui, sans-serif;
     --mono: 'IBM Plex Mono', ui-monospace, monospace;
     --radius: 13px;
     --radius-sm: 9px;
     --radius-lg: 18px;
   }
-  html[data-design='enterprise'] {
+  [data-design='enterprise'] {
     --font: 'Archivo', 'BIZ UDPGothic', system-ui, sans-serif;
     --mono: 'IBM Plex Mono', ui-monospace, monospace;
     --radius: 3px;
@@ -30,14 +30,14 @@
   }
 
   /* アクセント（デザイン × モード） */
-  html[data-design='calm'][data-theme='dark'] {
+  [data-design='calm'][data-theme='dark'] {
     --accent: oklch(77% 0.072 184);
     --accent-hover: oklch(83% 0.072 184);
     --accent-weak: oklch(30% 0.038 188);
     --accent-line: oklch(46% 0.05 188);
     --on-accent: oklch(19% 0.03 200);
   }
-  html[data-design='calm'][data-theme='light'] {
+  [data-design='calm'][data-theme='light'] {
     --accent: oklch(46% 0.068 186);
     --accent-hover: oklch(40% 0.068 186);
     --accent-weak: oklch(96% 0.016 186);
@@ -45,21 +45,21 @@
     --on-accent: oklch(99% 0 0);
   }
   /* calm: 枠線なしでもカードが浮くよう、面の濃淡コントラストを少し強める */
-  html[data-design='calm'][data-theme='light'] {
+  [data-design='calm'][data-theme='light'] {
     --bg: oklch(95.8% 0.008 220);
     --surface: oklch(100% 0 0);
     --surface-2: oklch(97.5% 0.006 220);
   }
-  html[data-design='calm'][data-theme='dark'] {
+  [data-design='calm'][data-theme='dark'] {
     --surface: oklch(23% 0.018 245);
     --surface-2: oklch(26.5% 0.018 245);
   }
-  html[data-design='enterprise'][data-theme='dark'] {
+  [data-design='enterprise'][data-theme='dark'] {
     --accent: oklch(74% 0.11 210);
     --accent-hover: oklch(80% 0.11 210);
     --on-accent: oklch(20% 0.04 230);
   }
-  html[data-design='enterprise'][data-theme='light'] {
+  [data-design='enterprise'][data-theme='light'] {
     --accent: oklch(47% 0.12 235);
     --accent-hover: oklch(41% 0.12 235);
     --on-accent: oklch(99% 0 0);
@@ -500,101 +500,101 @@
   }
 
   /* calm: 大きめタイポ・柔らかいカード・余白多め */
-  html[data-design='calm'] .t-h1 {
+  [data-design='calm'] .t-h1 {
     font-size: 30px;
     letter-spacing: -0.025em;
   }
-  html[data-design='calm'] .t-h2 {
+  [data-design='calm'] .t-h2 {
     font-size: 18px;
   }
-  html[data-design='calm'] .t-display {
+  [data-design='calm'] .t-display {
     font-size: 34px;
     line-height: 1.18;
   }
-  html[data-design='calm'] .page-head {
+  [data-design='calm'] .page-head {
     margin-bottom: var(--s2);
   }
   /* calm: フラットな塗り分け（枠線・影は使わず、濃淡＋余白で見せる） */
-  html[data-design='calm'] .card {
+  [data-design='calm'] .card {
     background: var(--surface);
     border: none;
     box-shadow: none;
   }
-  html[data-design='calm'] .card-pad {
+  [data-design='calm'] .card-pad {
     padding: var(--s8);
   }
-  html[data-design='calm'] .forecast {
+  [data-design='calm'] .forecast {
     gap: var(--s4);
     background: transparent;
     border: none;
     border-radius: 0;
   }
-  html[data-design='calm'] .forecast .stat {
+  [data-design='calm'] .forecast .stat {
     background: var(--surface);
     border: none;
     box-shadow: none;
     border-radius: var(--radius-lg);
     padding: var(--s5) var(--s6);
   }
-  html[data-design='calm'] .forecast .stat .val {
+  [data-design='calm'] .forecast .stat .val {
     font-size: 26px;
   }
-  html[data-design='calm'] .col {
+  [data-design='calm'] .col {
     background: transparent;
     border: none;
     padding: 0;
     gap: var(--s4);
   }
-  html[data-design='calm'] .col-head {
+  [data-design='calm'] .col-head {
     padding: 0 2px;
   }
-  html[data-design='calm'] .deal {
+  [data-design='calm'] .deal {
     background: var(--surface);
     border: none;
     border-radius: var(--radius-lg);
     padding: var(--s4);
     box-shadow: none;
   }
-  html[data-design='calm'] .deal:hover {
+  [data-design='calm'] .deal:hover {
     transform: translateY(-2px);
     background: var(--surface-2);
   }
-  html[data-design='calm'] .auth-form {
+  [data-design='calm'] .auth-form {
     background: var(--bg);
   }
-  html[data-design='calm'] .auth-card {
+  [data-design='calm'] .auth-card {
     background: var(--surface);
     border: none;
     box-shadow: none;
   }
-  html[data-design='calm'] .kpi-chip {
+  [data-design='calm'] .kpi-chip {
     border: none;
     background: color-mix(in oklch, var(--surface) 65%, transparent);
   }
-  html[data-design='calm'] .panel-title {
+  [data-design='calm'] .panel-title {
     border-bottom: none;
     padding-bottom: 0;
     margin-bottom: var(--s2);
   }
-  html[data-design='calm'] .panel-title::before {
+  [data-design='calm'] .panel-title::before {
     display: none;
   }
-  html[data-design='calm'] .list-row {
+  [data-design='calm'] .list-row {
     padding: var(--s5) var(--s6);
   }
-  html[data-design='calm'] .badge {
+  [data-design='calm'] .badge {
     border-radius: var(--r-pill);
   }
-  html[data-design='calm'] .input,
-  html[data-design='calm'] .select {
+  [data-design='calm'] .input,
+  [data-design='calm'] .select {
     border-radius: var(--radius);
     padding: 11px 14px;
   }
-  html[data-design='calm'] .btn {
+  [data-design='calm'] .btn {
     border-radius: var(--r-pill);
     padding: 10px 20px;
   }
-  html[data-design='calm'] .btn-sm {
+  [data-design='calm'] .btn-sm {
     padding: 7px 14px;
   }
 
@@ -694,86 +694,86 @@
   }
 
   /* enterprise: 高密度・角ばり・強罫線・モノ微ラベル */
-  html[data-design='enterprise'] {
+  [data-design='enterprise'] {
     font-size: 13.5px;
   }
-  html[data-design='enterprise'] .t-h1 {
+  [data-design='enterprise'] .t-h1 {
     font-size: 19px;
     letter-spacing: -0.01em;
   }
-  html[data-design='enterprise'] .card {
+  [data-design='enterprise'] .card {
     border-color: var(--line-strong);
     box-shadow: none;
   }
-  html[data-design='enterprise'] .card-pad {
+  [data-design='enterprise'] .card-pad {
     padding: var(--s5);
   }
-  html[data-design='enterprise'] .field > label {
+  [data-design='enterprise'] .field > label {
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--fg-muted);
   }
-  html[data-design='enterprise'] .input,
-  html[data-design='enterprise'] .select {
+  [data-design='enterprise'] .input,
+  [data-design='enterprise'] .select {
     padding: 7px 10px;
   }
-  html[data-design='enterprise'] .forecast {
+  [data-design='enterprise'] .forecast {
     gap: 0;
     border-color: var(--line-strong);
   }
-  html[data-design='enterprise'] .forecast .stat {
+  [data-design='enterprise'] .forecast .stat {
     border-right: 1px solid var(--line-strong);
     padding: var(--s3) var(--s4);
   }
-  html[data-design='enterprise'] .forecast .stat:last-child {
+  [data-design='enterprise'] .forecast .stat:last-child {
     border-right: none;
   }
-  html[data-design='enterprise'] .forecast .stat .label {
+  [data-design='enterprise'] .forecast .stat .label {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-size: 10px;
     font-weight: 700;
   }
-  html[data-design='enterprise'] .forecast .stat .val {
+  [data-design='enterprise'] .forecast .stat .val {
     font-size: 19px;
   }
-  html[data-design='enterprise'] .col {
+  [data-design='enterprise'] .col {
     border-color: var(--line-strong);
     padding: var(--s2);
     gap: var(--s2);
     background: var(--surface);
   }
-  html[data-design='enterprise'] .col-head {
+  [data-design='enterprise'] .col-head {
     padding: 6px 6px 4px;
     border-bottom: 1px solid var(--line);
   }
-  html[data-design='enterprise'] .deal {
+  [data-design='enterprise'] .deal {
     border-left-width: 3px;
     padding: var(--s2) var(--s3);
     box-shadow: none;
   }
-  html[data-design='enterprise'] .list-row {
+  [data-design='enterprise'] .list-row {
     padding: 9px var(--s4);
   }
-  html[data-design='enterprise'] .rows > * {
+  [data-design='enterprise'] .rows > * {
     border-color: var(--line);
   }
-  html[data-design='enterprise'] .panel-title::before {
+  [data-design='enterprise'] .panel-title::before {
     height: 14px;
   }
-  html[data-design='enterprise'] .btn {
+  [data-design='enterprise'] .btn {
     font-weight: 700;
     letter-spacing: 0.01em;
   }
-  html[data-design='enterprise'] .col-meta {
+  [data-design='enterprise'] .col-meta {
     font-family: var(--mono);
   }
 
   /* enterprise の予測バーが2列になる時の境界調整 */
   @media (max-width: 900px) {
-    html[data-design='enterprise'] .forecast .stat:nth-child(2) {
+    [data-design='enterprise'] .forecast .stat:nth-child(2) {
       border-right: none;
     }
   }
@@ -798,7 +798,7 @@
     .shell-calm .m-sheet-wrap.open {
       display: block;
     }
-    html[data-design='calm'] .m-sheet-wrap.open {
+    [data-design='calm'] .m-sheet-wrap.open {
       display: block;
     }
     /* 下部タブバー＋FAB の高さ分、本文に余白 */
@@ -807,22 +807,22 @@
       gap: var(--s5);
     }
     /* ラージタイトル（本文側）。 */
-    html[data-design='calm'] .t-h1 {
+    [data-design='calm'] .t-h1 {
       font-size: 26px;
     }
     /* The header "Add" buttons stay visible on mobile so every screen
      (board / users / stages) can create on a phone (no FAB). Stack the
      header so the title and button never overflow a narrow viewport. */
-    html[data-design='calm'] .page-head {
+    [data-design='calm'] .page-head {
       flex-direction: column;
       align-items: flex-start;
       gap: var(--s3);
     }
-    html[data-design='calm'] .page-head .btn-primary {
+    [data-design='calm'] .page-head .btn-primary {
       padding: 8px 14px;
     }
     /* 予測は横スクロールの要約ストリップ（左端はコンテンツ余白に揃える） */
-    html[data-design='calm'] .forecast {
+    [data-design='calm'] .forecast {
       display: flex;
       gap: var(--s3);
       overflow-x: auto;
@@ -831,27 +831,27 @@
       padding: 2px 0 8px;
       -webkit-overflow-scrolling: touch;
     }
-    html[data-design='calm'] .forecast::after {
+    [data-design='calm'] .forecast::after {
       content: '';
       flex: 0 0 2px;
     }
-    html[data-design='calm'] .forecast::-webkit-scrollbar {
+    [data-design='calm'] .forecast::-webkit-scrollbar {
       display: none;
     }
-    html[data-design='calm'] .forecast .stat {
+    [data-design='calm'] .forecast .stat {
       flex: 0 0 auto;
       min-width: 152px;
       scroll-snap-align: start;
       padding: var(--s4) var(--s5);
     }
-    html[data-design='calm'] .forecast .stat .val {
+    [data-design='calm'] .forecast .stat .val {
       font-size: 22px;
     }
     /* カンバンは縦のステージ別リスト */
-    html[data-design='calm'] .board {
+    [data-design='calm'] .board {
       gap: var(--s5);
     }
-    html[data-design='calm'] .col-head {
+    [data-design='calm'] .col-head {
       position: sticky;
       top: 54px;
       background: var(--bg);
@@ -863,16 +863,16 @@
       display: none;
     }
     /* ユーザー行：モバイルはタップで詳細シート。インライン操作は隠す */
-    html[data-design='calm'] .user-id {
+    [data-design='calm'] .user-id {
       cursor: pointer;
     }
-    html[data-design='calm'] .user-id .row-chevron {
+    [data-design='calm'] .user-id .row-chevron {
       display: inline-flex;
     }
-    html[data-design='calm'] .user-ctrls {
+    [data-design='calm'] .user-ctrls {
       display: none;
     }
-    html[data-design='calm'] .user-row:active {
+    [data-design='calm'] .user-row:active {
       background: var(--surface-2);
     }
 
@@ -1024,7 +1024,7 @@
     border-color: var(--fg-faint);
     background: var(--surface-2);
   }
-  html[data-design='calm'] .signout-btn {
+  [data-design='calm'] .signout-btn {
     border-radius: var(--r-pill);
   }
 
