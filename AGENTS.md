@@ -23,6 +23,7 @@ See [ADR 0002](docs/adr/0002-deal-is-pipeline-ssot-not-billing.md).
 - **Coding standards index:** `docs/development/coding-standards.md`
 - **Workflow:** `docs/workflow.md`
 - **Current work:** `docs/todo/current.md`
+- **Daily reports:** `docs/daily/<YYYY-MM-DD>.md` — location/format/operation governed by `_work/daily-report-convention.md`
 
 ## Operating Rules
 
