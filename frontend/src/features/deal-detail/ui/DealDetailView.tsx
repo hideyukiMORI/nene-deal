@@ -4,7 +4,7 @@ import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { formatMoneyJpy } from '@/shared/lib/format-money'
 import { EmptyState, Select, useToast } from '@/shared/ui'
 import { IconBack, IconCheck, IconInvoice, IconOwner, IconTrash } from '@/shared/ui/icons'
-import type { DealDetailStatus } from '../hooks/use-deal-detail-page'
+import type { DealDetailStatus } from '../model/use-deal-detail-page'
 import { ActivityTimeline } from './ActivityTimeline'
 import { EditDealForm } from './EditDealForm'
 
