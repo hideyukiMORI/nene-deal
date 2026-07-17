@@ -22,4 +22,5 @@ following the fleet format.
 
 ## Index
 
-- [2026-07-17](2026-07-17.md) — Front-overhaul burst: 5 PRs (#133–#137) — W-Layer, W-Spec (specificity 125→0), A1 hooks→model, visual-smoke harness.
+- [2026-07-17](2026-07-17.md) — Front-overhaul burst: 5 PRs (#133–#137) — W-Layer, W-Spec (specificity 125→0), A1 hooks→model, visual-smoke harness. Session 2: A1 extract (#141).
+- [2026-07-18](2026-07-18.md) — Park day: fleet#65 seed (allowlist 0 / legacy-manifest), CI Phase 0-1b (#143 context split), vendor NENE2 v1.10→v1.11, article-supply standing.
