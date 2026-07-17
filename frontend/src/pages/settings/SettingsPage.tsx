@@ -1,5 +1,6 @@
-import { SettingsView } from '@/features/settings'
+import { SettingsView, useSettingsPage } from '@/features/settings'
 
 export function SettingsPage() {
-  return <SettingsView />
+  const page = useSettingsPage()
+  return <SettingsView {...page} />
 }
