@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { Button, Input, useToast } from '@/shared/ui'
 import {
@@ -10,15 +10,7 @@ import {
   IconShield,
   IconTrash,
 } from '@/shared/ui/icons'
-import { downloadAuditCsv } from '../download-audit-csv'
-
-function today(): string {
-  return new Date().toISOString().slice(0, 10)
-}
-
-function firstOfMonth(): string {
-  return `${today().slice(0, 7)}-01`
-}
+import type { AuditExportPage } from '../model/use-audit-export-page'
 
 const RECORDED: { Icon: typeof IconPlus; label: MessageKey }[] = [
   { Icon: IconPlus, label: 'audit.chip.created' },
@@ -29,28 +21,29 @@ const RECORDED: { Icon: typeof IconPlus; label: MessageKey }[] = [
   { Icon: IconInvoice, label: 'audit.chip.handoff' },
 ]
 
-export function AuditExportView() {
+export type AuditExportViewProps = AuditExportPage
+
+export function AuditExportView({
+  from,
+  to,
+  setFrom,
+  setTo,
+  invalidRange,
+  pending,
+  download,
+}: AuditExportViewProps) {
   const { t } = useTranslation()
   const toast = useToast()
-  const [from, setFrom] = useState(firstOfMonth)
-  const [to, setTo] = useState(today)
-  const [pending, setPending] = useState(false)
-
-  const invalidRange = from > to
 
   const onDownload = (): void => {
     if (invalidRange || pending) return
-    setPending(true)
-    void (async () => {
-      try {
-        await downloadAuditCsv(from, to)
+    void download().then((ok) => {
+      if (ok) {
         toast.success(t('toast.audit.success.title'), `${from} – ${to}`)
-      } catch {
+      } else {
         toast.error(t('toast.audit.error.title'))
-      } finally {
-        setPending(false)
       }
-    })()
+    })
   }
 
   return (

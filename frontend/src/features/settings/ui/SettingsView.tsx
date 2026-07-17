@@ -1,10 +1,7 @@
-import { useState } from 'react'
-import { useSettings, useUpdateSettings } from '@/entities/settings'
 import { useTranslation } from '@/shared/i18n'
 import { Button, Select, useToast, type SelectOption } from '@/shared/ui'
 import { IconShield } from '@/shared/ui/icons'
-
-const MONTH_END = 'month-end'
+import { MONTH_END, type SettingsPage } from '../model/use-settings-page'
 
 function dayOptions(monthEndLabel: string): SelectOption[] {
   const days: SelectOption[] = [{ value: MONTH_END, label: monthEndLabel }]
@@ -14,31 +11,20 @@ function dayOptions(monthEndLabel: string): SelectOption[] {
   return days
 }
 
-export function SettingsView() {
+export type SettingsViewProps = SettingsPage
+
+export function SettingsView({ value, setDraft, loading, saving, save }: SettingsViewProps) {
   const { t } = useTranslation()
   const toast = useToast()
-  const settings = useSettings()
-  const update = useUpdateSettings()
-
-  // The selected value is a local draft layered over the loaded setting, so we
-  // avoid syncing state in an effect.
-  const [draft, setDraft] = useState<string | null>(null)
-  const loaded =
-    settings.data && settings.data.forecastClosingDay !== null
-      ? String(settings.data.forecastClosingDay)
-      : MONTH_END
-  const value = draft ?? loaded
 
   const onSave = (): void => {
-    const closingDay = value === MONTH_END ? null : Number(value)
-    void update.mutateAsync(closingDay).then(
-      () => {
+    void save().then((ok) => {
+      if (ok) {
         toast.success(t('toast.saved.title'), t('toast.saved.sub'))
-      },
-      () => {
+      } else {
         toast.error(t('settings.error'))
-      },
-    )
+      }
+    })
   }
 
   return (
@@ -70,7 +56,7 @@ export function SettingsView() {
             label={t('settings.closingDay.label')}
             options={dayOptions(t('settings.closingDay.monthEnd'))}
             value={value}
-            disabled={settings.isPending}
+            disabled={loading}
             onChange={(event) => {
               setDraft(event.target.value)
             }}
@@ -82,7 +68,7 @@ export function SettingsView() {
         </span>
 
         <div className="row g3">
-          <Button type="button" disabled={update.isPending || settings.isPending} onClick={onSave}>
+          <Button type="button" disabled={saving || loading} onClick={onSave}>
             {t('common.actions.save')}
           </Button>
         </div>

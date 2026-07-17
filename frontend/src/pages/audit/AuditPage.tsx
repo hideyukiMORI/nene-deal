@@ -1,5 +1,6 @@
-import { AuditExportView } from '@/features/audit-export'
+import { AuditExportView, useAuditExportPage } from '@/features/audit-export'
 
 export function AuditPage() {
-  return <AuditExportView />
+  const page = useAuditExportPage()
+  return <AuditExportView {...page} />
 }
