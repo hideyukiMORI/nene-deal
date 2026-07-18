@@ -22,8 +22,7 @@ See [ADR 0002](docs/adr/0002-deal-is-pipeline-ssot-not-billing.md).
 - **NENE2 inheritance:** `docs/inheritance-from-nene2.md`
 - **Coding standards index:** `docs/development/coding-standards.md`
 - **Workflow:** `docs/workflow.md`
-- **Current work:** `docs/todo/current.md`
-- **Daily reports:** `docs/daily/<YYYY-MM-DD>.md` — location/format/operation governed by `_work/daily-report-convention.md`
+- **Operational logs** (current work / daily reports / pre-2026-07-17 journal) have moved to the private mirror `nene-origin/internal-docs/deal/` (`todo/` · `daily/` · `journal/`). Read the latest status and hand-off there. Location/format/operation is governed by `_work/daily-report-convention.md` (v3). Public docs here keep Diátaxis + ADR/CHANGELOG only.
 
 ## Operating Rules
 
