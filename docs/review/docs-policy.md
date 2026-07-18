@@ -8,6 +8,6 @@ Use before merging documentation PRs.
 - [ ] English in repo Markdown (Issue/PR bodies may be Japanese)
 - [ ] ADR added if boundary or integration decision changed
 - [ ] Locale policy respected — product UI strings target `ja`/`en` only (ADR 0004)
-- [ ] `docs/todo/current.md` updated when phase milestones shift
+- [ ] Current work log (private mirror `nene-origin/internal-docs/deal/todo/current.md`) updated when phase milestones shift
 
 Last updated: 2026-05-30

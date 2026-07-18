@@ -5,7 +5,7 @@ Issue-driven development. Inherits [NENE2 workflow](https://github.com/hideyukiM
 ## Standard flow
 
 1. Create or reuse a GitHub Issue.
-2. Read `docs/todo/current.md` and `docs/roadmap.md`.
+2. Read the current work log — private mirror `nene-origin/internal-docs/deal/todo/current.md` (see AGENTS.md) — and `docs/roadmap.md`.
 3. Branch from `main`: `type/issue-number-summary`.
 4. Implement minimal change; update docs when boundaries shift.
 5. Run relevant checklist in `docs/review/`.
