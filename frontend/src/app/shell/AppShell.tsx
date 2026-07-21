@@ -1,7 +1,16 @@
 import { useState, type ComponentType, type SVGProps } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useCurrentUser } from '@/entities/auth'
-import { useTranslation, type MessageKey } from '@/shared/i18n'
+import {
+  LOCALES,
+  SUPPORTED_LOCALE_IDS,
+  useTranslation,
+  type MessageKey,
+  type SupportedLocale,
+} from '@/shared/i18n'
+import { useTheme } from '@/shared/theme'
+import { LangToggle } from '@/shared/ui/components/LangToggle'
+import { ThemeToggle } from '@/shared/ui/components/ThemeToggle'
 import {
   IconAccount,
   IconBack,
@@ -14,7 +23,7 @@ import {
   IconStages,
   IconUsers,
 } from '@/shared/ui/icons'
-import { LangToggle, SignoutButton, ThemeToggle } from './Toggles'
+import { SignoutButton } from './Toggles'
 
 type ScreenKey = 'board' | 'detail' | 'users' | 'stages' | 'audit' | 'settings'
 
@@ -70,11 +79,17 @@ function Brand() {
  * mobile too), so creation works on every screen without a FAB.
  */
 export function AppShell() {
-  const { t } = useTranslation()
+  const { t, locale, setLocale } = useTranslation()
+  const { theme, setTheme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
   const currentUser = useCurrentUser()
   const [sheetOpen, setSheetOpen] = useState(false)
+
+  const localeItems = SUPPORTED_LOCALE_IDS.map((id) => ({
+    id,
+    label: id === 'en' ? 'EN' : LOCALES[id].label,
+  }))
 
   const screen = screenFromPath(location.pathname)
   const isAdmin = currentUser.data?.role === 'admin'
@@ -130,8 +145,21 @@ export function AppShell() {
         </nav>
         <div className="topnav-right">
           <span className="hdr-controls">
-            <ThemeToggle />
-            <LangToggle />
+            <ThemeToggle
+              theme={theme}
+              onThemeChange={setTheme}
+              groupLabel={t('shell.theme')}
+              lightLabel={t('shell.themeLight')}
+              darkLabel={t('shell.themeDark')}
+            />
+            <LangToggle
+              items={localeItems}
+              activeId={locale}
+              onSelect={(id) => {
+                setLocale(id as SupportedLocale)
+              }}
+              groupLabel={t('shell.lang')}
+            />
           </span>
           <span className="nav-divider" />
           <span className="account-chip">
@@ -255,11 +283,24 @@ export function AppShell() {
           ) : null}
           <div className="m-sheet-row">
             <span className="mm-label">{t('shell.theme')}</span>
-            <ThemeToggle />
+            <ThemeToggle
+              theme={theme}
+              onThemeChange={setTheme}
+              groupLabel={t('shell.theme')}
+              lightLabel={t('shell.themeLight')}
+              darkLabel={t('shell.themeDark')}
+            />
           </div>
           <div className="m-sheet-row">
             <span className="mm-label">{t('shell.lang')}</span>
-            <LangToggle />
+            <LangToggle
+              items={localeItems}
+              activeId={locale}
+              onSelect={(id) => {
+                setLocale(id as SupportedLocale)
+              }}
+              groupLabel={t('shell.lang')}
+            />
           </div>
           <SignoutButton />
         </div>
