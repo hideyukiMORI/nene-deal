@@ -1,9 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { LangToggle, ThemeToggle } from '@/app/shell/Toggles'
 import type { LoginInput } from '@/entities/auth'
-import { useTranslation } from '@/shared/i18n'
+import { LOCALES, SUPPORTED_LOCALE_IDS, useTranslation, type SupportedLocale } from '@/shared/i18n'
+import { useTheme } from '@/shared/theme'
+import { LangToggle } from '@/shared/ui/components/LangToggle'
+import { ThemeToggle } from '@/shared/ui/components/ThemeToggle'
 import { IconLogo, IconShield } from '@/shared/ui/icons'
 
 export interface LoginViewProps {
@@ -18,7 +20,13 @@ interface LoginFormValues {
 }
 
 export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
-  const { t } = useTranslation()
+  const { t, locale, setLocale } = useTranslation()
+  const { theme, setTheme } = useTheme()
+
+  const localeItems = SUPPORTED_LOCALE_IDS.map((id) => ({
+    id,
+    label: id === 'en' ? 'EN' : LOCALES[id].label,
+  }))
 
   const schema = z.object({
     email: z.string().trim().min(1, t('login.validation.emailRequired')),
@@ -42,8 +50,21 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
     <div className="fs-wrap">
       <div className="fs-lang">
         <span className="hdr-controls">
-          <ThemeToggle />
-          <LangToggle />
+          <ThemeToggle
+            theme={theme}
+            onThemeChange={setTheme}
+            groupLabel={t('shell.theme')}
+            lightLabel={t('shell.themeLight')}
+            darkLabel={t('shell.themeDark')}
+          />
+          <LangToggle
+            items={localeItems}
+            activeId={locale}
+            onSelect={(id) => {
+              setLocale(id as SupportedLocale)
+            }}
+            groupLabel={t('shell.lang')}
+          />
         </span>
       </div>
 

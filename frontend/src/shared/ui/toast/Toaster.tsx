@@ -1,14 +1,23 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useTranslation } from '@/shared/i18n'
 import { IconCheck, IconClose } from '@/shared/ui/icons'
 import { dismissToast, subscribeToasts, type Toast } from './toast-store'
 
 const AUTO_DISMISS_MS = 2600
 const LEAVE_MS = 220
 
-/** App-root toast surface. Mount once inside the i18n provider. */
-export function Toaster() {
-  const { t } = useTranslation()
+export interface ToasterProps {
+  /** Accessible label for the live region (e.g. t('toast.region')). */
+  regionLabel: string
+  /** Accessible label for each toast's dismiss action (e.g. t('toast.dismiss')). */
+  dismissLabel: string
+}
+
+/**
+ * App-root toast surface (presentation-only). Mount once via an app-layer
+ * adapter that supplies the labels from i18n (R1②: shared/ui does not import
+ * i18n).
+ */
+export function Toaster({ regionLabel, dismissLabel }: ToasterProps) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
   useEffect(() => subscribeToasts(setToasts), [])
@@ -18,9 +27,9 @@ export function Toaster() {
   }
 
   return (
-    <div className="toast-host" role="region" aria-live="polite" aria-label={t('toast.region')}>
+    <div className="toast-host" role="region" aria-live="polite" aria-label={regionLabel}>
       {toasts.map((toast) => (
-        <ToastItem key={toast.id} toast={toast} dismissLabel={t('toast.dismiss')} />
+        <ToastItem key={toast.id} toast={toast} dismissLabel={dismissLabel} />
       ))}
     </div>
   )
