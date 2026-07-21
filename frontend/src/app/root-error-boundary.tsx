@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { Button, Stack, Text } from '@/shared/ui'
-
+import { Button } from '@/shared/ui/primitives/Button'
+import { Stack } from '@/shared/ui/primitives/Stack'
+import { Text } from '@/shared/ui/primitives/Text'
 interface RootErrorBoundaryProps {
   children: ReactNode
 }

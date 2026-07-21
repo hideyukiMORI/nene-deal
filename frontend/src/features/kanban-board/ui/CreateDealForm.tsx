@@ -4,8 +4,11 @@ import { z } from 'zod'
 import type { CreateDealInput } from '@/entities/deal'
 import { useTranslation } from '@/shared/i18n'
 import { yenToCents } from '@/shared/lib/format-money'
-import { Button, Input, Select, Stack, Text, type SelectOption } from '@/shared/ui'
-
+import { Button } from '@/shared/ui/primitives/Button'
+import { Input } from '@/shared/ui/primitives/Input'
+import { Select, type SelectOption } from '@/shared/ui/primitives/Select'
+import { Stack } from '@/shared/ui/primitives/Stack'
+import { Text } from '@/shared/ui/primitives/Text'
 export interface CreateDealFormProps {
   stageOptions: SelectOption[]
   pending: boolean

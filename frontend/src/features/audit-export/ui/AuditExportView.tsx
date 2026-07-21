@@ -1,6 +1,8 @@
 import { type ReactNode } from 'react'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
-import { Button, Input, useToast } from '@/shared/ui'
+import { Button } from '@/shared/ui/primitives/Button'
+import { Input } from '@/shared/ui/primitives/Input'
+import { useToast } from '@/shared/ui/toast/use-toast'
 import {
   IconArrowRight,
   IconInvoice,
