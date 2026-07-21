@@ -27,7 +27,7 @@
 | P-1 | A-6 `/demo/standard` `/demo/guided` が SPA ルート | `/demo/standard` は **PHP 側デモ入口**（disposable org 起動点・#69）。`/demo/guided` ルートは**無く**、guided 相当は **固定 demo org**（`tools/seed-demo.php` の配布資格情報）で代替 | 公開デモへの打鍵として **A-6 に採用**（「SPA ルートでなく配信入口」と注記・DEA-A6-*） |
 | P-2 | E-1/E-3 テーマ・言語切替 | **ランタイム ThemeToggle/LangToggle が存在する**（`shared/ui/components/`・07-21 C3a-2b で presentation 化）。light/dark ＋ ja/en | E-1・E-3 は **該当あり**（vault は該当なしだったが deal は逆・切替直後の全画面崩れを見る） |
 | P-3 | — | **意匠付き catch-all 404（NotFoundPage・router `*`）あり** | D-2・F-3 で「未知 URL が意匠付き 404 に落ちるか」を確認（良好側の想定） |
-| P-4 | B-7 ファイル入力 / B-8 エクスポート注入 | **ファイル upload/添付は無し** → **B-7 該当なし**。**audit CSV export あり**（#53 で `CsvWriter` により formula-injection を閉じ済み）→ **B-8 該当あり**（中和の実挙動を打鍵で裏取り） | B-7=該当なし（§1）／B-8=audit CSV に対して実施 |
+| P-4 | B-7 ファイル入力 / B-8 エクスポート注入 | **ファイル upload/添付は無し** → **B-7 該当なし**。**audit CSV export あり**。formula-injection 中和は**app 側でなく NENE2 vendor の `Nene2\Export\CsvWriter`**（`vendor/hideyukimori/nene2/src/Export/CsvWriter.php:39` `FORMULA_TRIGGERS = ['=','+','-','@',"\t","\r"]`・先頭一致で `'` prefix 中和・default on。コード上に #53 参照は無い＝旧記述の帰属を訂正） → **B-8 該当あり**（中和の実挙動を打鍵で裏取り） | B-7=該当なし（§1）／B-8=audit CSV に対して実施 |
 | P-5 | A-1 CRUD の delete | Deal は **soft-delete + restore（recycle bin・#47）**。stage は delete あり | A-1 は「作成→閲覧→編集→soft-delete→restore」の一巡で書く |
 | P-6 | D-3 複数タブ競合 | Deal は **kanban D&D（`use-kanban-dnd`）＋ stage move**。楽観更新の競合・タブ間同時編集・楽観ロック（vault で last-write-wins 発見）を **重点** | D-3 を D&D＋タブ競合＋stage move 競合で厚めに（board #84 no-refetch-deleted-deal も関連） |
 | P-7 | A-3 主要業務フロー | Deal の「売り」= pipeline（create→stage move→won→**invoice-handoff**）。**hub 追加観点**: invoice-handoff の連携がデモで実際に動くかを実証（LP 連携主張の裏取り）。動かなければ「導線の現状」として記録 | DEA-A3-* で handoff を実挙動まで打鍵 |
@@ -41,9 +41,9 @@
 ### A. 正常系
 | 項目 | 該当シナリオ / 該当なし理由 |
 |---|---|
-| A-1 全エンティティ CRUD 一巡 | DEA-A1-01（deal: 作成→board→detail→edit→soft-delete→restore）, DEA-A1-02（stage: 作成→rename→reorder→delete・terminal は不可）, DEA-A1-03（user: 作成→role変更→disable→enable→delete・self 不可）, DEA-A1-04（settings: forecast closing day 更新・singleton） |
+| A-1 全エンティティ CRUD 一巡 | DEA-A1-01（deal: 作成→board→detail→edit→soft-delete→restore）, DEA-A1-02（stage: 作成→rename→reorder→delete・terminal は不可・**空前提**）, DEA-A1-03（user: 作成→role変更→disable→enable→delete・self 不可）, DEA-A1-04（settings: forecast closing day 更新・singleton）, DEA-A1-05（**非空 stage の削除**＝deal を持つ stage を delete→server 拒否 vs 孤児化・frontend の無反応疑い） |
 | A-2 一覧（検索/フィルタ/ソート/ページング/0件/大量） | DEA-A2-01（board フィルタ = show won/lost・show deleted）, DEA-A2-02（board 0件 EmptyState）, DEA-A2-03（audit from/to フィルタ＋invalidRange）。**検索・ソート・ページングの UI は board/一覧に無し**（kanban は全件列・audit は日付範囲のみ）を明記 |
-| A-3 主要業務フロー（売りの導線） | DEA-A3-01（pipeline: 作成→DnD stage move→won→**invoice-handoff 実挙動**＝P-7 裏取り）, DEA-A3-02（audit CSV export 一巡＝証跡の売り） |
+| A-3 主要業務フロー（売りの導線） | DEA-A3-01（pipeline: 作成→DnD stage move→won→**invoice-handoff 実挙動**＝P-7 裏取り）, DEA-A3-02（audit CSV export 一巡＝証跡の売り・**日本語データの Excel 文字化け/BOM**）, DEA-A3-03（**lost 導線**＝DnD→lost stage・Lost 特別描画・weighted/forecast 除外・show won/lost OFF で消える） |
 | A-4 ダッシュボード・集計値の整合 | DEA-A4-01（forecast strip の weighted/open/won ↔ board 各 column の client 集計の整合・**server 集計と client 集計の二重計算**を突く） |
 | A-5 ナビ全リンク一巡 | DEA-A5-01（AppShell nav 全項目〔board/stages/users/audit/settings〕＋detail 往復＋mobile tabs） |
 | A-6 デモ固有導線 | DEA-A6-01（/demo/standard: disposable org・admin seat・board 着地）, DEA-A6-02（/demo/standard 再訪・連打＝毎回新 org・mint レート制限 30/h の節度）, DEA-A6-03（リロードで session 消滅＝memory-only token・再訪要）。P-1 注記（SPA ルートでなく配信入口・/demo/guided は無し） |
@@ -58,7 +58,7 @@
 | B-5 過長入力 | DEA-B5-01（account/note の上限超・巨大貼付） |
 | B-6 二重送信・連打 | DEA-B6-01（create/save/handoff/move の連打→pending disable・多重送信防止） |
 | B-7 ファイル入出力 | **該当なし**: deal にファイル upload/添付機能が無い（フロント全域に file input・upload エンドポイント無し）。export は CSV のみ（B-8 で扱う） |
-| B-8 エクスポート注入 | DEA-B8-01（audit の deal 名/note/field に `=`,`+`,`-`,`@`,`TAB` 始まりの値を仕込み→audit CSV export のセルで式化しないか＝#53 `CsvWriter` 中和の実挙動裏取り） |
+| B-8 エクスポート注入 | DEA-B8-01（audit の deal 名/note/field に `=`,`+`,`-`,`@`,`TAB`,`\r` 始まりの値を仕込み→audit CSV export のセルで式化しないか＝**NENE2 `Nene2\Export\CsvWriter`** の中和実挙動裏取り） |
 
 ### C. 異常系 — 認証・権限・境界
 | 項目 | 該当シナリオ / 該当なし理由 |
@@ -137,6 +137,15 @@
 - 証拠:
 - 発見:
 
+### DEA-A1-05: 非空 stage の削除（孤児化 vs 拒否・frontend の無反応疑い）
+- 分類: A-1 / 異常（**hub 査読追補・発見直結**）
+- 前提: admin・`/stages`・**deal を1件以上持つ非 terminal stage** を用意（board で当該 stage に deal を作る）
+- 手順: 1. 中に deal がある stage の Delete → confirm（「Delete this stage?」）
+- 期待: server（`DeleteStageUseCase`）は `hasDeals` ガードで **`StageHasDealsException`（409 conflict）を投げ、削除しない＝deal は孤児化しない**（孤児化疑いは server 側で否定される想定）。ただし **stage feature の delete は成功/失敗トーストが無い（silent）**ため、**拒否時にユーザへ何の反応も出ない疑い**＝⚠️/🔴 候補（confirm→無反応で「消えたのか？」となる UX）。実挙動を発見として固定
+- 結果:
+- 証拠:
+- 発見:
+
 ### DEA-A2-01: board フィルタ（show won/lost・show deleted）
 - 分類: A-2 / 正常
 - 前提: won/lost と削除済みを含む pipeline
@@ -173,11 +182,20 @@
 - 証拠:
 - 発見:
 
-### DEA-A3-02: audit CSV export 一巡
+### DEA-A3-02: audit CSV export 一巡（日本語データの Excel 文字化け/BOM）
 - 分類: A-3 / 正常
-- 前提: admin・`/audit`・操作履歴あり
-- 手順: 1. 範囲指定→Download 2. DL した CSV を開く
-- 期待: `audit-{from}_{to}.csv` が DL・success トースト・列が UI 表示と一致・操作が行として入る
+- 前提: admin・`/audit`・操作履歴あり（**日本語の account 名/note を含む deal 操作を事前に作る**）
+- 手順: 1. 範囲指定→Download 2. DL した CSV を **Excel（Windows/Mac）と表計算で開く** 3. 日本語セルの文字化けと BOM 有無を確認
+- 期待: `audit-{from}_{to}.csv` が DL・success トースト・列が UI 表示と一致・操作が行として入る。**日本語が Excel で文字化けしない**（UTF-8 BOM 付与の有無で Excel の自動判定が変わる＝BOM 無しだと Excel が Shift_JIS 誤認で化ける可能性→営業直結。BOM 有無を実測し記録）
+- 結果:
+- 証拠:
+- 発見:
+
+### DEA-A3-03: lost 導線（DnD→lost・Lost 特別描画・forecast 除外・フィルタ）
+- 分類: A-3 / 正常（**won だけ厚く lost を踏まないデモ致命穴の防止・hub 査読追補**）
+- 前提: admin・board・lost stage あり
+- 手順: 1. deal を DnD で **lost stage** へ移動 2. board 上の当該カードの描画（Lost 特別表示・`isLost`）3. board stat strip の weighted/forecast に lost が**含まれない**ことを確認 4. 「Show won/lost」を OFF にして lost カードが消えることを確認 5. detail を開き lost 状態表示
+- 期待: 2. lost カードが won とは別の特別描画（グレーアウト/Lost バッジ等）3. weighted/pipeline forecast から lost が除外（terminal 扱い）4. show won/lost OFF で lost 列/カードが非表示 5. detail に lost 反映。**lost 導線が破綻/未描画なら🔴（デモで負け筋を見せられない）**
 - 結果:
 - 証拠:
 - 発見:
@@ -334,11 +352,11 @@
 - 証拠:
 - 発見:
 
-### DEA-B8-01: audit CSV インジェクション中和（#53 裏取り）
+### DEA-B8-01: audit CSV インジェクション中和（NENE2 `Nene2\Export\CsvWriter` 裏取り）
 - 分類: B-8 / 異常（営業リスク）
 - 前提: admin
-- 手順: 1. account/note に `=1+1`・`=HYPERLINK("http://evil","x")`・`+1`・`-1`・`@x`・TAB 始まりの値を保存（→audit に記録される）2. `/audit` で export→CSV を Excel/表計算で開く
-- 期待: CSV セルで**式として評価されない**（先頭中和＝`CsvWriter` の formula-injection 対策・#53）。評価されたら🔴（営業直結）
+- 手順: 1. account/note に `=1+1`・`=HYPERLINK("http://evil","x")`・`+1`・`-1`・`@x`・TAB 始まり・`\r` 始まりの値を保存（→audit に記録される）2. `/audit` で export→CSV を Excel/表計算で開く
+- 期待: CSV セルで**式として評価されない**（`Nene2\Export\CsvWriter` が `FORMULA_TRIGGERS=['=','+','-','@',"\t","\r"]` 先頭一致で `'` prefix 中和・`sanitizeFormulas` default on）。全 trigger（`\r` 含む）で中和を確認。評価されたら🔴（営業直結）。※中和は NENE2 vendor 実装（app 側 #53 ではない）
 - 結果:
 - 証拠:
 - 発見:
@@ -361,9 +379,9 @@
 
 ### DEA-C2-02: 他 org の id 直叩き（テナント分離）
 - 分類: C-2 / 異常（重要）
-- 前提: demo org A で得た token・別 org B の deal id を推測
-- 手順: 1. `/deals/<other-org-id>`
-- 期待: 404/403 で他 org データを返さない（テナント分離・情報漏えい無し）
+- 前提: demo org A で得た token・別 org B の実在 deal id
+- 手順: **他 org id の安全な取得法**＝別ブラウザコンテキスト（別プロファイル/incognito）で `/demo/standard` をもう一度開き **2つ目の disposable org B を mint**→B の deal id を控える（推測でなく実在 id で確実に検証）。1. org A の token/セッションで `/deals/<org-B-id>` を直叩き（API も直接）
+- 期待: 404/403 で他 org データを返さない（テナント分離・情報漏えい無し）。org A の一覧/detail に B の deal が一切現れない
 - 結果:
 - 証拠:
 - 発見:
@@ -578,5 +596,5 @@
 
 ### 実行メモ（🔴/⚠️ の再現手順・batch 2 以降）
 
-- **batch 2 予定（要慎重・一部手動）**: A-1 CRUD 書込（disposable org 内）／**A-3 invoice-handoff 実挙動＝LP 連携裏取り**（invoice リナ実測「Deal 引き継ぎ未実装」と一致するか）／**B-8 audit CSV injection**（`=HYPERLINK` 実注入→中和裏取り・#53）／B-1/B-2/B-3 入力検証／**B-4 XSS 表示エスケープ**／**DEA-D3-01〜04 楽観ロック/連打 race**（要2タブ・operator ユーザ作成）／**E-4 TZ off-by-one**（timezoneId で UTC/JST 両撮り＝hub 手法）／E-2 レスポンシブ／E-5 金額書式。
+- **batch 2 予定（要慎重・一部手動）**: A-1 CRUD 書込（disposable org 内）／**A-3 invoice-handoff 実挙動＝LP 連携裏取り**（invoice リナ実測「Deal 引き継ぎ未実装」と一致するか）／**B-8 audit CSV injection**（`=HYPERLINK` 実注入→NENE2 `Nene2\Export\CsvWriter` 中和裏取り）／**A3-03 lost 導線**／**A1-05 非空 stage 削除**／**A3-02 CSV 日本語 BOM**／B-1/B-2/B-3 入力検証／**B-4 XSS 表示エスケープ**／**DEA-D3-01〜04 楽観ロック/連打 race**（要2タブ・operator ユーザ作成）／**E-4 TZ off-by-one**（timezoneId で UTC/JST 両撮り＝hub 手法）／E-2 レスポンシブ／E-5 金額書式。
 - A-5 nav 到達性・E-3-01 lang 切替は batch 2 でクライアント側クリック法にて再測（batch1 の⚠️2件はハードナビ／弱アサーションの手法起因で、機能不具合の疑いではない）。
