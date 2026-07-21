@@ -556,7 +556,27 @@
 > hub 査読 PASS 後にブラウザ打鍵で記入。**実行日時（TZ 明記）・実行者・ブラウザ/版・画面幅・デモ URL・フロントのビルド SHA** を必ず残す。
 
 - 実行日時 / 実行者 / ブラウザ / 画面幅 / デモ URL / ビルド SHA:
-- サマリ: 総数 __ / ✅ __ / 🔴 __ / ⚠️ __ / 未実行 __（理由）
+  - **batch 1（構造系・自動化 live Playwright）**: 2026-07-21・Deal リナ・Chromium(Playwright)・1280×900・`https://deal.ayane.co.jp/demo/standard`（生存 HTTP 200 実測）・本番デプロイ凍結不要。
+- サマリ（batch 1 = 構造系11項目）: ✅ 8 / 🔴 0 / ⚠️ 3（うち2は**テスト手法起因**・下記）/ 残 §2 の異常系・security・race・TZ・handoff・CRUD 書込・多タブは **batch 2 以降で継続**。
 - 🔴・⚠️ は**その場で再現手順を確定**させてから次へ進む（後から再現できない報告を作らない）。
 
-### 実行メモ（🔴/⚠️ の再現手順）
+### batch 1 結果（構造系・live 実測）
+
+| ID | 結果 | 観察 |
+|---|---|---|
+| DEA-A6-01 | ✅ | `/demo/standard` → seat 経由で `/`（board）着地・topnav 表示・admin nav 全項目 `[Pipeline\|Stages\|Users\|Audit\|Settings]` |
+| DEA-A5-01 | ⚠️（手法補正要）| nav 項目は admin 全5件を確認。ただし各ルートの**ハードナビ（full load）は `/login` へ**＝**メモリ専用トークンが full load で失われる**ため（下記 F-1 発見）。**nav 到達性はクライアント側クリックで batch 2 再測**（ハードナビ→login は仕様どおり） |
+| DEA-C1-01 | ✅（batch1 で確証）| 上記の裏返し＝**公開デモは fail-closed（`VITE_REQUIRE_LOGIN=true`）**。トークン無し／full load で保護 URL 直叩き → `/login` へ確実に落ちる（情報露出なし） |
+| DEA-D2-01 | ✅ | 未知 URL `/zzz-unknown-route` → 意匠付き 404（"The requested item was not found. … Back to pipeline"）・クラッシュ無し |
+| DEA-E1-01 | ✅ | ThemeToggle 押下で `html[data-theme]` が変化（light↔dark 切替動作）・崩れ目視は batch 2 の全画面撮りで |
+| DEA-E3-02 | ✅ | 言語スイッチャのラベルが endonym 固定 `[日本語 \| EN]`（判例19 の意図どおり） |
+| DEA-E3-01 | ⚠️（弱アサーション）| lang 押下で first nav link テキスト不変と観測＝**要手動確認**（当該 nav 語が ja/en 同綴りの可能性・切替自体の可否を batch 2 で目視） |
+| DEA-A6-03 | ✅ | board でリロード → `/login`（**トークンはメモリ専用**＝リロードでセッション消滅・再訪で新 org）。仕様どおり |
+| DEA-F4-01(batch1) | ✅ | batch1 の全遷移で **console error 0 / ネットワーク 4xx・5xx 0** |
+
+**batch 1 の主要観察（発見候補・hub 連携）**: 公開デモは **fail-closed**（保護 URL の full load 直叩き→login）＝C-1 は良好側で確証。**トークンがメモリ専用**のため full page load を挟む操作（ハードナビ・リロード）は毎回 login に戻る＝deep-link（D-2）や新規タブでの保護 URL は「一旦 login」挙動になる（クライアント側 SPA 遷移では保持）。営業導線上の含意は F-1 で評価。
+
+### 実行メモ（🔴/⚠️ の再現手順・batch 2 以降）
+
+- **batch 2 予定（要慎重・一部手動）**: A-1 CRUD 書込（disposable org 内）／**A-3 invoice-handoff 実挙動＝LP 連携裏取り**（invoice リナ実測「Deal 引き継ぎ未実装」と一致するか）／**B-8 audit CSV injection**（`=HYPERLINK` 実注入→中和裏取り・#53）／B-1/B-2/B-3 入力検証／**B-4 XSS 表示エスケープ**／**DEA-D3-01〜04 楽観ロック/連打 race**（要2タブ・operator ユーザ作成）／**E-4 TZ off-by-one**（timezoneId で UTC/JST 両撮り＝hub 手法）／E-2 レスポンシブ／E-5 金額書式。
+- A-5 nav 到達性・E-3-01 lang 切替は batch 2 でクライアント側クリック法にて再測（batch1 の⚠️2件はハードナビ／弱アサーションの手法起因で、機能不具合の疑いではない）。
