@@ -22,10 +22,11 @@
     "codegen": "openapi-typescript ../docs/openapi/openapi.yaml -o src/shared/api/schema.gen.ts",
     "knip": "knip",
     "check:fast": "npm run type-check && npm run lint && npm run format && npm run test",
-    "check": "npm run type-check && npm run lint && npm run lint:styles && npm run format && npm run test && npm run knip && npm run build-storybook",
+    "check": "npm run type-check && npm run lint && npm run lint:styles && npm run check:registries && npm run format && npm run test && npm run knip && npm run build-storybook",
     "smoke": "node tools/smoke/visual-smoke.mjs",
     "smoke:diff": "node tools/smoke/visual-diff.mjs",
-    "lint:styles": "stylelint 'src/**/*.css'"
+    "lint:styles": "stylelint 'src/**/*.css'",
+    "check:registries": "nene2-check init --check --repo nene-deal"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
@@ -41,7 +42,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@hideyukimori/nene2-standards": "^2.0.1",
+    "@hideyukimori/nene2-standards": "^2.1.0",
     "@storybook/addon-a11y": "^10.1.4",
     "@storybook/addon-docs": "^10.1.4",
     "@storybook/react-vite": "^10.1.4",
