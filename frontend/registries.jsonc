@@ -52,8 +52,9 @@
       "repo": "nene-deal",
       "rule": "nene2/data-theme-selector-location",
       "file": "src/app/design/styles.css",
-      "frozenCount": 3,
+      "frozenCount": 2,
       "initializedBy": "init --scan",
+      "shrunkBy": "C5 W3 #169: removed dead [data-theme='navy'] (unreachable; ThemeMode='light'|'dark' only). init --check verified live 3→2.",
     },
   ],
 }
