@@ -3,8 +3,10 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import type { CreateStageInput } from '@/entities/pipeline-stage'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Stack, Text } from '@/shared/ui'
-
+import { Button } from '@/shared/ui/primitives/Button'
+import { Input } from '@/shared/ui/primitives/Input'
+import { Stack } from '@/shared/ui/primitives/Stack'
+import { Text } from '@/shared/ui/primitives/Text'
 interface CreateStageFormProps {
   pending: boolean
   errorMessage: string | null

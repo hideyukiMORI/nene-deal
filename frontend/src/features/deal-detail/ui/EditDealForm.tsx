@@ -4,8 +4,10 @@ import { z } from 'zod'
 import type { Deal, UpdateDealInput } from '@/entities/deal'
 import { useTranslation } from '@/shared/i18n'
 import { centsToYen, yenToCents } from '@/shared/lib/format-money'
-import { Button, Input, Stack, Text } from '@/shared/ui'
-
+import { Button } from '@/shared/ui/primitives/Button'
+import { Input } from '@/shared/ui/primitives/Input'
+import { Stack } from '@/shared/ui/primitives/Stack'
+import { Text } from '@/shared/ui/primitives/Text'
 export interface EditDealFormProps {
   deal: Deal
   pending: boolean

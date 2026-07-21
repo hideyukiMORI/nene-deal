@@ -3,8 +3,11 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import type { CreateUserInput, OperatorRole } from '@/entities/user'
 import { useTranslation } from '@/shared/i18n'
-import { Button, Input, Select, Stack, Text } from '@/shared/ui'
-
+import { Button } from '@/shared/ui/primitives/Button'
+import { Input } from '@/shared/ui/primitives/Input'
+import { Select } from '@/shared/ui/primitives/Select'
+import { Stack } from '@/shared/ui/primitives/Stack'
+import { Text } from '@/shared/ui/primitives/Text'
 interface CreateUserFormProps {
   pending: boolean
   errorMessage: string | null

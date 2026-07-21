@@ -1,5 +1,7 @@
 import { useTranslation } from '@/shared/i18n'
-import { Button, Select, useToast, type SelectOption } from '@/shared/ui'
+import { Button } from '@/shared/ui/primitives/Button'
+import { Select, type SelectOption } from '@/shared/ui/primitives/Select'
+import { useToast } from '@/shared/ui/toast/use-toast'
 import { IconShield } from '@/shared/ui/icons'
 import { MONTH_END, type SettingsPage } from '../model/use-settings-page'
 
