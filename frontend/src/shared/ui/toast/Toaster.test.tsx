@@ -29,9 +29,7 @@ describe('Toaster', () => {
 
     // Click the toast (aria-labelled by the dismiss label) → begins the leave
     // animation, then removes after the leave delay.
-    act(() => {
-      fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }))
-    })
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }))
     act(() => {
       vi.advanceTimersByTime(400)
     })
