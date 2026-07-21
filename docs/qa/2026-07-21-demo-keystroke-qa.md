@@ -74,7 +74,7 @@
 |---|---|
 | D-1 入力途中のリロード/戻る/進む | DEA-D1-01（create-deal/edit 入力中→reload/戻る＝データ喪失の警告有無） |
 | D-2 深いリンク直行 | DEA-D2-01（`/deals/:id` をブックマーク/直行・未知 URL→意匠付き 404） |
-| D-3 複数タブ同時操作 | DEA-D3-01（2タブで同一 deal を edit＝last-write-wins/楽観ロック＝vault 鏡）, DEA-D3-02（2タブで同一 deal を別 stage へ DnD＝optimistic 競合・server 整合）, DEA-D3-03（別タブで削除済みの deal を操作＝board #84 no-refetch-deleted 関連） |
+| D-3 複数タブ同時操作 | DEA-D3-01（2タブで同一 deal を edit＝last-write-wins/楽観ロック＝vault 鏡）, DEA-D3-02（2タブで同一 deal を別 stage へ DnD＝optimistic 競合・server 整合）, DEA-D3-03（別タブで削除済みの deal を操作＝board #84 no-refetch-deleted 関連）, DEA-D3-04（**高速連続 stage move の race**＝楽観ロックの連打破れ・hub 査読補強） |
 | D-4 遅い回線/読み込み中の連打 | DEA-D4-01（throttle 下で DnD/保存 連打＝optimistic 多重・loading 状態の壊れ） |
 
 ### E. 表示・国際化・テーマ
@@ -439,6 +439,15 @@
 - 分類: D-3 / 異常（board #84 関連）
 - 手順: 1. タブA で deal を削除 2. タブB（未更新）で同 deal を move/edit
 - 期待: 削除済みへの操作が 404/409 に落ち、UI が壊れない・削除済みを誤って再取得しない（#84 no-refetch-deleted-deal）
+- 結果:
+- 証拠:
+- 発見:
+
+### DEA-D3-04: 高速連続 stage move の race（楽観ロックの連打破れ・hub 査読補強）
+- 分類: D-3 / 異常（重点・vault mint 連打の教訓）
+- 前提: 1枚のカードと複数 stage
+- 手順: 1. 同一カードを A→B→C→… と**高速で連続 DnD**（前の move の POST が返る前に次を撃つ）2. 単一タブ内での連続 move ＋（可能なら）2タブから交互に高速 move
+- 期待: 各 move の optimistic 適用が破綻せず、最終 server 状態と UI が一致（stale 残留・二重適用・カード消失・列不整合が起きない）。楽観ロック（last-write-wins）が連続 move で最も破れやすいため、**race による不整合が出れば🔴で即再現確定**（単発 DEA-D3-02 との差分を記録）
 - 結果:
 - 証拠:
 - 発見:
