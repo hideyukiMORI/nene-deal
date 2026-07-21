@@ -24,7 +24,8 @@
     "check:fast": "npm run type-check && npm run lint && npm run format && npm run test",
     "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run knip && npm run build-storybook",
     "smoke": "node tools/smoke/visual-smoke.mjs",
-    "smoke:diff": "node tools/smoke/visual-diff.mjs"
+    "smoke:diff": "node tools/smoke/visual-diff.mjs",
+    "lint:styles": "stylelint 'src/**/*.css'"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
@@ -40,6 +41,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@hideyukimori/nene2-standards": "^2.0.1",
     "@storybook/addon-a11y": "^10.1.4",
     "@storybook/addon-docs": "^10.1.4",
     "@storybook/react-vite": "^10.1.4",
@@ -69,6 +71,7 @@
     "pngjs": "^7.0.0",
     "prettier": "^3.6.2",
     "storybook": "^10.1.4",
+    "stylelint": "^16.26.1",
     "tailwindcss": "^4.1.17",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
