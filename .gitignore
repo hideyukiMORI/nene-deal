@@ -23,3 +23,8 @@ design-handoff.zip
 *.zip
 *:Zone.Identifier
 *Zone.Identifier
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+test-results/
+playwright-report/
