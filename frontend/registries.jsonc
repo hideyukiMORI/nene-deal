@@ -25,8 +25,9 @@
       "repo": "nene-deal",
       "rule": "color-no-hex",
       "file": "src/app/design/styles.css",
-      "frozenCount": 2,
+      "frozenCount": 0,
       "initializedBy": "init --scan",
+      "shrunkBy": "C5 W3 #169: the only two hex literals were the `#000` stops of the .auth-brand .grid-deco mask gradients; rewritten as oklch(0% 0 0) (same computed color, same alpha). init --check verified live 2→0.",
     },
     {
       "kind": "lint-baseline",
@@ -34,8 +35,9 @@
       "repo": "nene-deal",
       "rule": "declaration-no-important",
       "file": "src/app/design/styles.css",
-      "frozenCount": 1,
+      "frozenCount": 0,
       "initializedBy": "init --scan",
+      "shrunkBy": "C5 W3 #169: the sole !important (.col.drop-ok { opacity }) had no cascade to win — the 0.6 drag dim is already scoped `:not(.drop-ok)`. Dropped the flag, kept the declaration. init --check verified live 1→0.",
     },
     {
       "kind": "lint-baseline",

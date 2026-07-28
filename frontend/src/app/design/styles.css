@@ -840,8 +840,8 @@
       linear-gradient(var(--line-soft) 1px, transparent 1px),
       linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
     background-size: 32px 32px;
-    -webkit-mask-image: radial-gradient(120% 90% at 80% 10%, #000 0%, transparent 70%);
-    mask-image: radial-gradient(120% 90% at 80% 10%, #000 0%, transparent 70%);
+    -webkit-mask-image: radial-gradient(120% 90% at 80% 10%, oklch(0% 0 0) 0%, transparent 70%);
+    mask-image: radial-gradient(120% 90% at 80% 10%, oklch(0% 0 0) 0%, transparent 70%);
   }
   .auth-brand > * {
     position: relative;
@@ -1115,8 +1115,11 @@
   :where(.board.is-dragging) .col-body {
     border-color: var(--line-strong);
   }
+  /* `:where(.board.is-dragging) .col:not(.drop-ok)` already excludes this element from the
+     0.6 dim, so nothing ever sets a non-1 opacity here — the `!important` had no cascade to
+     win. Kept as a plain declaration so the drop target stays explicitly full-opacity. */
   .col.drop-ok {
-    opacity: 1 !important;
+    opacity: 1;
   }
   :where(.col.drop-ok) .col-body {
     border-color: var(--accent);
