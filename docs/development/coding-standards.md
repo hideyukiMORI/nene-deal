@@ -18,6 +18,10 @@ NENE2 `docs/development/coding-standards.md` after `composer install`.
 ```bash
 composer check
 npm run check --prefix frontend
+npm run audit --prefix frontend
 ```
+
+Dependency advisories are gated by `audit-ci`; the policy and the current exceptions live in
+[`dependency-audit.md`](./dependency-audit.md).
 
 Last updated: 2026-05-30
