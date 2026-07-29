@@ -331,11 +331,13 @@ function BoardColumn({
     <section className="col" data-stage={column.stageSlug} aria-label={column.stageLabel}>
       <div className="flex flex-col gap-0.5">
         <div className="col-head">
-          <h2 className="col-name">
+          <h2 className="flex items-center gap-2 font-semibold whitespace-nowrap text-body">
             <span className="stage-dot" style={{ background: stageColor(column.stageSlug) }} />
             {column.stageLabel}
           </h2>
-          <span className="count">{column.dealCount}</span>
+          <span className="bg-surface-overlay border-border text-text-muted rounded-full border px-2 py-px font-mono text-caption">
+            {column.dealCount}
+          </span>
         </div>
         <span className="text-text-faint px-1 text-caption">{summaryLabel}</span>
       </div>

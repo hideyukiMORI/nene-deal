@@ -98,6 +98,7 @@ describe('KanbanBoardView', () => {
     expect(container.querySelector('.bg-accent')).not.toBeNull()
     // negative: every class drained in this wave is gone
     for (const drained of [
+      // wave 1
       'details-link',
       'prob',
       'prob-track',
@@ -107,6 +108,9 @@ describe('KanbanBoardView', () => {
       'col-header',
       'col-meta',
       'board-tools',
+      // wave 2
+      'col-name',
+      'count',
     ]) {
       expect(container.querySelector(`.${drained}`)).toBeNull()
     }

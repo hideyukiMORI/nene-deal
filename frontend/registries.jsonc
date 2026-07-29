@@ -11,8 +11,9 @@
       // Shrunk by C5 W3 #169. A family (.brand-logo/.auth-card/.fs-lang/.fs-wrap
       // + the [data-design='calm'] .auth-form/.auth-card overrides): 1128/27890
       // → 1011/24480. B family wave 1 (.details-link): → 1008/24437.
-      "maxLines": 1008,
-      "maxBytes": 24437,
+      // B family wave 2 (.col-name out of the shared nowrap rule): → 1007/24424.
+      "maxLines": 1007,
+      "maxBytes": 24424,
     },
     {
       "kind": "legacy-manifest",
@@ -28,9 +29,12 @@
       // at 1696 rather than raised to bless the overshoot. B family wave 1
       // brings it to 1656 — back UNDER the original cap — so the cap now moves
       // down to the measured value as a normal shrink. Note the ratchet is
-      // still not enforced upstream: this number is maintained by hand.
-      "maxLines": 1656,
-      "maxBytes": 37520,
+      // still not enforced upstream: this number is maintained by hand, in raw
+      // `wc -l` units — fleet #176②' will re-measure and normalise these to
+      // formattedLineCount, so do not hand-convert them here.
+      // B family wave 2 (.col-head .col-name / .count): 1656 → 1640 / 37160.
+      "maxLines": 1640,
+      "maxBytes": 37160,
     },
     {
       "kind": "lint-baseline",

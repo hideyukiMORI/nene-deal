@@ -709,26 +709,10 @@
     justify-content: space-between;
     padding: 4px 4px 2px;
   }
-  .col-head .col-name {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    font-size: 13.5px;
-  }
   .col-head .stage-dot {
     width: 8px;
     height: 8px;
     border-radius: 2px;
-  }
-  .col-head .count {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--fg-muted);
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-    border-radius: var(--r-pill);
-    padding: 1px 8px;
   }
   .deal {
     display: flex;
