@@ -59,24 +59,10 @@
   .details-link {
     cursor: pointer;
   }
-  .brand-logo {
-    width: 34px;
-    height: 34px;
-    flex: none;
-    display: block;
-  }
-  .brand-logo svg,
   :where(.m-brand) .logo svg {
     width: 100%;
     height: 100%;
     display: block;
-  }
-  .auth-card {
-    border: 1px solid var(--line);
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    padding: var(--s8);
   }
   .handoff-mark {
     width: 38px;
@@ -539,14 +525,6 @@
     transform: translateY(-2px);
     background: var(--surface-2);
   }
-  [data-design='calm'] .auth-form {
-    background: var(--bg);
-  }
-  [data-design='calm'] .auth-card {
-    background: var(--surface);
-    border: none;
-    box-shadow: none;
-  }
   [data-design='calm'] .kpi-chip {
     border: none;
     background: color-mix(in oklch, var(--surface) 65%, transparent);
@@ -779,12 +757,6 @@
       overflow-x: auto;
     }
   }
-  @media (max-width: 560px) {
-    .fs-lang {
-      top: 12px;
-      right: 12px;
-    }
-  }
 
   /* ============================================================
    プロトタイプ操作バー（デザイン/表示/言語）— アプリ外のメタUI
@@ -852,10 +824,6 @@
   :where(.proto-controls .seg) button.active {
     background: var(--accent);
     color: var(--on-accent);
-  }
-
-  .fs-wrap {
-    min-height: 100vh;
   }
 
   /* ---- アプリ内：言語トグル / ログアウト / 区切り ---- */
@@ -938,13 +906,6 @@
   }
   :where(.nav-item.nav-signout):hover {
     color: var(--fg);
-  }
-
-  .fs-lang {
-    position: fixed;
-    top: 18px;
-    right: 20px;
-    z-index: 40;
   }
 
   /* 表示モード切替（太陽/月）＋ ヘッダーコントロール群 */

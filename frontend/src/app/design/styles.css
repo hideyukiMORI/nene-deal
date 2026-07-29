@@ -862,17 +862,6 @@
     position: relative;
     z-index: 1;
   }
-  .auth-form {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--s12) var(--s8);
-    background: var(--surface);
-  }
-  .auth-form form {
-    width: 100%;
-    max-width: 360px;
-  }
   .kpi-chip {
     display: inline-flex;
     align-items: center;
