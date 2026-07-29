@@ -26,7 +26,11 @@ export function useKanbanDnd(
     const origin = event.target as HTMLElement
     const card = origin.closest<HTMLElement>('.deal[data-deal]')
     if (card === null) return
-    if (origin.closest('.details-link') !== null) return // let the details link click through
+    // `data-details-link` (not a class) marks the click-through target: C5 W3
+    // #169 drained `.details-link`, and a styling class is the wrong hook for a
+    // behavioural lookup anyway — it would break again the next time the card
+    // is restyled.
+    if (origin.closest('[data-details-link]') !== null) return
     const boardEl = boardRef.current
     if (boardEl === null) return
 

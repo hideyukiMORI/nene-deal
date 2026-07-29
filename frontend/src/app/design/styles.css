@@ -730,11 +730,6 @@
     border-radius: var(--r-pill);
     padding: 1px 8px;
   }
-  .col-meta {
-    font-size: 11.5px;
-    color: var(--fg-faint);
-    padding: 0 4px;
-  }
   .deal {
     display: flex;
     flex-direction: column;
@@ -765,33 +760,6 @@
     font-variant-numeric: tabular-nums;
     font-weight: 600;
     font-size: 14px;
-  }
-  .deal-foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--s2);
-    margin-top: 2px;
-  }
-  .prob {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--fg-muted);
-  }
-  .prob-track {
-    width: 38px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--line);
-    overflow: hidden;
-  }
-  .prob-fill {
-    height: 100%;
-    background: var(--accent);
-    border-radius: 2px;
   }
 
   /* ---------- リスト行 ---------- */
@@ -1030,11 +998,6 @@
   }
 
   /* ---------- Kanban column drop zones ---------- */
-  .col-header {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
   .col-body {
     position: relative;
     display: flex;
@@ -1312,24 +1275,6 @@
   }
 
   /* ---------- Owner on cards ---------- */
-  .deal-owner {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--fg-faint);
-    font-size: 11px;
-    min-width: 0;
-  }
-  .deal-owner svg {
-    width: 12px;
-    height: 12px;
-    flex: none;
-  }
-  .deal-owner {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 
   /* ---------- Soft-deleted cards ---------- */
   .deal-deleted {
@@ -1374,9 +1319,6 @@
   }
 
   /* ---------- Stage-filter chips (board) ---------- */
-  .board-tools {
-    align-items: center;
-  }
   .fchips {
     display: inline-flex;
     align-items: center;

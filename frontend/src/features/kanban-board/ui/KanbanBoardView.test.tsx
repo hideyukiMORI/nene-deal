@@ -80,4 +80,36 @@ describe('KanbanBoardView', () => {
     await user.click(screen.getByRole('button', { name: 'Details' }))
     expect(onOpenDeal).toHaveBeenCalledWith('01DEALACME000000000000000A')
   })
+
+  // C5 W3 #169 B family wave 1. The `data-details-link` half is not cosmetic:
+  // use-kanban-dnd does `closest('[data-details-link]')` to let a details click
+  // through instead of starting a drag. When that hook was the `.details-link`
+  // CLASS, draining the class would have silently re-armed drag-on-click — a
+  // runtime-only break no styling assertion would catch.
+  /* eslint-disable testing-library/no-container, testing-library/no-node-access */
+  it('keeps the DnD click-through hook and drops the drained legacy classes', () => {
+    const { container } = renderWithProviders(
+      <KanbanBoardView {...baseProps({ columns: [buildKanbanColumn()] })} />,
+    )
+
+    // positive: the behavioural hook the DnD lookup depends on
+    expect(container.querySelector('[data-details-link]')).not.toBeNull()
+    // positive: the replacement utilities are on the probability bar
+    expect(container.querySelector('.bg-accent')).not.toBeNull()
+    // negative: every class drained in this wave is gone
+    for (const drained of [
+      'details-link',
+      'prob',
+      'prob-track',
+      'prob-fill',
+      'deal-owner',
+      'deal-foot',
+      'col-header',
+      'col-meta',
+      'board-tools',
+    ]) {
+      expect(container.querySelector(`.${drained}`)).toBeNull()
+    }
+  })
+  /* eslint-enable testing-library/no-container, testing-library/no-node-access */
 })

@@ -60,9 +60,12 @@ function monthLabel(month: string, locale: string): string {
 
 function ProbBar({ value }: { value: number }) {
   return (
-    <span className="prob">
-      <span className="prob-track">
-        <span className="prob-fill" style={{ width: `${String(value)}%` }} />
+    <span className="text-text-muted inline-flex items-center gap-1.5 font-mono text-caption">
+      <span className="bg-border h-1 w-9 overflow-hidden rounded-full">
+        <span
+          className="bg-accent block h-full rounded-full"
+          style={{ width: `${String(value)}%` }}
+        />
       </span>
       {value}%
     </span>
@@ -133,7 +136,7 @@ export function KanbanBoardView({
               : t('app.subtitle')}
           </span>
         </div>
-        <div className="row g4 wrap board-tools">
+        <div className="row g4 wrap items-center">
           <div className="fchips">
             <span className="fchips-label">{t('board.show')}</span>
             <button
@@ -326,7 +329,7 @@ function BoardColumn({
 
   return (
     <section className="col" data-stage={column.stageSlug} aria-label={column.stageLabel}>
-      <div className="col-header">
+      <div className="flex flex-col gap-0.5">
         <div className="col-head">
           <h2 className="col-name">
             <span className="stage-dot" style={{ background: stageColor(column.stageSlug) }} />
@@ -334,7 +337,7 @@ function BoardColumn({
           </h2>
           <span className="count">{column.dealCount}</span>
         </div>
-        <span className="col-meta">{summaryLabel}</span>
+        <span className="text-text-faint px-1 text-caption">{summaryLabel}</span>
       </div>
 
       <div className="col-body">
@@ -374,17 +377,18 @@ function BoardColumn({
               </div>
               <span className="amt">{formatMoneyJpy(deal.amountCents, moneyLocale)}</span>
               {deal.ownerLabel !== null ? (
-                <span className="deal-owner faint t-tiny">
+                <span className="text-text-faint inline-flex min-w-0 items-center gap-1 overflow-hidden text-caption text-ellipsis whitespace-nowrap [&>svg]:size-3 [&>svg]:flex-none">
                   <IconAccount />
                   {deal.ownerLabel}
                 </span>
               ) : null}
-              <div className="deal-foot">
+              <div className="mt-0.5 flex items-center justify-between gap-2">
                 <ProbBar value={deal.probabilityPercent} />
                 {isDeleted ? (
                   <button
                     type="button"
-                    className="details-link row g1 faint t-tiny"
+                    className="row g1 faint t-tiny cursor-pointer"
+                    data-details-link
                     style={{
                       border: 'none',
                       background: 'none',
@@ -401,7 +405,8 @@ function BoardColumn({
                 ) : (
                   <button
                     type="button"
-                    className="details-link row g1 faint t-tiny"
+                    className="row g1 faint t-tiny cursor-pointer"
+                    data-details-link
                     style={{
                       border: 'none',
                       background: 'none',
