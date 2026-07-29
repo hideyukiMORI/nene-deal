@@ -45,8 +45,9 @@
       "repo": "nene-deal",
       "rule": "nene2/data-theme-selector-location",
       "file": "src/app/design/designs.css",
-      "frozenCount": 6,
+      "frozenCount": 4,
       "initializedBy": "init --scan",
+      "shrunkBy": "C5 W3 #169: removed the unreachable [data-design='enterprise'|'console'] blocks (24 rules / 102 lines). Two of them were [data-design='enterprise'][data-theme='dark'|'light'] pairs, so the data-theme tail dropped with them. data-design is written only by index.html and shared/theme/index.ts, both hard-coded to 'calm', and there is no switcher — so none of the removed rules could ever match. init --check verified live 6→4.",
     },
     {
       "kind": "lint-baseline",

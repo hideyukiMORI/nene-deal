@@ -1,32 +1,22 @@
 @layer legacy {
   /* ============================================================
    NeNe Deal — デザイン・スキン
-   data-design = console | calm | enterprise  （<html> に付与）
-   各デザインで 書体 / 角丸 / 余白 / 罫線 / アクセント / ナビ構造 を変える。
+   data-design = calm のみ（<html> に付与・index.html と shared/theme が
+   固定値 'calm' を書く。切替 UI は存在しない）。
+   かつて console / enterprise のプロトタイプ・スキンがあったが、到達不能な
+   dead CSS になっていたため C5 W3 (#169) で削除した。新しいスキンを足す場合は
+   data-design を実際に切り替える手段とセットで入れること（さもないと同じ
+   dead CSS を作る）。
    data-theme (light|dark) と直交。
    ============================================================ */
 
   /* ---------- デザイン・トークン ---------- */
-  [data-design='console'] {
-    --font: 'IBM Plex Sans', 'IBM Plex Sans JP', system-ui, sans-serif;
-    --mono: 'IBM Plex Mono', ui-monospace, monospace;
-    --radius: 6px;
-    --radius-sm: 4px;
-    --radius-lg: 10px;
-  }
   [data-design='calm'] {
     --font: 'Hanken Grotesk', 'Zen Kaku Gothic New', system-ui, sans-serif;
     --mono: 'IBM Plex Mono', ui-monospace, monospace;
     --radius: 13px;
     --radius-sm: 9px;
     --radius-lg: 18px;
-  }
-  [data-design='enterprise'] {
-    --font: 'Archivo', 'BIZ UDPGothic', system-ui, sans-serif;
-    --mono: 'IBM Plex Mono', ui-monospace, monospace;
-    --radius: 3px;
-    --radius-sm: 2px;
-    --radius-lg: 4px;
   }
 
   /* アクセント（デザイン × モード） */
@@ -53,16 +43,6 @@
   [data-design='calm'][data-theme='dark'] {
     --surface: oklch(23% 0.018 245);
     --surface-2: oklch(26.5% 0.018 245);
-  }
-  [data-design='enterprise'][data-theme='dark'] {
-    --accent: oklch(74% 0.11 210);
-    --accent-hover: oklch(80% 0.11 210);
-    --on-accent: oklch(20% 0.04 230);
-  }
-  [data-design='enterprise'][data-theme='light'] {
-    --accent: oklch(47% 0.12 235);
-    --accent-hover: oklch(41% 0.12 235);
-    --on-accent: oklch(99% 0 0);
   }
 
   /* ============================================================
@@ -694,88 +674,10 @@
   }
 
   /* enterprise: 高密度・角ばり・強罫線・モノ微ラベル */
-  [data-design='enterprise'] {
-    font-size: 13.5px;
-  }
-  [data-design='enterprise'] .t-h1 {
-    font-size: 19px;
-    letter-spacing: -0.01em;
-  }
-  [data-design='enterprise'] .card {
-    border-color: var(--line-strong);
-    box-shadow: none;
-  }
-  [data-design='enterprise'] .card-pad {
-    padding: var(--s5);
-  }
-  :where([data-design='enterprise']) .field > label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--fg-muted);
-  }
   [data-design='enterprise'] .input,
-  [data-design='enterprise'] .select {
-    padding: 7px 10px;
-  }
-  [data-design='enterprise'] .forecast {
-    gap: 0;
-    border-color: var(--line-strong);
-  }
-  :where([data-design='enterprise']) .forecast .stat {
-    border-right: 1px solid var(--line-strong);
-    padding: var(--s3) var(--s4);
-  }
-  :where([data-design='enterprise'] .forecast) .stat:last-child {
-    border-right: none;
-  }
-  :where([data-design='enterprise'] .forecast) .stat .label {
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 10px;
-    font-weight: 700;
-  }
-  :where([data-design='enterprise'] .forecast) .stat .val {
-    font-size: 19px;
-  }
-  [data-design='enterprise'] .col {
-    border-color: var(--line-strong);
-    padding: var(--s2);
-    gap: var(--s2);
-    background: var(--surface);
-  }
-  [data-design='enterprise'] .col-head {
-    padding: 6px 6px 4px;
-    border-bottom: 1px solid var(--line);
-  }
-  [data-design='enterprise'] .deal {
-    border-left-width: 3px;
-    padding: var(--s2) var(--s3);
-    box-shadow: none;
-  }
-  [data-design='enterprise'] .list-row {
-    padding: 9px var(--s4);
-  }
-  [data-design='enterprise'] .rows > * {
-    border-color: var(--line);
-  }
-  :where([data-design='enterprise']) .panel-title::before {
-    height: 14px;
-  }
-  [data-design='enterprise'] .btn {
-    font-weight: 700;
-    letter-spacing: 0.01em;
-  }
-  [data-design='enterprise'] .col-meta {
-    font-family: var(--mono);
-  }
 
   /* enterprise の予測バーが2列になる時の境界調整 */
   @media (max-width: 900px) {
-    :where([data-design='enterprise'] .forecast) .stat:nth-child(2) {
-      border-right: none;
-    }
   }
 
   /* ============================================================
