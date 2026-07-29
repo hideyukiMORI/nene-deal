@@ -208,8 +208,8 @@ export function UserManagementView({
             }}
           />
           <div className="m-sheet" role="dialog" aria-label={t('users.detail.title')}>
-            <div className="m-sheet-grab" />
-            <div className="m-sheet-head">
+            <div className="bg-border-strong mx-auto mt-1 mb-1.5 h-1 w-10 rounded-full" />
+            <div className="flex items-center justify-between">
               <span className="t-h2">{t('users.detail.title')}</span>
               <button
                 type="button"

@@ -106,10 +106,6 @@
   .shell-calm .brandmark {
     padding: 0;
   }
-  .shell-calm .topnav-links {
-    display: flex;
-    gap: 2px;
-  }
   .shell-calm .topnav-link {
     border: none;
     background: none;
@@ -157,11 +153,6 @@
   }
   .shell-calm .content-narrow {
     max-width: 760px;
-  }
-  .shell-calm .topnav-right {
-    display: flex;
-    align-items: center;
-    gap: var(--s3);
   }
   .shell-calm .topnav {
     gap: var(--s4);
@@ -215,16 +206,6 @@
   }
   .m-back:hover {
     background: var(--surface-2);
-  }
-  .m-acct {
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    padding: 0;
   }
 
   .m-tabs {
@@ -305,6 +286,9 @@
     inset: 0;
     z-index: 50;
   }
+  /* park（C5 W3 #169 D wave2b）: animation を伴うので utility 化できない。
+     Tailwind の animate-[…] は arbitrary value 禁止（会議R1⑤）に触れ、
+     @theme に --animate-* を足すには @keyframes 側の移設も要る。 */
   .m-sheet-scrim {
     position: absolute;
     inset: 0;
@@ -333,40 +317,10 @@
     flex-direction: column;
     gap: var(--s4);
   }
-  .m-sheet-grab {
-    width: 40px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--line-strong);
-    margin: 4px auto 6px;
-  }
-  .m-sheet-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .m-account {
-    display: flex;
-    align-items: center;
-    gap: var(--s3);
-    padding-bottom: var(--s4);
-    border-bottom: 1px solid var(--line);
-  }
-  .m-sheet-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--s3);
-  }
   .m-sheet .signout-btn {
     width: 100%;
     justify-content: center;
     padding: 12px;
-  }
-  .mm-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--fg-muted);
   }
 
   /* リスト行：左テキストは省略、右コントロールははみ出さない */
@@ -790,10 +744,6 @@
     background: var(--line);
     margin: 5px 0;
   }
-  .account-chip {
-    display: inline-flex;
-    align-items: center;
-  }
   .nav-item.nav-signout {
     color: var(--fg-faint);
   }
@@ -802,11 +752,6 @@
   }
 
   /* 表示モード切替（太陽/月）＋ ヘッダーコントロール群 */
-  .hdr-controls {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
   .mode-toggle {
     display: inline-flex;
     align-items: center;

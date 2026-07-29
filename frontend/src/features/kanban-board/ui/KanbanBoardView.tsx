@@ -367,7 +367,7 @@ function BoardColumn({
                 </span>
               )}
               <div className="row between g2">
-                <span className="acct">{deal.accountLabel}</span>
+                <span className="font-semibold text-body">{deal.accountLabel}</span>
                 {isDeleted ? (
                   <span className="badge badge-muted">{deletedBadgeLabel}</span>
                 ) : isWon ? (

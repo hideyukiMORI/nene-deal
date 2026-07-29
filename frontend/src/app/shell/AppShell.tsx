@@ -106,7 +106,7 @@ export function AppShell() {
   }
 
   const accountBlock = (
-    <div className="m-account">
+    <div className="border-border flex items-center gap-3 border-b pb-4">
       <span className="avatar" style={{ width: 40, height: 40 }}>
         {avatarLetter}
       </span>
@@ -129,7 +129,7 @@ export function AppShell() {
         <div className="row g3">
           <Brand />
         </div>
-        <nav className="topnav-links">
+        <nav className="flex gap-0.5">
           {navItems.map((n) => (
             <button
               key={n.key}
@@ -143,8 +143,8 @@ export function AppShell() {
             </button>
           ))}
         </nav>
-        <div className="topnav-right">
-          <span className="hdr-controls">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex items-center gap-2">
             <ThemeToggle
               theme={theme}
               onThemeChange={setTheme}
@@ -162,7 +162,7 @@ export function AppShell() {
             />
           </span>
           <span className="nav-divider" />
-          <span className="account-chip">
+          <span className="inline-flex items-center">
             <span className="avatar">{avatarLetter}</span>
           </span>
           <SignoutButton />
@@ -192,7 +192,7 @@ export function AppShell() {
         )}
         <button
           type="button"
-          className="m-acct"
+          className="grid size-10 cursor-pointer place-items-center border-none bg-none p-0"
           aria-label={t('shell.account')}
           onClick={() => {
             setSheetOpen(true)
@@ -253,8 +253,8 @@ export function AppShell() {
           }}
         />
         <div className="m-sheet" role="dialog" aria-label={t('shell.settingsTitle')}>
-          <div className="m-sheet-grab" />
-          <div className="m-sheet-head">
+          <div className="bg-border-strong mx-auto mt-1 mb-1.5 h-1 w-10 rounded-full" />
+          <div className="flex items-center justify-between">
             <span className="t-h2">{t('shell.settingsTitle')}</span>
             <button
               type="button"
@@ -281,8 +281,8 @@ export function AppShell() {
               <IconChevron />
             </button>
           ) : null}
-          <div className="m-sheet-row">
-            <span className="mm-label">{t('shell.theme')}</span>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-text-muted text-body font-semibold">{t('shell.theme')}</span>
             <ThemeToggle
               theme={theme}
               onThemeChange={setTheme}
@@ -291,8 +291,8 @@ export function AppShell() {
               darkLabel={t('shell.themeDark')}
             />
           </div>
-          <div className="m-sheet-row">
-            <span className="mm-label">{t('shell.lang')}</span>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-text-muted text-body font-semibold">{t('shell.lang')}</span>
             <LangToggle
               items={localeItems}
               activeId={locale}
