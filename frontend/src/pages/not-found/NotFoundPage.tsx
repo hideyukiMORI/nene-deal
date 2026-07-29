@@ -5,7 +5,7 @@ export function NotFoundPage() {
   const { t } = useTranslation()
 
   return (
-    <div className="fs-wrap">
+    <div className="min-h-screen">
       <section className="notfound stack g4" style={{ alignContent: 'center' }}>
         <span className="code">404</span>
         <h1 className="t-h1">{t('common.error.notFound')}</h1>

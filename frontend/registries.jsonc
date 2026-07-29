@@ -8,14 +8,25 @@
       "id": "nene-deal-legacy-src-app-design-designs-css",
       "repo": "nene-deal",
       "path": "src/app/design/designs.css",
-      "maxLines": 1128,
-      "maxBytes": 27890,
+      // Shrunk by C5 W3 #169 (A family drain: .brand-logo/.auth-card/.fs-lang/
+      // .fs-wrap + the [data-design='calm'] .auth-form/.auth-card overrides).
+      // 1128/27890 → 1011/24480.
+      "maxLines": 1011,
+      "maxBytes": 24480,
     },
     {
       "kind": "legacy-manifest",
       "id": "nene-deal-legacy-src-app-design-styles-css",
       "repo": "nene-deal",
       "path": "src/app/design/styles.css",
+      // 🔴 DELIBERATELY NOT RAISED. The file is 1714 lines / 38578 bytes as of
+      // C5 W3 #169 (A family) — i.e. 18 lines OVER this cap, and it was 1725
+      // before this PR shrank it. It went over in an earlier PR and nothing
+      // caught it: `nene2-check init --check` does NOT enforce legacy-manifest
+      // maxLines/maxBytes at all. Verified by positive control — padding this
+      // file to 1914 lines (218 over) still exits green. Raising the cap to
+      // match reality would bless the overshoot; the cap stays until the fleet
+      // checker actually enforces it (reported to fleet-tooling 2026-07-29).
       "maxLines": 1696,
       "maxBytes": 38766,
     },

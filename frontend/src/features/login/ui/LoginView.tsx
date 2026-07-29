@@ -47,8 +47,8 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
   })
 
   return (
-    <div className="fs-wrap">
-      <div className="fs-lang">
+    <div className="min-h-screen">
+      <div className="fixed top-5 right-5 z-40 max-sm:top-3 max-sm:right-3">
         <span className="hdr-controls">
           <ThemeToggle
             theme={theme}
@@ -72,8 +72,8 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
         <aside className="auth-brand">
           <div className="grid-deco" />
           <div className="row g3">
-            <span className="brand-logo">
-              <IconLogo />
+            <span className="block size-8 flex-none">
+              <IconLogo className="block size-full" />
             </span>
             <span className="semi" style={{ fontSize: 16 }}>
               NeNe&nbsp;Deal
@@ -98,13 +98,13 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
           <span className="faint t-tiny">© 2026 NeNe Deal</span>
         </aside>
 
-        <div className="auth-form">
+        <div className="bg-surface flex items-center justify-center px-8 py-12">
           <form
             noValidate
             onSubmit={(event) => {
               void submit(event)
             }}
-            className="auth-card stack g6"
+            className="bg-surface-raised rounded-lg stack g6 w-full max-w-sm p-8"
           >
             <div className="stack g2">
               <h1 className="t-h1">{t('login.title')}</h1>

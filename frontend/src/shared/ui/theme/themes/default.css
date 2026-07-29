@@ -121,9 +121,26 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
 
-  /* ── radius ───────────────────────────────────────────────── */
-  --radius-sm: 0.25rem;
+  /* ── radius ───────────────────────────────────────────────────
+     🔴 These names COLLIDE with the legacy `[data-design='calm']` block
+     (`app/design/designs.css:14-20`), which also defines --radius-sm/--radius-lg
+     inside @layer legacy at :root level. A plain custom-property declaration on
+     a matching element wins over @theme regardless of layer, so TODAY the
+     legacy values are what render — and the values below are only reached for
+     keys legacy does not define. Measured (C5 W3 #169, A family):
+
+       rounded-sm  → 9px   (legacy calm wins; the old 0.25rem here was dead)
+       rounded-md  → 8px   (@theme wins; legacy defines --radius, not --radius-md)
+       rounded-lg  → 18px  (legacy calm wins)
+
+     So --radius-sm/lg are set to the calm effective values, per this file's
+     rule of lifting what the app ACTUALLY renders. Without that, deleting the
+     legacy block (the C5 theme-migration lane) silently reshapes every card.
+     --radius-md is left at 0.5rem because it is already the live value.
+     ── */
+  --radius-sm: 0.5625rem;
   --radius-md: 0.5rem;
+  --radius-lg: 1.125rem;
   --radius-full: 9999px;
 
   /* ── border width ─────────────────────────────────────────── */
