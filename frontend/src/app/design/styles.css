@@ -66,7 +66,13 @@
     --danger: oklch(54% 0.18 25);
     --danger-weak: color-mix(in oklch, var(--danger) 9%, var(--surface));
     --info: oklch(52% 0.12 235);
-    --focus: color-mix(in srgb, var(--accent) 35%, transparent);
+    /* Solid, not a 35%-alpha mix of the accent: the transparent form measured
+       1.38:1 against --bg and 1.39:1 against --surface, well under the 3:1 WCAG
+       AA minimum for focus indicators, and this ring is really rendered
+       (.btn:focus-visible and .input/.select/textarea:focus below). Keyboard
+       users could barely see where focus was. Dark mode uses a 55% mix of a
+       much lighter accent and already clears 3:1, so it is left alone. #182 */
+    --focus: oklch(52% 0.1 188);
     --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.06);
     --shadow-md: 0 10px 28px -10px oklch(0% 0 0 / 0.12);
     --shadow-pop: 0 20px 50px -14px oklch(0% 0 0 / 0.18);
@@ -254,7 +260,14 @@
   }
   .btn:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px var(--focus);
+    /* Two rings, not one: the inner ring is the page surface, so the indicator
+       stays visible on BOTH a light background and a filled .btn-primary (whose
+       background is --accent — a single accent-coloured ring merges into it and
+       disappears). WCAG 2.2 SC 1.4.11 measures the indicator against adjacent
+       colours, which includes the component itself. #182 */
+    box-shadow:
+      0 0 0 2px var(--surface),
+      0 0 0 4px var(--focus);
   }
   .btn-sm {
     padding: 6px 11px;
@@ -361,7 +374,9 @@
   :where(textarea.input):focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--focus);
+    box-shadow:
+      0 0 0 2px var(--surface),
+      0 0 0 4px var(--focus);
   }
   .input::placeholder {
     color: var(--fg-faint);

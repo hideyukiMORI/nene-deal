@@ -30,6 +30,7 @@
     "check": "npm run type-check && npm run lint && npm run lint:styles && npm run check:registries && npm run format && npm run coverage:check && npm run knip && npm run build && npm run build-storybook",
     "smoke": "node tools/smoke/visual-smoke.mjs",
     "smoke:diff": "node tools/smoke/visual-diff.mjs",
+    "smoke:focus": "node tools/smoke/focus-shot.mjs",
     "lint:styles": "stylelint 'src/**/*.css'",
     "tokens:validate": "nene2-tokens validate src/shared/ui/theme/themes/default.css",
     "check:registries": "nene2-check init --check --repo nene-deal"
