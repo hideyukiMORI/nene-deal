@@ -647,9 +647,74 @@ audit CSV の実カラムは `timestamp,actor,action,deal_id,field,before,after`
 
 本 batch は**データ投入を API 直叩き**（座席から捕捉した bearer で `POST /api/v1/deals`・`/api/v1/stages`・`/stage-change`）、**検証を実 UI の DOM 実測**で行いました。理由は 7トリガ×複数 venue を UI 手入力で回すと座席 mint とレート制限に触れるため。**表示側（＝本 batch の判定対象）は実ブラウザの実 DOM で見ています**。ただし上記のとおり **入力フォーム経由の挙動（WAF 403 時のトースト文言）は未確認**なので、batch 2 残余で実 UI 打鍵を行います。
 
+### batch 2b 追補（2a の残 venue 到達＋2a 記述の訂正・2026-07-29 夜）
+
+**実行条件**: 2026-07-29 23時台・Deal リナ（別セッション・2a との重複着手を後から検知＝末尾「重複の経緯」）・Chromium(Playwright 1.61.1)。**B-4 は本番ではなくローカル**（`docker compose` app:8110 ＋ Vite:5187・`tools/seed-demo.php` seed 済み）で実施。理由は下記 🔴 の方法論。B-8 は本番デモ org（`https://deal.ayane.co.jp/demo/standard`）で実施。
+
+| ID | 結果 | 観察 |
+|---|---|---|
+| DEA-B8-01 | ✅（**陽性対照つき**） | 8トリガ（`=1+1` / `=HYPERLINK(...)` / `+1+1` / `-1+1` / `@SUM(1+1)` / TAB / CR / `=cmd\|'/c calc'!A1`）を **deal の `account_label`・`note`** に仕込み `PATCH` → audit CSV の当該 32 セル**すべてに先頭 `'` prefix**。**陽性対照**: 先頭が安全な文字の CONTROL 値（`CONTROL safe 1+1`）には **prefix が付かない**（0件）＝無条件付与ではなく**先頭一致で選択的に効く本物の中和**であることを確認。CSV は **UTF-8 BOM 付き**（`ef bb bf`）＝Excel 文字化け対策も同時に確認（A3-02 の一部を前倒し実測） |
+| DEA-B4-01 | ✅（**detail 4画面に到達**・2a の未到達を解消） | payload 4種（`<script>alert(1)</script>` / `x"><img src=x onerror=alert(1)>` / `javascript:alert(3)` ＋ `<svg onload=alert(4)>` note / 多バイト）を投入し、**board ＋ deal detail 4画面**を実 DOM 実測。全画面で `#root script`=0・`img[onerror]`=0・`svg[onload]`=0・`a[href^=javascript:]`=0・**dialog 発火 0**・pageerror 0。`#root` の innerHTML 側で **`&lt;script&gt;` にエスケープ**されていることを直接確認 |
+| DEA-B4-02 | ✅ | 絵文字 😀・RTL アラビア語・全角が board / detail で**文字化けせず保持**・レイアウト破綻なし |
+
+**静的裏取り**: frontend 全域に `dangerouslySetInnerHTML` / `.innerHTML` / `outerHTML` / `eval(` / `new Function(` / `document.write` が **1件も無い**（`grep -rE` 実測）。エスケープは React 既定のみに依存＝sink が存在しない構造。
+
+#### 🔴 2a 記述の訂正 — `account_label`/`note` は **CSV に出力される**（update 経路）
+
+2a は「deal 作成行は field/before/after が空＝`account_label`・`note` は **CSV に一切出力されない**／ユーザ入力が CSV セルへ届くのは stage 名と actor email の2経路」と記録していますが、**これは `created` 行だけを見た結論で、誤りです**。
+
+deal を **`PATCH /deals/{id}` で更新**すると、変更フィールドが1行1フィールドで CSV に出ます（実測・本番デモ org）:
+
+```
+"2026-07-29 14:17:53",demo-admin@…,updated,01KYQ3S9KY…,account_label,"'=1+1 B8-01 equals","'=1+1 UPDATED"
+"2026-07-29 14:17:53",demo-admin@…,updated,01KYQ3S9KY…,note,"'=1+1 NOTE","'=1+1 NOTEUPD"
+```
+
+したがって **インジェクション面は 2a の想定より広く**、`before`/`after` には **stage 名だけでなく `account_label`・`note` など更新対象フィールドの値**が届きます。**中和は全経路で効いているので結論（✅・営業リスク無し）は変わりません**が、「真のインジェクション面は stage 名」という記述を残すと、将来 `CsvWriter` の `sanitizeFormulas` を触ったときに影響範囲を過小評価します。§2 の DEA-B8-01 手順文は「**値を保存**」ではなく「**値を保存し、さらに `PATCH` で更新する**」に差し替えが要ります（`created` 行には載らないため）。
+
+> 一般則: **「作成行に出ない」は「その項目は出ない」ではない**。監査ログは通常 create と update で記録形が違うので、両方の経路を踏んでから出力面を確定すること。
+
+#### 🔴 方法論 — **B-4 は公開デモでは検証できない**（WAF が陽性対照を潰す）
+
+2a は「WAF を通過する markup（`<b>`・`<img src=x>`）で React 既定エスケープを実測したので、`onerror` 系も同様と**判断できます（推論）**」としていますが、**推論を実測に格上げできます**。端 WAF が無いローカルで打鍵すればよい。
+
+本追補では **ローカル（WAF 無し）** で `<script>`・`onerror`・`svg onload` を**実際に app へ到達させ**、実 DOM で無害化を確認しました（上表）。公開デモでの再実測は不要です。
+
+| 環境 | `<script>alert(1)</script>` の到達 | B-4 の判定価値 |
+|---|---|---|
+| 公開デモ（本番） | **403・app 未到達**（端 WAF） | ❌ 「XSS が出ない」を見ても**アプリの防御の証明にならない**＝偽の合格 |
+| ローカル compose | **201・app 到達** | ✅ アプリ層の防御を直接判定できる |
+
+**§0 のスコープ規定「対象は公開デモ環境のみ」は B-4 系と衝突します。** インジェクション系は「payload が app に届いていること」が判定の前提なので、**WAF 無し環境で実施**と明記すべきです（本追補で実施済み）。WAF 403 のフォーム UX 文言（2a の 🟠 残件）だけは本番固有なので公開デモ側に残ります。
+
+なお **WAF の挙動は 2a と一致**を再確認: `<script>` / `onerror` / `"><img` は 403（非 JSON の日本語 HTML）、**正当な `株式会社テスト <大阪支店> & "quote"` は 201 で通過**（board 123 行・Issue #177 の実測と一致）。
+
+#### 🟠 audit 画面は B-4 の venue として **該当なし**（未到達ではない）
+
+2a は「audit 画面は未到達」と残していますが、実測の結果 **`/audit` は CSV エクスポート専用画面**で、監査行の**一覧表示そのものが存在しません**（画面要素は日付範囲ピッカー・記録対象の説明・CSV カラム説明・Download ボタンのみ）。したがって B-4 の表示 venue としては **該当なし**が正しく、CSV 側は DEA-B8-01 で検証済みです。§1 の B-4 venue 列挙（「audit CSV/画面」）は「audit **CSV**」のみに訂正が要ります。
+
+同様に **activity timeline は deal detail 内**にあり、detail 4画面の実測に含まれています（別 venue ではない）。
+
+#### 判定手法（2a の教訓を継承し、さらに1段追加）
+
+2a の4前提（クライアント遷移のみ／staleTime 待ち／2段判定／CSV セル完全一致）はすべて踏襲。本追補で**ハードナビによる偽 ✅ を実際に再現**しました（`page.goto('/')` 後 marker 0件・dialog 0 で一見 PASS）。2a の警告どおりだったので、**プローブ側に「陽性対照を満たさなければ PASS を出さない」ガードを組み込み**ました:
+
+1. **検査器の陽性対照** — `window.alert()` を意図的に起こし、dialog ハンドラが捕まえることを確認してから本測定に入る（捕まえられなければ `exit 2` で中断）。
+2. **到達の陽性対照** — payload マーカーが実際に描画されていること（`reached`）を PASS の**必要条件**にする。マーカー0件なら `CHECK` に落ちて ✅ にならない。
+3. **中和の陽性対照**（B-8） — 中和されるべきでない CONTROL 値に prefix が**付かない**ことを確認。全セルに無条件付与なら中和の証明にならないため。
+
+> 一般則（フリート共有済み・`_work/advice.md`）: **「無いこと」の検証には陽性対照が要る。** 検査器が生きていること・対象が検査範囲に入っていることを先に示さなければ、`0 件` は「安全」ではなく「測れていない」と読むべき。
+
+#### 重複の経緯（プロセスの記録）
+
+本追補は 2a（同日 20:01・コミット `dd8c932`）と**同じ2シナリオを重複実行**しました。原因は着手前の確認漏れです: `board.txt` 112 行が「**07-22 以降 未着手7日**」のままで、PR #168 の `updatedAt`（同日 11:01Z＝20:01 JST）を取得していたのに突き合わせませんでした。**board の記述より PR/ブランチの最終更新が新しい場合、後者が正**。着手前に対象ブランチの `git log -1` を見ていれば防げました。
+
+重複の結果として 2a の空白（detail venue）と誤り（CSV 出力経路）が埋まったため成果は無駄ではありませんが、**同じ時間で C5 drain を進められた**ことも事実です。以後、batch 着手前に ①対象ブランチの最新コミット ②PR の updatedAt を確認します。
+
 ### 実行メモ（🔴/⚠️ の再現手順・batch 2 以降）
 
 - **batch 2 予定（要慎重・一部手動）**: A-1 CRUD 書込（disposable org 内）／**A-3 invoice-handoff 実挙動＝LP 連携裏取り**（invoice リナ実測「Deal 引き継ぎ未実装」と一致するか）／**B-8 audit CSV injection**（`=HYPERLINK` 実注入→NENE2 `Nene2\Export\CsvWriter` 中和裏取り）／**A3-03 lost 導線**／**A1-05 非空 stage 削除**／**A3-02 CSV 日本語 BOM**／B-1/B-2/B-3 入力検証／**B-4 XSS 表示エスケープ**／**DEA-D3-01〜04 楽観ロック/連打 race**（要2タブ・operator ユーザ作成）／**E-4 TZ off-by-one**（timezoneId で UTC/JST 両撮り＝hub 手法）／E-2 レスポンシブ／E-5 金額書式。
 - A-5 nav 到達性・E-3-01 lang 切替は batch 2 でクライアント側クリック法にて再測（batch1 の⚠️2件はハードナビ／弱アサーションの手法起因で、機能不具合の疑いではない）。
 - **batch 2a（07-29）で消化済**: B-8 ✅ / B-4 ✅（board・stage 名）。**残**: B-4 の detail・timeline・audit 画面の venue（今回 UI 導線を特定できず未到達）、および **WAF 403 時のフォーム UX 文言**（新規・上記 🟠）。
+- **batch 2b（07-29 夜・追補）で消化済**: B-4 の **detail 4画面 ✅**（timeline は detail 内・audit 画面は**該当なし**と確定）／B-8 を **`account_label`・`note` の update 経路でも ✅**（陽性対照つき）／B-4 を **ローカル（WAF 無し）で実測に格上げ**（2a の「推論」を解消）。**残**: **WAF 403 時のフォーム UX 文言のみ**（本番固有・実 UI 打鍵・Issue #177 と同件）。
 - **batch 2 の実行時に必ず効かせる前提**（2a で判明）: ①クライアント遷移のみ（ハードナビ＝トークン喪失） ②書込後の再取得は **staleTime 30 秒**待ち ③判定は「描画されている」→「解釈されていない」の2段 ④CSV 判定はパースしてセル完全一致。
