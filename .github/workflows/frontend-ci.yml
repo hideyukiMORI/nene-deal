@@ -5,8 +5,13 @@ on:
     branches:
       - main
   pull_request:
+    # `w3/**` は C5 W3 の drain wave 用。wave は前段の上に積む stacked PR に
+    # なるため base が main にならず、branches が main だけだと CI が一切
+    # 走らない（PR #187/#188 が "no checks reported" だった）。base 側の
+    # ブランチ名で拾うことで、stacked でもゲートが効く。
     branches:
       - main
+      - 'w3/**'
 
 jobs:
   frontend-check:
