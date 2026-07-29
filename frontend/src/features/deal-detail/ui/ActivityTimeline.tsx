@@ -71,9 +71,9 @@ export function ActivityTimeline({ activity, stages, locale }: ActivityTimelineP
     if (entry.action === 'stage_changed') {
       return (
         <span className="tl-change mono">
-          <span className="from">{stageLabel(entry.fromStageId)}</span>
+          <span className="text-text-faint line-through">{stageLabel(entry.fromStageId)}</span>
           <IconArrowRight />
-          <span className="to">{stageLabel(entry.toStageId)}</span>
+          <span className="text-text-primary">{stageLabel(entry.toStageId)}</span>
         </span>
       )
     }
@@ -83,9 +83,9 @@ export function ActivityTimeline({ activity, stages, locale }: ActivityTimelineP
       return (
         <span key={c.field} className="tl-change mono">
           {fieldLabel ? `${t(fieldLabel)} ` : `${c.field} `}
-          <span className="from">{fmtValue(c.field, c.from, locale)}</span>
+          <span className="text-text-faint line-through">{fmtValue(c.field, c.from, locale)}</span>
           <IconArrowRight />
-          <span className="to">{fmtValue(c.field, c.to, locale)}</span>
+          <span className="text-text-primary">{fmtValue(c.field, c.to, locale)}</span>
         </span>
       )
     })
@@ -101,10 +101,10 @@ export function ActivityTimeline({ activity, stages, locale }: ActivityTimelineP
             <Icon />
           </span>
         </span>
-        <div className="tl-body">
-          <span className="tl-title">{t(meta.label)}</span>
+        <div className="flex min-w-0 flex-col gap-1 pt-1">
+          <span className="font-semibold text-body">{t(meta.label)}</span>
           {changeNode(entry)}
-          <span className="tl-meta">
+          <span className="text-text-faint font-mono text-caption">
             {(entry.actorLabel ?? t('detail.owner.empty')) +
               ' · ' +
               fmtTime(entry.createdAt, locale)}
@@ -139,7 +139,7 @@ export function ActivityTimeline({ activity, stages, locale }: ActivityTimelineP
         {t('detail.activity.sub')}
       </span>
 
-      <ul className="timeline">
+      <ul className="m-0 flex list-none flex-col p-0 pt-0.5">
         {collapsed ? (
           <>
             {activity.slice(0, HEAD).map(item)}
@@ -156,7 +156,7 @@ export function ActivityTimeline({ activity, stages, locale }: ActivityTimelineP
                   <IconMore />
                 </button>
               </span>
-              <div className="tl-body">
+              <div className="flex min-w-0 flex-col gap-1 pt-1">
                 <button
                   type="button"
                   className="tl-gapbtn"

@@ -1272,28 +1272,6 @@
   }
 
   /* ---------- Activity timeline ---------- */
-  .activity {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s3);
-  }
-  .activity-item {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-  }
-  .activity-dot {
-    flex: none;
-    width: 8px;
-    height: 8px;
-    margin-top: 5px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-weak);
-  }
 
   /* ============================================================
    Design spec v3 — filter chips, activity timeline, audit
@@ -1448,13 +1426,6 @@
   }
 
   /* ---------- Activity timeline (audit log) ---------- */
-  .timeline {
-    list-style: none;
-    margin: 0;
-    padding: 2px 0 0;
-    display: flex;
-    flex-direction: column;
-  }
   .tl-item {
     position: relative;
     display: flex;
@@ -1508,17 +1479,6 @@
     color: var(--danger);
     border-color: color-mix(in oklch, var(--danger) 40%, var(--line));
   }
-  .tl-body {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-width: 0;
-    padding-top: 4px;
-  }
-  .tl-title {
-    font-weight: 600;
-    font-size: 13.5px;
-  }
   .tl-change {
     display: inline-flex;
     align-items: center;
@@ -1528,18 +1488,6 @@
     color: var(--fg-muted);
   }
   .tl-change svg {
-    color: var(--fg-faint);
-  }
-  .tl-change .from {
-    color: var(--fg-faint);
-    text-decoration: line-through;
-  }
-  .tl-change .to {
-    color: var(--fg);
-  }
-  .tl-meta {
-    font-family: var(--mono);
-    font-size: 11px;
     color: var(--fg-faint);
   }
   :where(.tl-gap) .tl-rail::before {
@@ -1596,11 +1544,6 @@
   .tl-gapbtn:hover {
     color: var(--accent-hover);
     text-decoration: underline;
-  }
-  .tl-gapnote {
-    font-size: 11px;
-    color: var(--fg-faint);
-    margin-top: 1px;
   }
 
   /* ---------- Audit export ---------- */
