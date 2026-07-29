@@ -12,7 +12,12 @@
 
 ## 0. スコープと安全規範
 
-- **対象は公開デモ環境のみ**（`/demo/standard` の disposable org・#69 Nene2\Demo）。本番顧客データには触れない。書き込み系シナリオは nightly reset / TTL 3h で消える demo org 内で完結させる。
+- **対象は原則として公開デモ環境**（`/demo/standard` の disposable org・#69 Nene2\Demo）。本番顧客データには触れない。書き込み系シナリオは nightly reset / TTL 3h で消える demo org 内で完結させる。
+- **例外（hub 裁定 2026-07-29）— インジェクション系は WAF 無し環境で実施する**。端 WAF（HETEML）が `<script>` / `onerror=` / `">` を含む値を **app 到達前に 403** で落とすため、公開デモで「XSS が発火しない」ことを見ても**アプリ層の防御の証明にならない**（＝偽の合格）。**payload が app に届いていることが判定の前提**である B-4・B-8 等は、**ローカル**（`docker compose` app:8110 ＋ Vite:5187 ＋ `tools/seed-demo.php` seed）で打鍵する。公開デモ側に残すのは **WAF そのものの挙動と 403 時の UX 文言**のみ。実測経緯は §3 batch 2b。
+- **打鍵の陽性対照（hub 承認 2026-07-29・batch 2 残余の標準手順）**: 「危険な挙動が観測されない」を ✅ と読む前に、次の3つを満たすこと。満たさなければ ✅ ではなく **CHECK（測れていない）** と記録する。
+  1. **検査器の生存** — 意図的に `window.alert()` 等を発火させ、検出側（dialog ハンドラ）が実際に捕まえることを先に確認する。
+  2. **payload の到達** — 仕込んだ marker が確かに描画/出力されていること。0 件なら「安全」ではなく「対象が検査範囲に入っていない」。
+  3. **対照の陰性** — 中和されるべきでない値（CONTROL）に中和痕が**付かない**こと。全件に無条件付与なら中和の証明にならない。
 - 破壊的操作（deal 削除・stage 削除）は「デモとして見せてよい範囲」でのみ実行。Deal の「削除」は **soft-delete（→recycle bin→restore 可）**（#47）＝hard-delete でない。この前提を各シナリオに明記する。
 - **実行中はデモへのデプロイ・データ操作を凍結**（hub 管理）。本仕様書の起草は repo 内ドキュメント作業のみで凍結対象外。デプロイ凍結の要否は実行着手時に hub へ申告（deal に本番反映予定が無ければ不要）。
 - 実行記録に **ビルド SHA・実行日時（TZ 明記）・ブラウザ/バージョン・画面幅・デモ URL** を必ず残す（§3）。
@@ -54,7 +59,7 @@
 | B-1 境界値 | DEA-B1-01（amount: 0/負/巨大〔円×100 の桁〕/小数）, DEA-B1-02（probability: 0/100/-1/101）, DEA-B1-03（stage sortOrder: 0/負・inline edit の silent guard） |
 | B-2 空・必須欠落・空白のみ | DEA-B2-01（create-deal account 空/空白）, DEA-B2-02（user create email 空・password<8）, DEA-B2-03（stage label 空/空白） |
 | B-3 型不正 | DEA-B3-01（login email 不正形式＝client 検証なし→server 挙動）, DEA-B3-02（user create email 不正形式＝client email 検証あり）, DEA-B3-03（date 欄に不正形式・native date widget 迂回） |
-| B-4 多バイト・絵文字・RTL・HTML/スクリプト | DEA-B4-01（account/note に `<script>alert(1)</script>` → board/detail/timeline/audit の表示エスケープ）, DEA-B4-02（絵文字・RTL・多バイト account/note） |
+| B-4 多バイト・絵文字・RTL・HTML/スクリプト | DEA-B4-01（account/note に `<script>alert(1)</script>` → board/detail/timeline の表示エスケープ（audit は CSV のみ＝画面は該当なし・§3 batch 2b））, DEA-B4-02（絵文字・RTL・多バイト account/note） |
 | B-5 過長入力 | DEA-B5-01（account/note の上限超・巨大貼付） |
 | B-6 二重送信・連打 | DEA-B6-01（create/save/handoff/move の連打→pending disable・多重送信防止） |
 | B-7 ファイル入出力 | **該当なし**: deal にファイル upload/添付機能が無い（フロント全域に file input・upload エンドポイント無し）。export は CSV のみ（B-8 で扱う） |
@@ -355,7 +360,7 @@
 ### DEA-B8-01: audit CSV インジェクション中和（NENE2 `Nene2\Export\CsvWriter` 裏取り）
 - 分類: B-8 / 異常（営業リスク）
 - 前提: admin
-- 手順: 1. account/note に `=1+1`・`=HYPERLINK("http://evil","x")`・`+1`・`-1`・`@x`・TAB 始まり・`\r` 始まりの値を保存（→audit に記録される）2. `/audit` で export→CSV を Excel/表計算で開く
+- 手順: 1. account/note に `=1+1`・`=HYPERLINK("http://evil","x")`・`+1`・`-1`・`@x`・TAB 始まり・`\r` 始まりの値を保存し、**さらに `PATCH` で更新する**（**`created` 行は field/before/after が空で CSV に載らない**＝update しないと audit に到達しない・§3 batch 2b の訂正）2. `/audit` で export→CSV を Excel/表計算で開く。stage 名（`stage_changed` 行の before/after）と actor email も同じ CSV 経路
 - 期待: CSV セルで**式として評価されない**（`Nene2\Export\CsvWriter` が `FORMULA_TRIGGERS=['=','+','-','@',"\t","\r"]` 先頭一致で `'` prefix 中和・`sanitizeFormulas` default on）。全 trigger（`\r` 含む）で中和を確認。評価されたら🔴（営業直結）。※中和は NENE2 vendor 実装（app 側 #53 ではない）
 - 結果:
 - 証拠:
