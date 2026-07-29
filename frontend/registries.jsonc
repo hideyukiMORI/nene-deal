@@ -12,7 +12,11 @@
       // + the [data-design='calm'] .auth-form/.auth-card overrides): 1128/27890
       // → 1011/24480. B family wave 1 (.details-link): → 1008/24437.
       // B family wave 2 (.col-name out of the shared nowrap rule): → 1007/24424.
-      "maxLines": 1007,
+      // maxLines is formattedLineCount (prettier-formatted, blank lines
+      // dropped) — NOT raw `wc -l`, which reads 1007 here. Measured locally
+      // with the fleet's own definition and cross-checked against their
+      // independent run (fleet #176②'): both give 984.
+      "maxLines": 984,
       "maxBytes": 24424,
     },
     {
@@ -29,11 +33,16 @@
       // at 1696 rather than raised to bless the overshoot. B family wave 1
       // brings it to 1656 — back UNDER the original cap — so the cap now moves
       // down to the measured value as a normal shrink. Note the ratchet is
-      // still not enforced upstream: this number is maintained by hand, in raw
-      // `wc -l` units — fleet #176②' will re-measure and normalise these to
-      // formattedLineCount, so do not hand-convert them here.
-      // B family wave 2 (.col-head .col-name / .count): 1656 → 1640 / 37160.
-      "maxLines": 1640,
+      // still not enforced upstream (fleet #180 implements it but is not
+      // published yet), so this number is maintained by hand.
+      // B family wave 2 (.col-head .col-name / .count): 1640 raw / 37160 bytes.
+      // NORMALISED to formattedLineCount per fleet #176②' — raw `wc -l` is
+      // 1640, the formatted count is 1605. Do not substitute wc -l here: raw
+      // carries the blank lines and pre-format layout, which is a ~2% slack
+      // that would be frozen into the cap once enforcement lands. Reproduce
+      // with prettier.format(source, {parser:'css'}) then count non-empty
+      // lines; maxBytes stays the unformatted source byte length.
+      "maxLines": 1605,
       "maxBytes": 37160,
     },
     {
