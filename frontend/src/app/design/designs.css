@@ -947,8 +947,7 @@
   .shell-calm .topnav-link,
   .shell-ent .tab,
   .brandmark .name,
-  .brandmark .sub,
-  .col-name {
+  .brandmark .sub {
     white-space: nowrap;
   }
   .shell-ent .tab {
