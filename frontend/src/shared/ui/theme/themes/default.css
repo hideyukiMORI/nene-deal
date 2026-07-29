@@ -1,41 +1,100 @@
+/*
+ * Default theme — NeNe Deal.
+ *
+ * Contract: nene2 tokens contract v1 (`@hideyukimori/nene2-tokens@1.2.0`).
+ * Shape and key set come from that package's `themes/reference.css`; the VALUES
+ * are Deal's own. The reference palette is amber (hue 72) — Deal is teal
+ * (hue ~185), canonicalised by the owner ("deal ティール正本化"), so adopting the
+ * reference values verbatim would change the product's identity. We take the
+ * structure, not the colours (C5 W3 / #169, decided 2026-07-29).
+ *
+ * The values below are lifted from what the app ACTUALLY renders today: the
+ * legacy token block in `app/design/styles.css` plus the `[data-design='calm']`
+ * overrides in `designs.css`, which are the effective values (`data-design` is
+ * hard-coded to 'calm'). This file previously carried a THIRD palette — a blue
+ * (hue 255) set that matched neither the shipped teal nor the fleet reference —
+ * which was dormant because only 3 of the 41 tokens the legacy CSS consumes
+ * shared a name with it. Nothing rendered from it, so nothing revealed it.
+ *
+ * Utility names derive from the part after the namespace:
+ *   --color-surface-raised → bg-surface-raised / text-surface-raised
+ *   --color-text-primary   → text-text-primary
+ *   --shadow-md            → shadow-md
+ *
+ * Dark mode is the `[data-theme='dark']` block at the bottom (contract layer 2).
+ * `shared/theme` sets `data-theme` on <html>; utilities follow automatically
+ * because Tailwind emits `var(--color-*)` and the block redefines those names.
+ */
 @theme {
-  /* ============================================================
-     NeNe Deal — default light theme.
-     The complete token set; a sibling theme file redefines every
-     token below and active.css points at it to restyle the app.
-     ============================================================ */
-
-  /* ── Surfaces ──────────────────────────────────────────────── */
-  --color-surface: oklch(97% 0.005 250);
+  /* ── surfaces ─────────────────────────────────────────────────
+     surface = app background (legacy --bg, calm light override)
+     surface-raised = cards / panels (legacy --surface) */
+  --color-surface: oklch(95.8% 0.008 220);
   --color-surface-raised: oklch(100% 0 0);
-  --color-surface-overlay: oklch(94% 0.008 250);
+  --color-surface-overlay: oklch(97.5% 0.006 220);
+  --color-surface-sunken: oklch(96% 0.006 225);
 
-  /* ── Text ──────────────────────────────────────────────────── */
-  --color-text-primary: oklch(22% 0.02 260);
-  --color-text-muted: oklch(52% 0.02 260);
+  /* ── text ─────────────────────────────────────────────────── */
+  --color-text-primary: oklch(26% 0.02 245);
+  --color-text-muted: oklch(48% 0.02 245);
+  --color-text-faint: oklch(63% 0.016 245);
   --color-text-inverse: oklch(99% 0 0);
 
-  /* ── Border ────────────────────────────────────────────────── */
-  --color-border: oklch(89% 0.01 260);
+  /* ── border ───────────────────────────────────────────────── */
+  --color-border: oklch(90.5% 0.008 230);
+  --color-border-strong: oklch(82% 0.012 235);
 
-  /* ── Accent ────────────────────────────────────────────────── */
-  --color-accent: oklch(55% 0.16 255);
-  --color-accent-hover: oklch(49% 0.16 255);
-  --color-accent-weak: color-mix(in oklch, var(--color-accent) 12%, var(--color-surface-raised));
+  /* ── accent (Deal teal) ───────────────────────────────────── */
+  --color-accent: oklch(52% 0.1 188);
+  --color-accent-hover: oklch(46% 0.1 188);
+  --color-accent-soft: color-mix(in oklch, var(--color-accent) 10%, var(--color-surface-raised));
+  --color-on-accent: oklch(99% 0 0);
 
-  /* ── Danger ────────────────────────────────────────────────── */
-  --color-danger: oklch(54% 0.2 25);
-  --color-danger-hover: oklch(48% 0.2 25);
+  /* ── danger ───────────────────────────────────────────────── */
+  --color-danger: oklch(54% 0.18 25);
+  --color-danger-soft: color-mix(in oklch, var(--color-danger) 9%, var(--color-surface-raised));
+  --color-on-danger: oklch(99% 0 0);
 
-  /* ── Status (stage / forecast accents) ─────────────────────── */
-  --color-ok: oklch(58% 0.14 150);
-  --color-warn: oklch(70% 0.15 75);
-  --color-info: oklch(58% 0.14 250);
+  /* ── success (legacy --ok) ────────────────────────────────── */
+  --color-success: oklch(52% 0.12 155);
+  --color-success-soft: color-mix(in oklch, var(--color-success) 14%, var(--color-surface-raised));
+  --color-on-success: oklch(99% 0 0);
 
-  /* ── Focus ring ────────────────────────────────────────────── */
-  --color-focus-ring: oklch(68% 0.13 255);
+  /* ── warn ─────────────────────────────────────────────────── */
+  --color-warn: oklch(62% 0.13 70);
+  --color-warn-soft: color-mix(in oklch, var(--color-warn) 14%, var(--color-surface-raised));
+  --color-on-warn: oklch(22% 0.04 70);
 
-  /* ── Spacing ───────────────────────────────────────────────── */
+  /* ── info ─────────────────────────────────────────────────── */
+  --color-info: oklch(52% 0.12 235);
+  --color-info-soft: color-mix(in oklch, var(--color-info) 14%, var(--color-surface-raised));
+  --color-on-info: oklch(99% 0 0);
+
+  /* ── focus / scrim ────────────────────────────────────────── */
+  /* Solid, not a 35%-alpha mix: the legacy --focus (accent @ 35% over the
+     surface) measures 1.39:1, below the 3:1 WCAG AA minimum for focus
+     indicators. Using the accent itself clears the bar. */
+  --color-focus-ring: oklch(52% 0.1 188);
+  --color-scrim: oklch(0% 0 0 / 0.45);
+
+  /* ── shadow (legacy --shadow-sm / -md / -pop) ─────────────── */
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.06);
+  --shadow-md: 0 10px 28px -10px oklch(0% 0 0 / 0.12);
+  --shadow-lg: 0 20px 50px -14px oklch(0% 0 0 / 0.18);
+  --shadow-focus: 0 0 0 3px var(--color-focus-ring);
+
+  /* ────────────────────────────────────────────────────────────
+     Below this line: tokens OUTSIDE contract v1's vocabulary.
+     Contract v1 covers --color-* and --shadow-* only, so these report as
+     `contract-vocabulary` findings under `nene2-tokens validate`. They are
+     kept as-is deliberately: `px-inline-lg` and `py-stack-xl` are already
+     consumed by components, so renaming them to the extension form
+     (--<cat>-x-<name>) changes call sites and is a fleet-wide naming decision,
+     not a per-repo one. Tracked for the fleet vocabulary ruling; nene-field
+     (the 1.2.0 reference consumer) is in the same state.
+     ──────────────────────────────────────────────────────────── */
+
+  /* ── spacing ──────────────────────────────────────────────── */
   --spacing-inline-xs: 0.25rem;
   --spacing-inline-sm: 0.5rem;
   --spacing-inline-md: 1rem;
@@ -47,7 +106,7 @@
   --spacing-stack-lg: 1.5rem;
   --spacing-stack-xl: 2rem;
 
-  /* ── Typography (Inter for Latin, Noto Sans JP for Japanese) ── */
+  /* ── typography ───────────────────────────────────────────── */
   --font-sans: 'Inter', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Inter', 'Noto Sans JP', ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'JetBrains Mono', monospace;
@@ -62,26 +121,62 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
 
-  /* ── Radius ────────────────────────────────────────────────── */
+  /* ── radius ───────────────────────────────────────────────── */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-full: 9999px;
 
-  /* ── Shadow ────────────────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.05);
-  --shadow-md: 0 6px 20px oklch(0% 0 0 / 0.08);
-  --shadow-focus: 0 0 0 3px color-mix(in oklch, var(--color-focus-ring) 35%, transparent);
-
-  /* ── Border width ──────────────────────────────────────────── */
+  /* ── border width ─────────────────────────────────────────── */
   --border-width-default: 1px;
 
-  /* ── Motion ────────────────────────────────────────────────── */
+  /* ── motion ───────────────────────────────────────────────── */
   --duration-fast: 120ms;
   --duration-normal: 200ms;
   --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* ── Z-index ───────────────────────────────────────────────── */
+  /* ── z-index ──────────────────────────────────────────────── */
   --z-dropdown: 100;
   --z-modal: 200;
   --z-toast: 300;
+}
+
+/* ── layer 2: dark mode (no @layer — same-name overrides on the themed
+      element, so color-mix chains such as -soft / focus-ring follow
+      automatically and not every key needs restating).
+      Values are the legacy dark block in app/design/styles.css plus the
+      [data-design='calm'][data-theme='dark'] surface overrides. ── */
+[data-theme='dark'] {
+  --color-surface: oklch(17% 0.018 245);
+  --color-surface-raised: oklch(23% 0.018 245);
+  --color-surface-overlay: oklch(26.5% 0.018 245);
+  --color-surface-sunken: oklch(14% 0.02 245);
+
+  --color-text-primary: oklch(96% 0.005 230);
+  --color-text-muted: oklch(73% 0.014 235);
+  --color-text-faint: oklch(56% 0.016 240);
+  --color-text-inverse: oklch(20% 0.04 200);
+
+  --color-border: oklch(31% 0.018 245);
+  --color-border-strong: oklch(42% 0.02 245);
+
+  --color-accent: oklch(74% 0.12 182);
+  --color-accent-hover: oklch(80% 0.12 182);
+  --color-on-accent: oklch(20% 0.04 200);
+  --color-focus-ring: oklch(74% 0.12 182);
+
+  --color-danger: oklch(68% 0.17 25);
+  --color-on-danger: oklch(18% 0.03 25);
+
+  --color-success: oklch(76% 0.14 155);
+  --color-on-success: oklch(18% 0.03 155);
+
+  --color-warn: oklch(80% 0.13 80);
+  --color-on-warn: oklch(20% 0.04 80);
+
+  --color-info: oklch(72% 0.1 230);
+  --color-on-info: oklch(18% 0.03 230);
+
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.35);
+  --shadow-md: 0 8px 26px -8px oklch(0% 0 0 / 0.55);
+  --shadow-lg: 0 18px 48px -12px oklch(0% 0 0 / 0.6);
 }
