@@ -22,7 +22,11 @@ const BASE = process.env.SMOKE_BASE || 'http://localhost:5187'
 const OUT = process.env.SMOKE_OUT || `/tmp/deal-smoke/${LABEL}`
 const CREDS = { email: 'operator@nene-deal.test', password: 'password' }
 const VARIANTS = []
-for (const d of ['calm', 'enterprise']) for (const t of ['light', 'dark']) VARIANTS.push({ d, t })
+// 'calm' is the only design the app ships: index.html and shared/theme both
+// hard-code data-design='calm' and there is no switcher. The 'enterprise' and
+// 'console' skins were unreachable dead CSS and were removed in C5 W3 (#169) —
+// capturing them here would screenshot a design that cannot occur in the app.
+for (const d of ['calm']) for (const t of ['light', 'dark']) VARIANTS.push({ d, t })
 
 fs.mkdirSync(OUT, { recursive: true })
 
