@@ -11,13 +11,14 @@
       // Shrunk by C5 W3 #169. A family (.brand-logo/.auth-card/.fs-lang/.fs-wrap
       // + the [data-design='calm'] .auth-form/.auth-card overrides): 1128/27890
       // → 1011/24480. B family wave 1 (.details-link): → 1008/24437.
-      // B family wave 2 (.col-name out of the shared nowrap rule): → 1007/24424.
+      // B family wave 2 (.col-name out of the shared nowrap rule): → 984/24424.
+      // D family wave 1 (dead enterprise/console skin removal):    → 880/22416.
       // maxLines is formattedLineCount (prettier-formatted, blank lines
-      // dropped) — NOT raw `wc -l`, which reads 1007 here. Measured locally
-      // with the fleet's own definition and cross-checked against their
-      // independent run (fleet #176②'): both give 984.
-      "maxLines": 984,
-      "maxBytes": 24424,
+      // dropped) — NOT raw `wc -l`. Measured locally with the fleet's own
+      // definition and cross-checked against their independent run
+      // (fleet #176②').
+      "maxLines": 880,
+      "maxBytes": 22416,
     },
     {
       "kind": "legacy-manifest",
