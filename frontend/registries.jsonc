@@ -8,27 +8,29 @@
       "id": "nene-deal-legacy-src-app-design-designs-css",
       "repo": "nene-deal",
       "path": "src/app/design/designs.css",
-      // Shrunk by C5 W3 #169 (A family drain: .brand-logo/.auth-card/.fs-lang/
-      // .fs-wrap + the [data-design='calm'] .auth-form/.auth-card overrides).
-      // 1128/27890 → 1011/24480.
-      "maxLines": 1011,
-      "maxBytes": 24480,
+      // Shrunk by C5 W3 #169. A family (.brand-logo/.auth-card/.fs-lang/.fs-wrap
+      // + the [data-design='calm'] .auth-form/.auth-card overrides): 1128/27890
+      // → 1011/24480. B family wave 1 (.details-link): → 1008/24437.
+      "maxLines": 1008,
+      "maxBytes": 24437,
     },
     {
       "kind": "legacy-manifest",
       "id": "nene-deal-legacy-src-app-design-styles-css",
       "repo": "nene-deal",
       "path": "src/app/design/styles.css",
-      // 🔴 DELIBERATELY NOT RAISED. The file is 1714 lines / 38578 bytes as of
-      // C5 W3 #169 (A family) — i.e. 18 lines OVER this cap, and it was 1725
-      // before this PR shrank it. It went over in an earlier PR and nothing
-      // caught it: `nene2-check init --check` does NOT enforce legacy-manifest
-      // maxLines/maxBytes at all. Verified by positive control — padding this
-      // file to 1914 lines (218 over) still exits green. Raising the cap to
-      // match reality would bless the overshoot; the cap stays until the fleet
-      // checker actually enforces it (reported to fleet-tooling 2026-07-29).
-      "maxLines": 1696,
-      "maxBytes": 38766,
+      // This file was 1725 lines — 29 OVER the old 1696 cap — and nothing
+      // caught it, because `nene2-check init --check` does not enforce
+      // legacy-manifest maxLines/maxBytes at all (positive control: padded to
+      // 1914 lines, 218 over, still exits green). Reported to fleet-tooling
+      // 2026-07-29, who reproduced it independently and filed their #176.
+      // The A family drain left it at 1714 (still over), so the cap was held
+      // at 1696 rather than raised to bless the overshoot. B family wave 1
+      // brings it to 1656 — back UNDER the original cap — so the cap now moves
+      // down to the measured value as a normal shrink. Note the ratchet is
+      // still not enforced upstream: this number is maintained by hand.
+      "maxLines": 1656,
+      "maxBytes": 37520,
     },
     {
       "kind": "lint-baseline",

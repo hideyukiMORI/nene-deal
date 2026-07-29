@@ -56,9 +56,6 @@
     color: var(--fg);
     border-color: var(--line-strong);
   }
-  .details-link {
-    cursor: pointer;
-  }
   :where(.m-brand) .logo svg {
     width: 100%;
     height: 100%;
