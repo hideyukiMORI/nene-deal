@@ -47,7 +47,7 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
   })
 
   return (
-    <div className="fs-wrap">
+    <div className="min-h-screen">
       <div className="fs-lang">
         <span className="hdr-controls">
           <ThemeToggle

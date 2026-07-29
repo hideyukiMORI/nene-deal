@@ -861,10 +861,6 @@
     color: var(--on-accent);
   }
 
-  .fs-wrap {
-    min-height: 100vh;
-  }
-
   /* ---- アプリ内：言語トグル / ログアウト / 区切り ---- */
   .lang-toggle {
     display: inline-flex;
