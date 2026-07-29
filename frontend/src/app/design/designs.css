@@ -82,9 +82,6 @@
   .nav-item.nav-error {
     margin-top: auto;
   }
-  :where(.nav-item.nav-error) + .sidebar-foot {
-    margin-top: var(--s4);
-  }
 
   /* ============================================================
    デザイン 2 — CALM（上部ナビ・余白広め・大見出し）
