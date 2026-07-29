@@ -74,13 +74,11 @@
   }
 
   /* ============================================================
-   デザイン 1 — CONSOLE（左サイドバー・現行）
+   かつて デザイン 1 — CONSOLE（左サイドバー）があった場所。
+   スキン本体（.shell-console / .shell-ent とその配下）は到達不能な
+   dead CSS だったため C5 W3 #169 D family で削除した。残っているのは
+   .nav-item 系＝calm でも使う共用クラスなので温存している。
    ============================================================ */
-  .shell-console {
-    display: grid;
-    grid-template-columns: var(--sidebar-w) 1fr;
-    min-height: 100%;
-  }
   .nav-item.nav-error {
     margin-top: auto;
   }
@@ -556,97 +554,6 @@
   /* ============================================================
    デザイン 3 — ENTERPRISE（上部ツールバー・強い罫線・高密度）
    ============================================================ */
-  .shell-ent {
-    display: block;
-    min-height: 100%;
-    background: var(--bg);
-  }
-  .shell-ent .brandbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--s4);
-    padding: 10px 24px;
-    background: var(--sunk);
-    border-bottom: 1px solid var(--line-strong);
-  }
-  .shell-ent .brandmark {
-    padding: 0;
-  }
-  :where(.shell-ent) .brandmark .logo {
-    width: 28px;
-    height: 28px;
-  }
-  .shell-ent .ent-user {
-    display: flex;
-    align-items: center;
-    gap: var(--s2);
-  }
-  :where(.shell-ent) .ent-user .avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 11px;
-  }
-  .shell-ent .toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--s4);
-    padding: 0 24px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--line-strong);
-    position: sticky;
-    top: 0;
-    z-index: 5;
-  }
-  .shell-ent .tabs {
-    display: flex;
-  }
-  .shell-ent .tab {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-family: var(--font);
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--fg-muted);
-    padding: 12px 16px;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition:
-      color 0.12s,
-      border-color 0.12s,
-      background 0.12s;
-  }
-  :where(.shell-ent) .tab .ico {
-    width: 15px;
-    height: 15px;
-  }
-  :where(.shell-ent) .tab:hover {
-    color: var(--fg);
-    background: var(--surface-2);
-  }
-  :where(.shell-ent) .tab.active {
-    color: var(--accent);
-    border-bottom-color: var(--accent);
-  }
-  :where(.shell-ent) .toolbar .crumb {
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--fg-faint);
-    letter-spacing: 0.02em;
-  }
-  .shell-ent .content {
-    max-width: 1320px;
-    padding: 22px 24px 56px;
-    gap: var(--s5);
-  }
-  .shell-ent .content-narrow {
-    max-width: 860px;
-  }
 
   /* ============================================================
    レスポンシブ（calm/ent 上部ナビ）
@@ -744,14 +651,6 @@
     }
     :where([data-design='calm']) .user-row:active {
       background: var(--surface-2);
-    }
-
-    .shell-ent .content {
-      padding: 16px 16px 40px;
-    }
-    .shell-ent .toolbar {
-      padding: 0 12px;
-      overflow-x: auto;
     }
   }
 
@@ -945,13 +844,9 @@
   /* 折り返し防止（ナビ/見出し/カード見出し） */
   .nav-item > span,
   .shell-calm .topnav-link,
-  .shell-ent .tab,
   .brandmark .name,
   .brandmark .sub {
     white-space: nowrap;
-  }
-  .shell-ent .tab {
-    flex: none;
   }
 
   @media (max-width: 720px) {
