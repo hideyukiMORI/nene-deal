@@ -481,14 +481,6 @@
     min-height: 100%;
     background: var(--bg);
   }
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    background: var(--sunk);
-    border-right: 1px solid var(--line);
-    padding: var(--s5) var(--s4);
-    gap: var(--s2);
-  }
   .brandmark {
     display: flex;
     align-items: center;
@@ -575,14 +567,6 @@
     color: var(--accent);
   }
 
-  .sidebar-foot {
-    margin-top: auto;
-    border-top: 1px solid var(--line);
-    padding-top: var(--s4);
-    display: flex;
-    align-items: center;
-    gap: var(--s3);
-  }
   .avatar {
     width: 32px;
     height: 32px;
