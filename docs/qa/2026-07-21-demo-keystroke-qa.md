@@ -594,7 +594,62 @@
 
 **batch 1 の主要観察（発見候補・hub 連携）**: 公開デモは **fail-closed**（保護 URL の full load 直叩き→login）＝C-1 は良好側で確証。**トークンがメモリ専用**のため full page load を挟む操作（ハードナビ・リロード）は毎回 login に戻る＝deep-link（D-2）や新規タブでの保護 URL は「一旦 login」挙動になる（クライアント側 SPA 遷移では保持）。営業導線上の含意は F-1 で評価。
 
+### batch 2a 結果（security 先行 2件・live 実測 2026-07-29）
+
+**実行条件**: 2026-07-29・Deal リナ・Chromium(Playwright 1.61.1)・`https://deal.ayane.co.jp/demo/standard` の使い捨て org 内・座席 mint は各ラウンド1回（連打節度）・API 直叩き併用（打鍵経路は §末尾の「実行方法の但し書き」参照）。hub 裁定 07-29 = **公開デモが本番稼働中のため security 2件（B-8/B-4）を C5 drain より先に抜く**。
+
+| ID | 結果 | 観察 |
+|---|---|---|
+| DEA-B8-01 | ✅ | **全7トリガで中和を確認**（`=` `+` `-` `@` TAB CR ＋ `=HYPERLINK("http://evil.example","x")`）。audit CSV の該当セルは**すべて先頭 `'` prefix**で出力。CSV を RFC4180 パースし**セル完全一致**で判定（下記「⚠️ 判定手法の訂正」参照）。中和は NENE2 vendor `Nene2\Export\CsvWriter`（`FORMULA_TRIGGERS = ['=','+','-','@',"\t","\r"]`・`vendor/hideyukimori/nene2/src/Export/CsvWriter.php:39,138-140`）。式評価の兆候なし＝**営業リスク無し** |
+| DEA-B4-01 | ✅（board / stage 名）<br>⚠️（detail・timeline・audit 画面は未到達）| 保存した markup が**全て文字列としてエスケープ表示**。deal 名 `<b>bold</b>` / `<img src=x>`、stage 名 `<i>stg</i>` のいずれも**リテラル文字として可視**。DOM 注入 0（payload 由来の `<b>`/`<i>` 要素 0・`img[src=x]` 0・`alert(` を含む `<script>` 0）・**dialog 発火 0**・pageerror 0。`&lt;`/`&amp;` の**二重デコードも無し**、引用符・アンパサンドも保持 |
+
+#### 🔴 仕様書の訂正 — B-8 のベクタは deal 名/note ではなく **stage 名**
+
+§2 の DEA-B8-01 手順は「account/note に trigger 値を仕込む」でしたが、**実測の結果この経路では audit CSV に到達しません**。
+
+audit CSV の実カラムは `timestamp,actor,action,deal_id,field,before,after` で、deal 作成行は
+`"2026-07-29 10:51:49",demo-admin@…,created,01KYP…,,,` と **field/before/after が空**＝`account_label`・`note` は **CSV に一切出力されない**。
+
+したがって **ユーザ入力が CSV セルへ届く経路は次の2つ**です:
+
+1. **`before`/`after` = stage 名**（`stage_changed` 行）— stage は自由文（label maxLength 64・#36 で rename/add 可）＝**これが真のインジェクション面**
+2. **`actor` = ユーザの email**（email 形式検証あり＝トリガ文字は先頭に置きにくい）
+
+今回は (1) で実測し、**7トリガ全て中和**を確認しました。**§2 の DEA-B8-01 手順文をこの経路に差し替える必要があります**（次回改訂で反映）。
+
+#### 🟠 発見 — 端 WAF が XSS ペイロードを app 到達前に 403 で遮断（本番のみ）
+
+`<script>…</script>` / `onerror=` / `"><img …` を含む値は、**アプリに届く前に共用ホスティング（HETEML）の WAF が 403 を返します**。本文は日本語の非ブランド HTML（`<TITLE>閲覧できません (Forbidden access)</TITLE>`）で、**JSON でも RFC9457 Problem Details でもありません**。
+
+| ペイロード | 結果 |
+|---|---|
+| `plain` / `<b>bold</b>` / `<img src=x>` | 201（app 到達・**エスケープ確認できた**） |
+| `<img src=x onerror=alert(1)>` | **403（端 WAF・app 未到達）** |
+| `<script>alert(1)</script>` | **403（端 WAF・app 未到達）** |
+| `"><img src=x onerror=alert(1)>` | **403（端 WAF・app 未到達）** |
+| `<svg/onload=1>` | **403（端 WAF・app 未到達）** |
+
+含意2点:
+- **セキュリティ的にはむしろ良好側**（多層防御）。ただし **app 自身の防御が本番トラフィックで検証できない**＝「WAF に守られている」状態と「app が安全」は別。今回は WAF を通過する markup（`<b>`・`<img src=x>`）で **app 側の React 既定エスケープが効いていることを実測**したので、同じ描画経路を通る `onerror` 系も同様にエスケープされる、と判断できます（**推論**・本番での直接実測は WAF により不可）。
+- **UX 面は要確認（batch 2 残余へ）**: SPA は 403 の HTML を JSON として解釈できないため、利用者が商談名に `<` を含む文字列（例: 社名の記号や引用符混じり）を入れた際に**何のエラーか分からないトーストになる**可能性があります。**実 UI 打鍵での確認が必要**（今回は API 直叩きのため未確認）。
+
+#### ⚠️ 判定手法の訂正（自己申告・2回とも当方の測定ミス）
+
+初回の判定は**2つとも無効**で、やり直しています。同型の誤りは他艦でも起きるので手順ごと残します。
+
+1. **部分文字列マッチの衝突** — `+1 QA…` を `includes()` で探したところ、`=1+1 QA…` の中の `+1 QA…` にヒットして別セルを「中和済み」と誤判定していました。**CSV を実際にパースし、セル文字列の完全一致（`cell === "'" + payload`）で判定**するよう修正。
+2. **ハードナビでトークンを失い board が描画されていなかった** — `page.goto('/')` で再訪した結果、batch 1 で判明済みの **F-1（トークンはメモリ専用）** をそのまま踏み、board が `/login` 相当で payload が 0 件。「注入なし」に見えていたのは**そもそも何も描画されていなかった**ためで、**偽の ✅ でした**。SPA セッション内のクライアント遷移のみに修正。
+3. さらに **TanStack Query の `staleTime: 30_000`**（`frontend/src/app/providers.tsx:22`）により、作成直後の再取得はキャッシュに阻まれます。**35 秒待ってから**クライアント遷移して初めて payload が board に現れました。ここを待たずに「表示されない＝注入なし」と読むと、また偽 ✅ になります。
+
+> **教訓**: 「危険な文字列が画面に出てこない」は ✅ の証拠になりません。**まず payload が確かに描画されていること**を確認し、その上で**要素として解釈されていないこと**を見る、の2段で判定する。
+
+#### 実行方法の但し書き（打鍵純度）
+
+本 batch は**データ投入を API 直叩き**（座席から捕捉した bearer で `POST /api/v1/deals`・`/api/v1/stages`・`/stage-change`）、**検証を実 UI の DOM 実測**で行いました。理由は 7トリガ×複数 venue を UI 手入力で回すと座席 mint とレート制限に触れるため。**表示側（＝本 batch の判定対象）は実ブラウザの実 DOM で見ています**。ただし上記のとおり **入力フォーム経由の挙動（WAF 403 時のトースト文言）は未確認**なので、batch 2 残余で実 UI 打鍵を行います。
+
 ### 実行メモ（🔴/⚠️ の再現手順・batch 2 以降）
 
 - **batch 2 予定（要慎重・一部手動）**: A-1 CRUD 書込（disposable org 内）／**A-3 invoice-handoff 実挙動＝LP 連携裏取り**（invoice リナ実測「Deal 引き継ぎ未実装」と一致するか）／**B-8 audit CSV injection**（`=HYPERLINK` 実注入→NENE2 `Nene2\Export\CsvWriter` 中和裏取り）／**A3-03 lost 導線**／**A1-05 非空 stage 削除**／**A3-02 CSV 日本語 BOM**／B-1/B-2/B-3 入力検証／**B-4 XSS 表示エスケープ**／**DEA-D3-01〜04 楽観ロック/連打 race**（要2タブ・operator ユーザ作成）／**E-4 TZ off-by-one**（timezoneId で UTC/JST 両撮り＝hub 手法）／E-2 レスポンシブ／E-5 金額書式。
 - A-5 nav 到達性・E-3-01 lang 切替は batch 2 でクライアント側クリック法にて再測（batch1 の⚠️2件はハードナビ／弱アサーションの手法起因で、機能不具合の疑いではない）。
+- **batch 2a（07-29）で消化済**: B-8 ✅ / B-4 ✅（board・stage 名）。**残**: B-4 の detail・timeline・audit 画面の venue（今回 UI 導線を特定できず未到達）、および **WAF 403 時のフォーム UX 文言**（新規・上記 🟠）。
+- **batch 2 の実行時に必ず効かせる前提**（2a で判明）: ①クライアント遷移のみ（ハードナビ＝トークン喪失） ②書込後の再取得は **staleTime 30 秒**待ち ③判定は「描画されている」→「解釈されていない」の2段 ④CSV 判定はパースしてセル完全一致。
