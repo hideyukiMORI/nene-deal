@@ -35,15 +35,15 @@
       // down to the measured value as a normal shrink. Note the ratchet is
       // still not enforced upstream (fleet #180 implements it but is not
       // published yet), so this number is maintained by hand.
-      // B family wave 2 (.col-head .col-name / .count): 1640 raw / 37160 bytes.
-      // NORMALISED to formattedLineCount per fleet #176②' — raw `wc -l` is
-      // 1640, the formatted count is 1605. Do not substitute wc -l here: raw
-      // carries the blank lines and pre-format layout, which is a ~2% slack
-      // that would be frozen into the cap once enforcement lands. Reproduce
-      // with prettier.format(source, {parser:'css'}) then count non-empty
-      // lines; maxBytes stays the unformatted source byte length.
-      "maxLines": 1605,
-      "maxBytes": 37160,
+      // Values are formattedLineCount per fleet #176②' — NOT raw `wc -l`. Do
+      // not substitute wc -l: raw carries blank lines and pre-format layout,
+      // a ~2% slack that would be frozen into the cap once enforcement lands.
+      // Reproduce with prettier.format(source, {parser:'css'}) then count
+      // non-empty lines; maxBytes stays the unformatted source byte length.
+      // B family wave 2 (.col-head .col-name / .count): 1605 / 37160.
+      // C family wave 1 (timeline drain + 4 dead rules):  1548 / 36119.
+      "maxLines": 1548,
+      "maxBytes": 36119,
     },
     {
       "kind": "lint-baseline",

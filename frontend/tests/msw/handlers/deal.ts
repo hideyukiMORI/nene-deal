@@ -102,4 +102,54 @@ export const dealHandlers = [
       handoff_actor_user_id: null,
     })
   }),
+
+  // Stage/field history behind the deal-detail activity timeline.
+  //
+  // This route was missing, so `useDealActivity` always resolved to [] and the
+  // timeline rendered its empty state — including in the visual smoke, whose
+  // `3-deal` shot therefore never covered the timeline at all. Added while
+  // draining the C family (#169) so that drain has something to verify against.
+  http.get('/api/v1/deals/:id/history', ({ params }) => {
+    const id = typeof params.id === 'string' ? params.id : 'unknown'
+    return HttpResponse.json({
+      data: [
+        {
+          id: '01HIST00000000000000000003',
+          deal_id: id,
+          action: 'stage_changed',
+          from_stage_id: 'proposal',
+          to_stage_id: 'won',
+          actor_user_id: '01USER0000000000000000000A',
+          actor_label: 'operator@nene-deal.test',
+          changes: null,
+          created_at: '2026-05-31 09:15:00',
+        },
+        {
+          id: '01HIST00000000000000000002',
+          deal_id: id,
+          action: 'updated',
+          from_stage_id: null,
+          to_stage_id: null,
+          actor_user_id: '01USER0000000000000000000A',
+          actor_label: 'operator@nene-deal.test',
+          changes: {
+            amount_cents: { from: 120_000_000, to: 150_000_000 },
+            probability_percent: { from: 60, to: 100 },
+          },
+          created_at: '2026-05-30 14:02:00',
+        },
+        {
+          id: '01HIST00000000000000000001',
+          deal_id: id,
+          action: 'created',
+          from_stage_id: null,
+          to_stage_id: 'lead',
+          actor_user_id: '01USER0000000000000000000A',
+          actor_label: 'operator@nene-deal.test',
+          changes: null,
+          created_at: '2026-05-28 10:00:00',
+        },
+      ],
+    })
+  }),
 ]
