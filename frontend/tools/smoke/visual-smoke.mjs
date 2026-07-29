@@ -75,5 +75,33 @@ if (await clickBtn(page, /Details|詳細/)) {
   await clickBtn(page, /Pipeline|パイプライン/)
 } else console.log('note: no Details link reached (deal-detail skipped)')
 
+// Admin routes. These were invisible to the smoke until the mock grew a
+// `/auth/me` handler (#191): without it `useCurrentUser` fails, AppShell falls
+// back to non-admin, and the admin nav never renders — so Stages/Users/Audit/
+// Settings had never been captured. They are also where a nav/shell regression
+// would show up first, which is exactly the D family's blast radius.
+const ADMIN_ROUTES = [
+  ['4-stages', /^Stages$|ステージ/],
+  ['5-users', /^Users$|ユーザー/],
+  ['6-audit', /^Audit$|監査/],
+  ['7-settings', /^Settings$|設定/],
+]
+let reached = 0
+for (const [name, re] of ADMIN_ROUTES) {
+  if (await clickBtn(page, re)) {
+    await shot(page, name)
+    reached += 1
+  } else console.log(`note: admin route ${name} not reached`)
+}
+// Fail loudly rather than silently shrinking the matrix: a smoke that quietly
+// captures fewer screens still exits 0 and every later diff looks clean.
+if (reached !== ADMIN_ROUTES.length) {
+  console.error(
+    `ERROR: reached ${reached}/${ADMIN_ROUTES.length} admin routes — the matrix is incomplete, so a 0px diff would be meaningless.`,
+  )
+  await browser.close()
+  process.exit(1)
+}
+
 await browser.close()
 console.log(`${LABEL}: ${fs.readdirSync(OUT).length} shots -> ${OUT}`)
