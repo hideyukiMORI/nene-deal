@@ -7,6 +7,15 @@ mechanism. This document records the **Deal-specific** summary. Every finding
 below was re-verified against this repository's actual code (file:line) before
 being filed.
 
+> **This document is a dated snapshot, not live state.** Every finding and
+> file:line reference records what was observed on **2026-07-11**. Remediation
+> landed after that date is **not** reflected in the finding text — the findings
+> are deliberately left as written so the audit stays a faithful record of that
+> day. Before acting on any finding, verify it against current code. Findings
+> confirmed to be resolved carry an inline **Resolved** marker and an entry in
+> the [Resolution log](#resolution-log); an unmarked finding means "no
+> resolution has been recorded here", **not** "still open".
+
 Issue mapping: #89 (audit logging), #90 (account status), #91 (roll-up
 checklist), #92 (this document).
 
@@ -48,11 +57,38 @@ checklist), #92 (this document).
 | 4 | `Nene2\Validation` unused — handlers hand-write 422 responses (10 files), so no per-field `errors[]` structure | `src/User/CreateUserHandler.php:27-49` et al. | Medium | #91 (d) |
 | 5 | Custom base64 offset `Cursor` pagination instead of `Nene2\Http\Pagination` (the other three products) | `src/Deal/Cursor.php`, `src/Deal/ListDealsHandler.php:37,56` | Medium | #91 (e) |
 | 6 | No superadmin concept — roles are admin/operator only, `organization_id` NOT NULL; no cross-tenant management layer | `src/` grep | Medium | #91 (f) |
-| 7 | `.htaccess` has neither the `E=HTTP_AUTHORIZATION` re-delivery nor hardening headers (CSP/HSTS); mitigated at runtime by `AuthorizationHeaderFallback` (`public_html/index.php:26`) | `public_html/.htaccess` | Medium | #91 (g) |
+| 7 | `.htaccess` has neither the `E=HTTP_AUTHORIZATION` re-delivery nor hardening headers (CSP/HSTS); mitigated at runtime by `AuthorizationHeaderFallback` (`public_html/index.php:26`) — **Resolved 2026-07-15, see [Resolution log](#resolution-log)** | `public_html/.htaccess` | Medium | #91 (g), #132 |
 | 8 | `tools/build-heteml-artifact.sh` produces neither a zip nor a SHA-256 sidecar — no distribution integrity guarantee (invoice's `build-release.sh` is the template) | `tools/build-heteml-artifact.sh` | High | #91 (h) |
 | 9 | No JST/UTC regression test pinning the sweep TTL parsing (a trap the fleet hit twice; clear/vault have the test) | `tools/sweep-demo.php:60-64`, `tests/` | Medium | #91 (i) |
 | 10 | No multi-tenancy ADR — the ULID string(26) org PK (unique in the fleet) and the claim→header→sole-org resolution order are undocumented design decisions | `docs/adr/` (0001–0004 only), `database/migrations/20260530120000_create_organizations_table.php:12` | Medium | #91 (j) |
 | 11 | Migration seeds well-known credentials (`operator@nene-deal.test` / `password`); the browser installer deletes them (#65) but the manual CLI-migrate path leaves them in place | `database/migrations/20260531130000_seed_default_operator.php:27-33`, `public_html/install.php:1216-1219` | Medium | #91 (k) |
+
+## Resolution log
+
+Remediation that landed **after** the 2026-07-11 audit date. The finding text
+above is left as originally written (see the snapshot note at the top); this
+section is where the current state is recorded.
+
+### Finding 7 — `.htaccess` Authorization re-delivery and hardening headers
+
+**Resolved.** Both halves of the finding no longer hold, and the mitigation
+mechanism it described has itself been replaced:
+
+- **Authorization re-delivery** — `public_html/.htaccess:25` now carries
+  `RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]`, added by
+  **#101** (`2ebb104`, 2026-07-12).
+- **Hardening headers** — the same commit added `Strict-Transport-Security`,
+  `X-Frame-Options`, `X-Content-Type-Options`
+  (`public_html/.htaccess:50-52`) and a `Content-Security-Policy`
+  (`public_html/.htaccess:77`) scoped to preserve the demo seat handoff.
+- **Runtime mitigation moved** — the bespoke `AuthorizationHeaderFallback` at
+  `public_html/index.php:26` is gone. Its job is now done by NENE2's opt-in
+  `AuthorizationHeaderFallbackMiddleware` (NENE2 #1558 / ADR 0019), enabled via
+  `enableAuthorizationHeaderFallback: true` in
+  `src/Http/RuntimeServiceProvider.php:378` — landed by **#130/#131**
+  (`db6ccc6`). The audit's `index.php:26` reference is therefore stale.
+
+Re-verified against `origin/main` on **2026-07-29**. Recorded in **#132**.
 
 ## Cross-product notes
 
@@ -63,4 +99,4 @@ checklist), #92 (this document).
 - The audit's full four-product report lives in the workspace layer; this file
   is the Deal-scoped record.
 
-Last updated: 2026-07-11
+Findings recorded: 2026-07-11 (unchanged). Resolution log last updated: 2026-07-29.
