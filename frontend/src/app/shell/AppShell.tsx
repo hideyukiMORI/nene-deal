@@ -107,7 +107,7 @@ export function AppShell() {
 
   const accountBlock = (
     <div className="border-border flex items-center gap-3 border-b pb-4">
-      <span className="avatar" style={{ width: 40, height: 40 }}>
+      <span className="avatar cursor-pointer" style={{ width: 40, height: 40 }}>
         {avatarLetter}
       </span>
       <div className="stack g1" style={{ flex: 1, minWidth: 0 }}>
@@ -163,7 +163,7 @@ export function AppShell() {
           </span>
           <span className="nav-divider" />
           <span className="inline-flex items-center">
-            <span className="avatar">{avatarLetter}</span>
+            <span className="avatar cursor-pointer">{avatarLetter}</span>
           </span>
           <SignoutButton />
         </div>
@@ -198,7 +198,7 @@ export function AppShell() {
             setSheetOpen(true)
           }}
         >
-          <span className="avatar">{avatarLetter}</span>
+          <span className="avatar cursor-pointer">{avatarLetter}</span>
         </button>
       </header>
 

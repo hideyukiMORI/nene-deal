@@ -117,9 +117,6 @@
   :where(.shell-calm) .nav-pill:hover {
     color: var(--fg);
   }
-  .shell-calm .avatar {
-    cursor: pointer;
-  }
   .shell-calm .content {
     max-width: 1000px;
     padding: 52px 40px 96px;
