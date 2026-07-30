@@ -28,6 +28,18 @@ const VARIANTS = []
 // capturing them here would screenshot a design that cannot occur in the app.
 for (const d of ['calm']) for (const t of ['light', 'dark']) VARIANTS.push({ d, t })
 
+// The shell swaps at 1024px: the desktop `.topnav` is hidden and `.m-topbar` /
+// `.m-tabs` / `.m-sheet-wrap` take over (designs.css @media (max-width:1024px)).
+// A single 1280px matrix therefore renders NONE of the mobile shell — draining
+// those classes would diff 0px while breaking every phone, which is the same
+// shape as the admin routes that were invisible until #192. Both widths are
+// captured, and `assertBreakpointLive` proves the small one really crosses the
+// breakpoint rather than just being a narrower desktop.
+const VIEWPORTS = [
+  { vp: 'w1280', width: 1280, height: 900 },
+  { vp: 'w390', width: 390, height: 844 },
+]
+
 fs.mkdirSync(OUT, { recursive: true })
 
 const shot = async (page, name) => {
@@ -40,9 +52,43 @@ const shot = async (page, name) => {
       },
       [d, t],
     )
-    await page.waitForTimeout(120)
-    await page.screenshot({ path: `${OUT}/${name}__${d}-${t}.png`, fullPage: true })
+    for (const { vp, width, height } of VIEWPORTS) {
+      await page.setViewportSize({ width, height })
+      await page.waitForTimeout(120)
+      await page.screenshot({ path: `${OUT}/${name}__${d}-${t}__${vp}.png`, fullPage: true })
+    }
+    await page.setViewportSize({ width: VIEWPORTS[0].width, height: VIEWPORTS[0].height })
   }
+}
+
+/**
+ * Positive control for the matrix itself: capturing a second width proves
+ * nothing unless that width actually selects the mobile shell. Measure the one
+ * element the breakpoint owns (`.m-tabs`, `display:none` → `grid`) at both
+ * widths and fail loudly if it does not flip — otherwise a later 0px result
+ * would be "the mobile CSS never rendered", not "the mobile CSS is unchanged".
+ */
+const assertBreakpointLive = async (page) => {
+  const read = async (width) => {
+    await page.setViewportSize({ width, height: 844 })
+    await page.waitForTimeout(200)
+    return page.evaluate(() => {
+      const el = document.querySelector('.m-tabs')
+      return el ? getComputedStyle(el).display : '(no .m-tabs in DOM)'
+    })
+  }
+  const wide = await read(1280)
+  const narrow = await read(390)
+  await page.setViewportSize({ width: 1280, height: 900 })
+  if (wide === narrow || narrow === '(no .m-tabs in DOM)') {
+    console.error(
+      `ERROR: the 1024px breakpoint did not engage (.m-tabs display: ${wide} @1280 vs ${narrow} @390). ` +
+        `The mobile shots would be narrow desktops, so a 0px diff over them would prove nothing.`,
+    )
+    await page.context().browser()?.close()
+    process.exit(1)
+  }
+  console.log(`breakpoint control: .m-tabs display ${wide} @1280 → ${narrow} @390 ✓`)
 }
 const clickBtn = async (page, re) => {
   const l = page.getByRole('button', { name: re }).first()
@@ -68,6 +114,7 @@ await page
   .waitForURL((u) => !u.pathname.endsWith('/login'), { timeout: 8000 })
   .catch(() => console.log('login nav timeout'))
 await page.waitForTimeout(700)
+await assertBreakpointLive(page)
 await shot(page, '2-board')
 
 if (await clickBtn(page, /Details|詳細/)) {

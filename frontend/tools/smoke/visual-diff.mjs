@@ -10,6 +10,21 @@ fs.mkdirSync(DIFF, { recursive: true })
 
 const files = fs.readdirSync(A).filter((f) => f.endsWith('.png'))
 let total = 0
+
+// The loop below walks the BEFORE set, so a shot that exists only in AFTER was
+// silently ignored — which is exactly what happens when the matrix grows (a new
+// viewport, a new route). "0px across N shots" then hides that N moved. Compare
+// the two sets first and fail on either asymmetry.
+const afterFiles = new Set(fs.readdirSync(B).filter((f) => f.endsWith('.png')))
+const onlyInAfter = [...afterFiles].filter((f) => !files.includes(f))
+if (onlyInAfter.length > 0) {
+  console.log(
+    `MATRIX GREW: ${onlyInAfter.length} shot(s) exist only in after — the before set predates the ` +
+      `current matrix, so this run cannot speak for them: ${onlyInAfter.slice(0, 6).join(', ')}` +
+      (onlyInAfter.length > 6 ? ' …' : ''),
+  )
+  total += onlyInAfter.length
+}
 for (const f of files) {
   if (!fs.existsSync(`${B}/${f}`)) {
     console.log('MISSING after:', f)
