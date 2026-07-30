@@ -21,8 +21,10 @@
       // dropped) — NOT raw `wc -l`. Measured locally with the fleet's own
       // definition and cross-checked against their independent run
       // (fleet #176②').
-      "maxLines": 797,
-      "maxBytes": 20558,
+      // D wave3 (dead `.shell-calm .avatar` cursor rule — drained to a
+      // cursor-pointer utility at the 5 call sites):                → 794/20509.
+      "maxLines": 794,
+      "maxBytes": 20509,
     },
     {
       "kind": "legacy-manifest",
@@ -57,8 +59,10 @@
       // to say where they went — 3 lines of pointer, kept rather than trimmed so
       // the next reader is not sent looking for blocks that are no longer here.)
       //                                                   1466 / 33299.
-      "maxLines": 1466,
-      "maxBytes": 33299,
+      // D wave3 (dead `.frame` / `.frame .shell` — zero references in any of the
+      // FC-1 five forms and zero elements at runtime):     1456 / 33081.
+      "maxLines": 1456,
+      "maxBytes": 33081,
     },
     {
       "kind": "lint-baseline",

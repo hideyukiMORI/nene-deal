@@ -157,7 +157,9 @@ export function UserManagementView({
                       setOpenUser(user)
                     }}
                   >
-                    <span className="avatar">{(user.email[0] ?? '?').toUpperCase()}</span>
+                    <span className="avatar cursor-pointer">
+                      {(user.email[0] ?? '?').toUpperCase()}
+                    </span>
                     <div className="stack g1">
                       <span className="row g2">
                         <span className="medium">{user.email}</span>
@@ -223,7 +225,10 @@ export function UserManagementView({
               </button>
             </div>
             <div className="us-id">
-              <span className="avatar" style={{ width: 48, height: 48, fontSize: 18 }}>
+              <span
+                className="avatar cursor-pointer"
+                style={{ width: 48, height: 48, fontSize: 18 }}
+              >
                 {(openUser.email[0] ?? '?').toUpperCase()}
               </span>
               <div className="stack g1" style={{ minWidth: 0 }}>
