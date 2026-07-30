@@ -53,9 +53,12 @@
       // token blocks moved to themes/calm-skin.css. `color-scheme` could not go
       // with them (not a custom property — themes-token-only), so it stayed as
       // one `color-scheme: var(--color-scheme)` line on the base :root:
-      //                                                   1463 / 33007.
-      "maxLines": 1463,
-      "maxBytes": 33007,
+      // (The header comment that used to describe the theme tokens was rewritten
+      // to say where they went — 3 lines of pointer, kept rather than trimmed so
+      // the next reader is not sent looking for blocks that are no longer here.)
+      //                                                   1466 / 33299.
+      "maxLines": 1466,
+      "maxBytes": 33299,
     },
     {
       "kind": "lint-baseline",
