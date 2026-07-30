@@ -61,8 +61,9 @@
       //                                                   1466 / 33299.
       // D wave3 (dead `.frame` / `.frame .shell` — zero references in any of the
       // FC-1 five forms and zero elements at runtime):     1456 / 33081.
-      "maxLines": 1456,
-      "maxBytes": 33081,
+      // G family spacing-a (dead `.g8` — 参照0/全5形態):    1453 / 33049.
+      "maxLines": 1453,
+      "maxBytes": 33049,
     },
     {
       "kind": "lint-baseline",

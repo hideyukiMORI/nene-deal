@@ -9,10 +9,10 @@ export interface StackProps {
 }
 
 const gapClasses: Record<StackGap, string> = {
-  xs: 'g1',
-  sm: 'g2',
-  md: 'g4',
-  lg: 'g6',
+  xs: 'gap-1',
+  sm: 'gap-2',
+  md: 'gap-4',
+  lg: 'gap-6',
 }
 
 export function Stack({ direction = 'vertical', gap = 'md', children, className }: StackProps) {
