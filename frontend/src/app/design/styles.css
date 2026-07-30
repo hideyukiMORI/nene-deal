@@ -719,10 +719,6 @@
     border-left-color: var(--accent);
     box-shadow: var(--shadow-md);
   }
-  .deal .acct {
-    font-weight: 600;
-    font-size: 13.5px;
-  }
   .deal .amt {
     font-family: var(--mono);
     font-variant-numeric: tabular-nums;

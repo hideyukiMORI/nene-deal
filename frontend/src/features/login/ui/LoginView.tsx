@@ -49,7 +49,7 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
   return (
     <div className="min-h-screen">
       <div className="fixed top-5 right-5 z-40 max-sm:top-3 max-sm:right-3">
-        <span className="hdr-controls">
+        <span className="inline-flex items-center gap-2">
           <ThemeToggle
             theme={theme}
             onThemeChange={setTheme}

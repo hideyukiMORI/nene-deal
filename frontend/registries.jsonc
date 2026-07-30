@@ -14,12 +14,13 @@
       // B family wave 2 (.col-name out of the shared nowrap rule): → 984/24424.
       // D family wave 1 (dead enterprise/console skin removal):    → 880/22416.
       // D family wave 2a (dead .sidebar-foot rule):                 → 877/22337.
+      // D family wave 2b (topnav / m-sheet 系 11種 drain):          → 822/21490.
       // maxLines is formattedLineCount (prettier-formatted, blank lines
       // dropped) — NOT raw `wc -l`. Measured locally with the fleet's own
       // definition and cross-checked against their independent run
       // (fleet #176②').
-      "maxLines": 877,
-      "maxBytes": 22337,
+      "maxLines": 822,
+      "maxBytes": 21490,
     },
     {
       "kind": "legacy-manifest",
@@ -45,8 +46,9 @@
       // B family wave 2 (.col-head .col-name / .count): 1605 / 37160.
       // C family wave 1 (timeline drain + 4 dead rules):  1548 / 36119.
       // D family wave 2a (dead .sidebar / .sidebar-foot): 1532 / 35756.
-      "maxLines": 1532,
-      "maxBytes": 35756,
+      // D family wave 2b (.deal .acct):                    1528 / 35691.
+      "maxLines": 1528,
+      "maxBytes": 35691,
     },
     {
       "kind": "lint-baseline",
