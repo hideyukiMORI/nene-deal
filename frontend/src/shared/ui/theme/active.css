@@ -1,3 +1,8 @@
 /* The single theme-swap point. Change this import (or swap this file in the
    build) to restyle the entire app without editing any component. */
 @import './themes/default.css';
+/* The legacy skin's own theme blocks. Separate from default.css because the
+   two use disjoint token vocabularies (contract `--color-*` vs legacy `--fg`
+   /`--surface`/…) and this one retires with the C5 drain — keeping them apart
+   means deleting a file, not editing one. #169 */
+@import './themes/calm-skin.css';

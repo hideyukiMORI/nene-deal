@@ -19,32 +19,6 @@
     --radius-lg: 18px;
   }
 
-  /* アクセント（デザイン × モード） */
-  [data-design='calm'][data-theme='dark'] {
-    --accent: oklch(77% 0.072 184);
-    --accent-hover: oklch(83% 0.072 184);
-    --accent-weak: oklch(30% 0.038 188);
-    --accent-line: oklch(46% 0.05 188);
-    --on-accent: oklch(19% 0.03 200);
-  }
-  [data-design='calm'][data-theme='light'] {
-    --accent: oklch(46% 0.068 186);
-    --accent-hover: oklch(40% 0.068 186);
-    --accent-weak: oklch(96% 0.016 186);
-    --accent-line: oklch(87% 0.03 186);
-    --on-accent: oklch(99% 0 0);
-  }
-  /* calm: 枠線なしでもカードが浮くよう、面の濃淡コントラストを少し強める */
-  [data-design='calm'][data-theme='light'] {
-    --bg: oklch(95.8% 0.008 220);
-    --surface: oklch(100% 0 0);
-    --surface-2: oklch(97.5% 0.006 220);
-  }
-  [data-design='calm'][data-theme='dark'] {
-    --surface: oklch(23% 0.018 245);
-    --surface-2: oklch(26.5% 0.018 245);
-  }
-
   /* ============================================================
    共通シェル基礎（main-inner は透明ラッパ）
    ============================================================ */

@@ -15,12 +15,14 @@
       // D family wave 1 (dead enterprise/console skin removal):    → 880/22416.
       // D family wave 2a (dead .sidebar-foot rule):                 → 877/22337.
       // D family wave 2b (topnav / m-sheet 系 11種 drain):          → 822/21490.
+      // Supply PR (#169): the four [data-design='calm'][data-theme=…] token
+      // blocks moved to themes/calm-skin.css:                       → 797/20558.
       // maxLines is formattedLineCount (prettier-formatted, blank lines
       // dropped) — NOT raw `wc -l`. Measured locally with the fleet's own
       // definition and cross-checked against their independent run
       // (fleet #176②').
-      "maxLines": 822,
-      "maxBytes": 21490,
+      "maxLines": 797,
+      "maxBytes": 20558,
     },
     {
       "kind": "legacy-manifest",
@@ -47,8 +49,16 @@
       // C family wave 1 (timeline drain + 4 dead rules):  1548 / 36119.
       // D family wave 2a (dead .sidebar / .sidebar-foot): 1532 / 35756.
       // D family wave 2b (.deal .acct):                    1528 / 35691.
-      "maxLines": 1528,
-      "maxBytes": 35691,
+      // Supply PR (#169): the :root/[data-theme='dark'] and [data-theme='light']
+      // token blocks moved to themes/calm-skin.css. `color-scheme` could not go
+      // with them (not a custom property — themes-token-only), so it stayed as
+      // one `color-scheme: var(--color-scheme)` line on the base :root:
+      // (The header comment that used to describe the theme tokens was rewritten
+      // to say where they went — 3 lines of pointer, kept rather than trimmed so
+      // the next reader is not sent looking for blocks that are no longer here.)
+      //                                                   1466 / 33299.
+      "maxLines": 1466,
+      "maxBytes": 33299,
     },
     {
       "kind": "lint-baseline",
@@ -70,25 +80,36 @@
       "initializedBy": "init --scan",
       "shrunkBy": "C5 W3 #169: the sole !important (.col.drop-ok { opacity }) had no cascade to win — the 0.6 drag dim is already scoped `:not(.drop-ok)`. Dropped the flag, kept the declaration. init --check verified live 1→0.",
     },
+    // The two nene2/data-theme-selector-location lint-baselines (designs.css 4 /
+    // styles.css 2 — the "tail of 6") are GONE, not shrunk: the blocks they
+    // grandfathered were moved into src/shared/ui/theme/themes/calm-skin.css,
+    // where the rule does not apply because that is where [data-theme] belongs
+    // (会議R2⑥). A baseline entry records a violation we are tolerating; once
+    // the violation is structurally impossible the entry has to go, otherwise
+    // the ledger keeps claiming debt that no longer exists.
+    //
+    // The two composite selectors below are the reason the move is not enough on
+    // its own: inside a theme file, themes-token-only only accepts the bare
+    // `[data-theme='x']` shape by default, so `[data-design='calm'][data-theme=…]`
+    // would be rejected there. Registering them as scoped-theme/local bakes them
+    // into the synthesised config's additionalScopeSelectors (#159).
     {
-      "kind": "lint-baseline",
-      "id": "nene-deal-lb-nene2-data-theme-selector-location-src-app-design-designs-css",
+      "kind": "scoped-theme",
+      "id": "nene-deal-scoped-theme-calm-dark",
       "repo": "nene-deal",
-      "rule": "nene2/data-theme-selector-location",
-      "file": "src/app/design/designs.css",
-      "frozenCount": 4,
-      "initializedBy": "init --scan",
-      "shrunkBy": "C5 W3 #169: removed the unreachable [data-design='enterprise'|'console'] blocks (24 rules / 102 lines). Two of them were [data-design='enterprise'][data-theme='dark'|'light'] pairs, so the data-theme tail dropped with them. data-design is written only by index.html and shared/theme/index.ts, both hard-coded to 'calm', and there is no switcher — so none of the removed rules could ever match. init --check verified live 6→4.",
+      "variant": "local",
+      // Must match the CSS byte for byte (quote style and spacing included) —
+      // the synthesiser compares selector strings, not parsed selectors.
+      "selector": "[data-design='calm'][data-theme='dark']",
+      "reasonRef": "nene-deal#169 — C5 W3: the calm skin's accent/surface tokens are per design × mode, so the scope is data-design × data-theme rather than data-theme alone. data-design is hard-coded to 'calm' (index.html + shared/theme/index.ts) and there is no switcher, so this is a single-skin scope, not a theme matrix.",
     },
     {
-      "kind": "lint-baseline",
-      "id": "nene-deal-lb-nene2-data-theme-selector-location-src-app-design-styles-css",
+      "kind": "scoped-theme",
+      "id": "nene-deal-scoped-theme-calm-light",
       "repo": "nene-deal",
-      "rule": "nene2/data-theme-selector-location",
-      "file": "src/app/design/styles.css",
-      "frozenCount": 2,
-      "initializedBy": "init --scan",
-      "shrunkBy": "C5 W3 #169: removed dead [data-theme='navy'] (unreachable; ThemeMode='light'|'dark' only). init --check verified live 3→2.",
+      "variant": "local",
+      "selector": "[data-design='calm'][data-theme='light']",
+      "reasonRef": "nene-deal#169 — C5 W3: light half of the pair above. Retires with the calm skin when the C5 drain removes the last legacy rule reading these token names.",
     },
   ],
 }
