@@ -25,7 +25,6 @@
     --r-pill: 999px;
     --sidebar-w: 248px;
     /* spacing */
-    --s1: 4px;
     --s2: 8px;
     --s3: 12px;
     --s4: 16px;
@@ -148,23 +147,9 @@
   .grow {
     flex: 1;
   }
-  .g1 {
-    gap: var(--s1);
-  }
-  .g2 {
-    gap: var(--s2);
-  }
-  .g3 {
-    gap: var(--s3);
-  }
+  /* 他の .gN は gap-* へ drain 済み。.g4 だけ park（境界不一致・#169 spacing-b）。 */
   .g4 {
     gap: var(--s4);
-  }
-  .g5 {
-    gap: var(--s5);
-  }
-  .g6 {
-    gap: var(--s6);
   }
 
   /* ---------- ボタン ---------- */

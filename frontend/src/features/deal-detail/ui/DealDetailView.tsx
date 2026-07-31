@@ -55,7 +55,7 @@ export function DealDetailView({
   const toast = useToast()
 
   return (
-    <section className="content content-narrow stack g6">
+    <section className="content content-narrow stack">
       <button
         type="button"
         className="btn btn-secondary btn-sm back-link"
@@ -71,7 +71,7 @@ export function DealDetailView({
       {status === 'missing' ? <EmptyState title={t('detail.notFound')} /> : null}
 
       {status === 'error' ? (
-        <div className="stack g3">
+        <div className="stack gap-3">
           <h1 className="t-h1">{t('detail.error.title')}</h1>
           <p className="muted t-body">
             {errorMessageKey !== null ? t(errorMessageKey) : t('common.error.unknown')}
@@ -81,8 +81,8 @@ export function DealDetailView({
 
       {status === 'ready' && deal !== null ? (
         <>
-          <div className="stack g3 page-head">
-            <div className="row between wrap g3">
+          <div className="stack gap-3 page-head">
+            <div className="row between wrap gap-3">
               <h1 className="t-h1">{deal.accountLabel}</h1>
               {deal.stageSlug === 'won' ? (
                 <span className="badge badge-ok">
@@ -91,7 +91,7 @@ export function DealDetailView({
                 </span>
               ) : null}
             </div>
-            <div className="row g4 wrap muted t-cap">
+            <div className="row gap-4 wrap muted t-cap">
               <span className="num semi" style={{ color: 'var(--fg)', fontSize: 15 }}>
                 {formatMoneyJpy(deal.amountCents, locale)}
               </span>
@@ -99,7 +99,7 @@ export function DealDetailView({
                 {t('deal.field.probability')}{' '}
                 <span className="num">{deal.probabilityPercent}%</span>
               </span>
-              <span className="row g1">
+              <span className="row gap-1">
                 <IconOwner />
                 <span className="num">{deal.ownerLabel ?? t('detail.owner.empty')}</span>
               </span>
@@ -152,7 +152,7 @@ export function DealDetailView({
 
           <ActivityTimeline activity={activity} stages={stages} locale={locale} />
 
-          <div className="stack g2 danger-zone">
+          <div className="stack gap-2 danger-zone">
             <button
               type="button"
               className="btn btn-danger"
@@ -202,12 +202,12 @@ function HandoffSection({
   const linked = quoteId !== null
 
   return (
-    <section aria-label={t('handoff.title')} className="card card-pad stack g4">
-      <div className="row g3">
+    <section aria-label={t('handoff.title')} className="card card-pad stack gap-4">
+      <div className="row gap-3">
         <span className="handoff-mark">
           <IconInvoice />
         </span>
-        <div className="stack g1">
+        <div className="stack gap-1">
           <h2 className="t-h2">{t('handoff.title')}</h2>
           <span className="muted t-cap">{t('handoff.description')}</span>
         </div>
@@ -215,8 +215,8 @@ function HandoffSection({
       <hr className="divider" />
 
       {linked ? (
-        <div className="stack g2">
-          <div className="row g2 ok semi t-cap">
+        <div className="stack gap-2">
+          <div className="row gap-2 ok semi t-cap">
             <IconCheck />
             {t('handoff.linked')}
           </div>
@@ -225,11 +225,11 @@ function HandoffSection({
           </span>
         </div>
       ) : (
-        <div className="stack g3">
+        <div className="stack gap-3">
           {handoffErrorMessage !== null ? (
             <span className="t-cap danger">{handoffErrorMessage}</span>
           ) : null}
-          <div className="row g3">
+          <div className="row gap-3">
             <button
               type="button"
               className="btn btn-primary"

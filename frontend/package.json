@@ -31,6 +31,9 @@
     "smoke": "node tools/smoke/visual-smoke.mjs",
     "smoke:diff": "node tools/smoke/visual-diff.mjs",
     "smoke:focus": "node tools/smoke/focus-shot.mjs",
+    "probe:computed": "node tools/smoke/computed-probe.mjs",
+    "probe:diff": "node tools/smoke/computed-diff.mjs",
+    "probe:liveness": "node tools/smoke/class-liveness.mjs",
     "lint:styles": "stylelint 'src/**/*.css'",
     "tokens:validate": "nene2-tokens validate src/shared/ui/theme/themes/default.css",
     "check:registries": "nene2-check init --check --repo nene-deal --enforce-legacy-size"

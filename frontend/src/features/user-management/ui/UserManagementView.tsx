@@ -89,9 +89,9 @@ export function UserManagementView({
   )
 
   return (
-    <section className="content content-narrow stack g6">
+    <section className="content content-narrow stack">
       <div className="row between wrap g4 page-head">
-        <div className="stack g1">
+        <div className="stack gap-1">
           <h1 className="t-h1">{t('users.title')}</h1>
           <span className="muted t-cap">{t('users.subtitle')}</span>
         </div>
@@ -125,12 +125,12 @@ export function UserManagementView({
       {status === 'loading' ? <p className="muted t-body">{t('users.loading')}</p> : null}
 
       {status === 'error' ? (
-        <div className="stack g3">
+        <div className="stack gap-3">
           <h2 className="t-h2">{t('users.error.title')}</h2>
           <p className="muted t-body">
             {errorKey !== null ? t(errorKey) : t('common.error.unknown')}
           </p>
-          <div className="row g3">
+          <div className="row gap-3">
             <button type="button" className="btn btn-secondary" onClick={retry}>
               {t('common.actions.retry')}
             </button>
@@ -160,8 +160,8 @@ export function UserManagementView({
                     <span className="avatar cursor-pointer">
                       {(user.email[0] ?? '?').toUpperCase()}
                     </span>
-                    <div className="stack g1">
-                      <span className="row g2">
+                    <div className="stack gap-1">
+                      <span className="row gap-2">
                         <span className="medium">{user.email}</span>
                         {you ? <span className="badge badge-accent">{t('users.you')}</span> : null}
                         {user.status === 'disabled' ? (
@@ -174,7 +174,7 @@ export function UserManagementView({
                       <IconChevron />
                     </span>
                   </button>
-                  <div className="row g3 user-ctrls">
+                  <div className="row gap-3 user-ctrls">
                     {roleSelect(user, true)}
                     {you ? null : statusButton(user)}
                     {you ? null : (
@@ -231,7 +231,7 @@ export function UserManagementView({
               >
                 {(openUser.email[0] ?? '?').toUpperCase()}
               </span>
-              <div className="stack g1" style={{ minWidth: 0 }}>
+              <div className="stack gap-1" style={{ minWidth: 0 }}>
                 <span className="medium us-email">{openUser.email}</span>
                 {openUser.id === currentUserId ? (
                   <span className="badge badge-accent" style={{ alignSelf: 'flex-start' }}>

@@ -62,8 +62,19 @@
       // D wave3 (dead `.frame` / `.frame .shell` — zero references in any of the
       // FC-1 five forms and zero elements at runtime):     1456 / 33081.
       // G family spacing-a (dead `.g8` — 参照0/全5形態):    1453 / 33049.
-      "maxLines": 1453,
-      "maxBytes": 33049,
+      // G family spacing-b: `.g1`〜`.g3` `.g5` `.g6` の 5 ルール ＋ 参照が 0 に
+      // なった `--s1` 宣言を削除。`.g4` は残す — `.page-head` の 5 箇所で
+      // desktop のみ効いており、1024px 以下では @media の
+      // `[data-design='calm'] .page-head`(0,2,0) が var(--s3) で勝つ。utility は
+      // @layer legacy に無条件で勝つため `gap-4` に移すと mobile が 12→16px に
+      // 変わる。`max-lg:` は width < 64rem ＝ 1024px を含まず `max-width:1024px`
+      // と境界が一致しないので、境界語彙が入るまで park（#169 の park 種別
+      // 「境界不一致」）。他に .content×6 / .badge×2 / .audit-cols×1 の計 9 箇所は
+      // `.gN` が別ルールに負けて**元から効いていなかった**ため、utility へ移さず
+      // クラスごと除去した（移すと死んでいた値が生き返って意匠が変わる）。
+      //                                                     1438 / 32979.
+      "maxLines": 1438,
+      "maxBytes": 32979,
     },
     {
       "kind": "lint-baseline",
