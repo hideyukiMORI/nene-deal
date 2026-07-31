@@ -135,18 +135,6 @@
     flex-direction: row;
     align-items: center;
   }
-  .row.top {
-    align-items: flex-start;
-  }
-  .between {
-    justify-content: space-between;
-  }
-  .wrap {
-    flex-wrap: wrap;
-  }
-  .grow {
-    flex: 1;
-  }
   /* 他の .gN は gap-* へ drain 済み。.g4 だけ park（境界不一致・#169 spacing-b）。 */
   .g4 {
     gap: var(--s4);

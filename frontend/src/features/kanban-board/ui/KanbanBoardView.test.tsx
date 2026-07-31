@@ -160,4 +160,34 @@ describe('KanbanBoardView', () => {
     }
   })
   /* eslint-enable testing-library/no-container, testing-library/no-node-access */
+
+  // C5 W3 #169 G family flex-a guard. `.between` / `.wrap` / `.grow` each declare
+  // exactly one property and nothing in @layer legacy competes for it, so all 74
+  // observed (class, property, element) pairs were live and the whole set moved.
+  // `.row` and `.stack` are deliberately NOT in this wave: they are entangled with
+  // `@media (max-width:1024px)` rules on `.page-head` (flex-direction/align-items)
+  // and `.user-ctrls` (display:none), where a utility would win at every width.
+  // The assertions below therefore pin both halves — the migrated classes are gone
+  // AND the deferred ones are still present, so splitting the wave stays visible.
+  /* eslint-disable testing-library/no-container, testing-library/no-node-access */
+  it('migrates the single-property flex classes and defers .row/.stack', () => {
+    const { container } = renderWithProviders(
+      <KanbanBoardView {...baseProps({ columns: [buildKanbanColumn()] })} />,
+    )
+
+    // positive: the replacement utilities are on the elements
+    expect(container.querySelector('.justify-between')).not.toBeNull()
+    expect(container.querySelector('.flex-wrap')).not.toBeNull()
+
+    // negative: the drained classes are gone
+    for (const drained of ['between', 'wrap', 'grow']) {
+      expect(container.querySelector(`.${drained}`)).toBeNull()
+    }
+
+    // deferred to flex-b — if these disappear without the @media entanglement
+    // being handled, mobile layout breaks silently (see the wave comment above).
+    expect(container.querySelector('.row')).not.toBeNull()
+    expect(container.querySelector('.stack')).not.toBeNull()
+  })
+  /* eslint-enable testing-library/no-container, testing-library/no-node-access */
 })

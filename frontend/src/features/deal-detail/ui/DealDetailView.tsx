@@ -82,7 +82,7 @@ export function DealDetailView({
       {status === 'ready' && deal !== null ? (
         <>
           <div className="stack gap-3 page-head">
-            <div className="row between wrap gap-3">
+            <div className="row justify-between flex-wrap gap-3">
               <h1 className="t-h1">{deal.accountLabel}</h1>
               {deal.stageSlug === 'won' ? (
                 <span className="badge badge-ok">
@@ -91,7 +91,7 @@ export function DealDetailView({
                 </span>
               ) : null}
             </div>
-            <div className="row gap-4 wrap muted t-cap">
+            <div className="row gap-4 flex-wrap muted t-cap">
               <span className="num semi" style={{ color: 'var(--fg)', fontSize: 15 }}>
                 {formatMoneyJpy(deal.amountCents, locale)}
               </span>

@@ -73,8 +73,16 @@
       // `.gN` が別ルールに負けて**元から効いていなかった**ため、utility へ移さず
       // クラスごと除去した（移すと死んでいた値が生き返って意匠が変わる）。
       //                                                     1438 / 32979.
-      "maxLines": 1438,
-      "maxBytes": 32979,
+      // G family flex-a: `.between` `.wrap` `.grow` の 3 ルール（32 call site を
+      // `justify-between` / `flex-wrap` / `flex-1` へ）＋ 参照 0 の dead
+      // `.row.top`。この 3 種は宣言プロパティが 1 つずつで legacy に競合が無く、
+      // 観測した 74 組すべてが live だったため park 無し。`.row` / `.stack` は
+      // 同じ G family だが flex-b へ分離 — @media の `.page-head`
+      // (flex-direction/align-items) と `.user-ctrls` (display:none) に負けている
+      // 箇所があり、utility 化すると全幅で勝って mobile が壊れる。
+      //                                                     1426 / 32818.
+      "maxLines": 1426,
+      "maxBytes": 32818,
     },
     {
       "kind": "lint-baseline",

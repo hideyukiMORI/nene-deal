@@ -45,7 +45,7 @@ export function StageManagementView({
 
   return (
     <section className="content content-narrow stack">
-      <div className="row between wrap g4 page-head">
+      <div className="row justify-between flex-wrap g4 page-head">
         <div className="stack gap-1">
           <h1 className="t-h1">{t('stages.title')}</h1>
           <span className="muted t-cap">{t('stages.subtitle')}</span>
@@ -216,7 +216,7 @@ function StageEditRow({
   return (
     <div className="list-row">
       <form
-        className="stack gap-4 grow"
+        className="stack gap-4 flex-1"
         onSubmit={(e) => {
           e.preventDefault()
         }}
@@ -224,8 +224,8 @@ function StageEditRow({
         <div className="row gap-2 t-cap semi" style={{ color: 'var(--accent)' }}>
           {t('stages.editing')}
         </div>
-        <div className="row gap-4 wrap">
-          <div className="grow">
+        <div className="row gap-4 flex-wrap">
+          <div className="flex-1">
             <Input
               id={`stage-label-edit-${stage.id}`}
               label={t('stages.field.label')}

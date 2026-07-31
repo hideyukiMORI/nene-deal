@@ -124,7 +124,7 @@ export function KanbanBoardView({
 
   return (
     <section className="content stack">
-      <div className="row between wrap g4 page-head">
+      <div className="row justify-between flex-wrap g4 page-head">
         <div className="stack gap-1">
           <h1 className="t-h1">{t('board.heading')}</h1>
           <span className="muted t-cap">
@@ -136,7 +136,7 @@ export function KanbanBoardView({
               : t('app.subtitle')}
           </span>
         </div>
-        <div className="row gap-4 wrap items-center">
+        <div className="row gap-4 flex-wrap items-center">
           <div className="fchips">
             <span className="fchips-label">{t('board.show')}</span>
             <button
@@ -366,7 +366,7 @@ function BoardColumn({
                   <i />
                 </span>
               )}
-              <div className="row between gap-2">
+              <div className="row justify-between gap-2">
                 <span className="font-semibold text-body">{deal.accountLabel}</span>
                 {isDeleted ? (
                   <span className="badge badge-muted">{deletedBadgeLabel}</span>

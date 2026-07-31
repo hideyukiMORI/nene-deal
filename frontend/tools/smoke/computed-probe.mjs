@@ -25,17 +25,40 @@
  *
  * 環境変数:
  *   PROBE_PROP     測るプロパティ（既定 gap）。flex 群なら justify-content 等。
- *   PROBE_CONTROL  陽性対照に使うクラス（カンマ区切り・既定 gap-1..gap-6）
+ *   PROBE_CONTROL  陽性対照。**`クラス@プロパティ` の組**（カンマ区切り）。
+ *                  既定 gap-1@gap,…,gap-6@gap。`@プロパティ` 省略時は PROBE_PROP。
  *   PROBE_BASE     既定 http://localhost:5187
+ *
+ * ⚠️ **対照は (クラス, プロパティ) の組で問う。** クラス単独で問うと嘘が出る:
+ * `justify-between` は justify-content しか供給しないので、display を測っている
+ * 回で「`justify-between` を外しても display が変わらない」のは当たり前であって
+ * 「対照が死んでいる」ではない。2026-07-31 に この取り違えを2回踏んだ（liveness
+ * 判定と本ツールの両方）。そこで PROBE_PROP に対応しない組は自動で除外し、
+ * 対応する組が1つも無ければ**黙って緑にせず FAIL させる**。
  */
 import { chromium } from 'playwright'
 import fs from 'node:fs'
 
 const BASE = process.env.PROBE_BASE || 'http://localhost:5187'
 const PROP = process.env.PROBE_PROP || 'gap'
-const CONTROL_CLASSES = (process.env.PROBE_CONTROL || 'gap-1,gap-2,gap-3,gap-4,gap-5,gap-6').split(
-  ',',
-)
+const CONTROL_SPEC = (process.env.PROBE_CONTROL || 'gap-1,gap-2,gap-3,gap-4,gap-5,gap-6')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean)
+  .map((s) => {
+    const [cls, prop = PROP] = s.split('@')
+    return { cls, prop }
+  })
+// 測っているプロパティを供給しない対照は、そもそも問いとして成立しないので落とす。
+const CONTROL_CLASSES = CONTROL_SPEC.filter((c) => c.prop === PROP).map((c) => c.cls)
+if (CONTROL_CLASSES.length === 0) {
+  console.error(
+    `ERROR: prop=${PROP} に対応する陽性対照が指定されていない（渡されたのは ` +
+      `${CONTROL_SPEC.map((c) => `${c.cls}@${c.prop}`).join(',')}）。` +
+      `対照の無い測定は「変えたら変わる」を確認できないので緑にしてはいけない。`,
+  )
+  process.exit(1)
+}
 const OUT = process.argv[2] || '/tmp/computed-probe.json'
 const CREDS = { email: 'operator@nene-deal.test', password: 'password' }
 
