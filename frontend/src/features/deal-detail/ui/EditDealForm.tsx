@@ -92,8 +92,8 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
           error={errors.accountLabel?.message}
           {...register('accountLabel')}
         />
-        <div className="row gap-4 wrap">
-          <div className="grow">
+        <div className="row gap-4 flex-wrap">
+          <div className="flex-1">
             <Input
               id="edit-amount"
               label={t('deal.field.amount')}
@@ -104,7 +104,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
               {...register('amountYen', { valueAsNumber: true })}
             />
           </div>
-          <div className="grow">
+          <div className="flex-1">
             <Input
               id="edit-probability"
               label={t('deal.field.probability')}

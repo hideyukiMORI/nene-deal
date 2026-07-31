@@ -50,7 +50,7 @@ export function AuditExportView({
 
   return (
     <section className="content content-narrow stack">
-      <div className="row between wrap g4 page-head">
+      <div className="row justify-between flex-wrap g4 page-head">
         <div className="stack gap-1">
           <h1 className="t-h1">{t('audit.title')}</h1>
           <span className="muted t-cap">{t('audit.subtitle')}</span>
@@ -71,8 +71,8 @@ export function AuditExportView({
           <h2 className="t-h2">{t('audit.rangeTitle')}</h2>
         </div>
 
-        <div className="row gap-4 wrap">
-          <div className="grow">
+        <div className="row gap-4 flex-wrap">
+          <div className="flex-1">
             <Input
               id="audit-from"
               label={t('audit.from')}
@@ -83,7 +83,7 @@ export function AuditExportView({
               }}
             />
           </div>
-          <div className="grow">
+          <div className="flex-1">
             <Input
               id="audit-to"
               label={t('audit.to')}
@@ -98,7 +98,7 @@ export function AuditExportView({
 
         <div className="stack gap-2">
           <span className="eyebrow">{t('audit.recorded')}</span>
-          <div className="row wrap gap-2">
+          <div className="row flex-wrap gap-2">
             {RECORDED.map(
               ({ Icon, label }): ReactNode => (
                 <span key={label} className="audit-chip">
@@ -112,7 +112,7 @@ export function AuditExportView({
 
         {invalidRange ? <span className="t-cap danger">{t('audit.invalidRange')}</span> : null}
 
-        <div className="row gap-4 wrap" style={{ alignItems: 'center' }}>
+        <div className="row gap-4 flex-wrap" style={{ alignItems: 'center' }}>
           <Button type="button" disabled={pending || invalidRange} onClick={onDownload}>
             {pending ? t('audit.downloading') : t('audit.download')}
           </Button>
@@ -122,7 +122,7 @@ export function AuditExportView({
         </div>
       </form>
 
-      <div className="card card-pad row between wrap audit-cols">
+      <div className="card card-pad row justify-between flex-wrap audit-cols">
         <span className="eyebrow">{t('audit.colsLabel')}</span>
         <code className="mono t-cap">{t('audit.colsVal')}</code>
       </div>

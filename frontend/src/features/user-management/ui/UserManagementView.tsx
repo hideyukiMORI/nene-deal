@@ -90,7 +90,7 @@ export function UserManagementView({
 
   return (
     <section className="content content-narrow stack">
-      <div className="row between wrap g4 page-head">
+      <div className="row justify-between flex-wrap g4 page-head">
         <div className="stack gap-1">
           <h1 className="t-h1">{t('users.title')}</h1>
           <span className="muted t-cap">{t('users.subtitle')}</span>
