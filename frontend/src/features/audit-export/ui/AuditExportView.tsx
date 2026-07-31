@@ -49,20 +49,20 @@ export function AuditExportView({
   }
 
   return (
-    <section className="content content-narrow stack g6">
+    <section className="content content-narrow stack">
       <div className="row between wrap g4 page-head">
-        <div className="stack g1">
+        <div className="stack gap-1">
           <h1 className="t-h1">{t('audit.title')}</h1>
           <span className="muted t-cap">{t('audit.subtitle')}</span>
         </div>
-        <span className="badge badge-accent row g1">
+        <span className="badge badge-accent row">
           <IconShield />
           {t('audit.adminOnly')}
         </span>
       </div>
 
       <form
-        className="card card-pad stack g5"
+        className="card card-pad stack gap-5"
         onSubmit={(event) => {
           event.preventDefault()
         }}
@@ -71,7 +71,7 @@ export function AuditExportView({
           <h2 className="t-h2">{t('audit.rangeTitle')}</h2>
         </div>
 
-        <div className="row g4 wrap">
+        <div className="row gap-4 wrap">
           <div className="grow">
             <Input
               id="audit-from"
@@ -96,9 +96,9 @@ export function AuditExportView({
           </div>
         </div>
 
-        <div className="stack g2">
+        <div className="stack gap-2">
           <span className="eyebrow">{t('audit.recorded')}</span>
-          <div className="row wrap g2">
+          <div className="row wrap gap-2">
             {RECORDED.map(
               ({ Icon, label }): ReactNode => (
                 <span key={label} className="audit-chip">
@@ -112,7 +112,7 @@ export function AuditExportView({
 
         {invalidRange ? <span className="t-cap danger">{t('audit.invalidRange')}</span> : null}
 
-        <div className="row g4 wrap" style={{ alignItems: 'center' }}>
+        <div className="row gap-4 wrap" style={{ alignItems: 'center' }}>
           <Button type="button" disabled={pending || invalidRange} onClick={onDownload}>
             {pending ? t('audit.downloading') : t('audit.download')}
           </Button>
@@ -122,7 +122,7 @@ export function AuditExportView({
         </div>
       </form>
 
-      <div className="card card-pad row between wrap g3 audit-cols">
+      <div className="card card-pad row between wrap audit-cols">
         <span className="eyebrow">{t('audit.colsLabel')}</span>
         <code className="mono t-cap">{t('audit.colsVal')}</code>
       </div>

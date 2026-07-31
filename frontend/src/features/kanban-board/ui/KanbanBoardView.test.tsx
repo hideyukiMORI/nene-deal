@@ -116,4 +116,48 @@ describe('KanbanBoardView', () => {
     }
   })
   /* eslint-enable testing-library/no-container, testing-library/no-node-access */
+
+  // C5 W3 #169 G family spacing-b guard. Three different outcomes share this
+  // wave, and each needs its own assertion because reverting any one of them
+  // would still pass the other two:
+  //
+  //  1. migrated  — `.g1`/`.g2`/`.g3`/`.g5`/`.g6` became `gap-*` utilities.
+  //  2. removed   — on `.content` the gap was never coming from `.g6`;
+  //                 `.shell-calm .content` (0,2,0) outranked it. Moving that
+  //                 site to a utility would have *changed* the layout (32px →
+  //                 24px), so the class was dropped instead of translated.
+  //  3. PARKED    — `.g4` deliberately STAYS on `.page-head`. Below 1024px the
+  //                 @media `[data-design='calm'] .page-head` supplies 12px and
+  //                 `.g4` is inert; a utility would win at every width and make
+  //                 mobile 16px. `max-lg:` cannot express it either (width <
+  //                 64rem excludes 1024px itself). The assertion below is a
+  //                 guard against a well-meaning future migration.
+  /* eslint-disable testing-library/no-container, testing-library/no-node-access */
+  it('migrates the spacing classes, drops the inert ones and keeps the parked .g4', () => {
+    const { container } = renderWithProviders(
+      <KanbanBoardView {...baseProps({ columns: [buildKanbanColumn()] })} />,
+    )
+
+    // 1. positive: the replacement utilities are on the elements
+    const section = container.querySelector('section.content')
+    expect(section).not.toBeNull()
+    expect(container.querySelector('.gap-1')).not.toBeNull()
+    expect(container.querySelector('.gap-4')).not.toBeNull()
+
+    // 2. the inert `.g6` is gone AND was not replaced by a utility — the gap on
+    //    `.content` must keep coming from the legacy descendant rule.
+    expect(section).not.toHaveClass('g6')
+    expect(section?.className).not.toMatch(/\bgap-\d/)
+
+    // 3. park: `.g4` must still be on the page-head row.
+    const pageHead = container.querySelector('.page-head')
+    expect(pageHead).not.toBeNull()
+    expect(pageHead).toHaveClass('g4')
+
+    // negative: every spacing class drained in this wave is gone repo-wide.
+    for (const drained of ['g1', 'g2', 'g3', 'g5', 'g6']) {
+      expect(container.querySelector(`.${drained}`)).toBeNull()
+    }
+  })
+  /* eslint-enable testing-library/no-container, testing-library/no-node-access */
 })

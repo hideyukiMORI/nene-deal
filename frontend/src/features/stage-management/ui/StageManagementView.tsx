@@ -44,9 +44,9 @@ export function StageManagementView({
   const [editingId, setEditingId] = useState<string | null>(null)
 
   return (
-    <section className="content content-narrow stack g6">
+    <section className="content content-narrow stack">
       <div className="row between wrap g4 page-head">
-        <div className="stack g1">
+        <div className="stack gap-1">
           <h1 className="t-h1">{t('stages.title')}</h1>
           <span className="muted t-cap">{t('stages.subtitle')}</span>
         </div>
@@ -80,12 +80,12 @@ export function StageManagementView({
       {status === 'loading' ? <p className="muted t-body">{t('stages.loading')}</p> : null}
 
       {status === 'error' ? (
-        <div className="stack g3">
+        <div className="stack gap-3">
           <h2 className="t-h2">{t('stages.error.title')}</h2>
           <p className="muted t-body">
             {errorKey !== null ? t(errorKey) : t('common.error.unknown')}
           </p>
-          <div className="row g3">
+          <div className="row gap-3">
             <button type="button" className="btn btn-secondary" onClick={retry}>
               {t('common.actions.retry')}
             </button>
@@ -148,7 +148,7 @@ function StageReadRow({
   const color = STAGE_COLORS[stage.slug] ?? 'var(--fg-faint)'
   return (
     <div className="list-row">
-      <div className="row g3">
+      <div className="row gap-3">
         <span className="num faint" style={{ width: 18, textAlign: 'center' }}>
           {stage.sortOrder}
         </span>
@@ -156,8 +156,8 @@ function StageReadRow({
           className="stage-dot"
           style={{ width: 9, height: 9, borderRadius: 2, background: color }}
         />
-        <div className="stack g1">
-          <span className="row g2">
+        <div className="stack gap-1">
+          <span className="row gap-2">
             <span className="medium">{stage.label}</span>
             {stage.isWon ? (
               <span className="badge badge-ok">
@@ -175,7 +175,7 @@ function StageReadRow({
       </div>
 
       {stage.isTerminal ? null : (
-        <div className="row g2">
+        <div className="row gap-2">
           <Button variant="secondary" size="sm" onClick={onEdit}>
             {t('common.actions.edit')}
           </Button>
@@ -216,15 +216,15 @@ function StageEditRow({
   return (
     <div className="list-row">
       <form
-        className="stack g4 grow"
+        className="stack gap-4 grow"
         onSubmit={(e) => {
           e.preventDefault()
         }}
       >
-        <div className="row g2 t-cap semi" style={{ color: 'var(--accent)' }}>
+        <div className="row gap-2 t-cap semi" style={{ color: 'var(--accent)' }}>
           {t('stages.editing')}
         </div>
-        <div className="row g4 wrap">
+        <div className="row gap-4 wrap">
           <div className="grow">
             <Input
               id={`stage-label-edit-${stage.id}`}
@@ -247,7 +247,7 @@ function StageEditRow({
             />
           </div>
         </div>
-        <div className="row g2">
+        <div className="row gap-2">
           <Button
             size="sm"
             onClick={() => {

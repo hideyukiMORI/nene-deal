@@ -104,7 +104,7 @@ export function CreateDealForm({
           error={errors.accountLabel?.message}
           {...register('accountLabel')}
         />
-        <div className="row g4 wrap">
+        <div className="row gap-4 wrap">
           <div className="grow">
             <Input
               id="deal-amount"

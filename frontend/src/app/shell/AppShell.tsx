@@ -110,11 +110,11 @@ export function AppShell() {
       <span className="avatar cursor-pointer" style={{ width: 40, height: 40 }}>
         {avatarLetter}
       </span>
-      <div className="stack g1" style={{ flex: 1, minWidth: 0 }}>
+      <div className="stack gap-1" style={{ flex: 1, minWidth: 0 }}>
         <span className="medium" style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {email}
         </span>
-        <span className="faint t-tiny row g1">
+        <span className="faint t-tiny row gap-1">
           <IconShield />
           {t('users.role.admin')}
         </span>
@@ -126,7 +126,7 @@ export function AppShell() {
     <div className="shell shell-calm">
       {/* Desktop top nav */}
       <header className="topnav">
-        <div className="row g3">
+        <div className="row gap-3">
           <Brand />
         </div>
         <nav className="flex gap-0.5">
