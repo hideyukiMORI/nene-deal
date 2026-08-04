@@ -126,13 +126,9 @@
   }
 
   /* ---------- レイアウト ---------- */
-  .stack {
-    display: flex;
-    flex-direction: column;
-  }
+  /* .stack drained; .row parked — #169 flex-b */
   .row {
     display: flex;
-    flex-direction: row;
     align-items: center;
   }
   /* 他の .gN は gap-* へ drain 済み。.g4 だけ park（境界不一致・#169 spacing-b）。 */

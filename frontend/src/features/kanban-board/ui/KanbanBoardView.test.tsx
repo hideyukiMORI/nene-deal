@@ -169,8 +169,15 @@ describe('KanbanBoardView', () => {
   // and `.user-ctrls` (display:none), where a utility would win at every width.
   // The assertions below therefore pin both halves — the migrated classes are gone
   // AND the deferred ones are still present, so splitting the wave stays visible.
+  //
+  // flex-b (this wave) resolved the deferral: `.stack` drained everywhere, so it
+  // is now absent from this view. `.row` did NOT drain — the `.page-head` row
+  // here is one of the six parked call sites, because Tailwind's `max-lg:`
+  // (width < 64rem) excludes 1024px while the legacy `@media (max-width:1024px)`
+  // includes it, so no responsive variant reproduces the boundary. The assertion
+  // therefore flips for `.stack` and hardens for `.row`.
   /* eslint-disable testing-library/no-container, testing-library/no-node-access */
-  it('migrates the single-property flex classes and defers .row/.stack', () => {
+  it('migrates the single-property flex classes, drains .stack and parks .row', () => {
     const { container } = renderWithProviders(
       <KanbanBoardView {...baseProps({ columns: [buildKanbanColumn()] })} />,
     )
@@ -184,10 +191,18 @@ describe('KanbanBoardView', () => {
       expect(container.querySelector(`.${drained}`)).toBeNull()
     }
 
-    // deferred to flex-b — if these disappear without the @media entanglement
-    // being handled, mobile layout breaks silently (see the wave comment above).
-    expect(container.querySelector('.row')).not.toBeNull()
-    expect(container.querySelector('.stack')).not.toBeNull()
+    // flex-b: `.stack` is drained — its 38 call sites moved to `flex flex-col`.
+    expect(container.querySelector('.stack')).toBeNull()
+    expect(container.querySelector('.flex-col')).not.toBeNull()
+
+    // flex-b park: `.row` survives ONLY on the page-head, and must keep both the
+    // token and the absence of a competing utility. If a later wave moves this
+    // to `flex items-center`, the utility beats `@layer legacy` at every width
+    // and the header stops stacking below 1024px — invisible at 1280px.
+    const pageHead = container.querySelector('.page-head')
+    expect(pageHead).not.toBeNull()
+    expect(pageHead).toHaveClass('row')
+    expect(pageHead?.className).not.toMatch(/\bitems-center\b/)
   })
   /* eslint-enable testing-library/no-container, testing-library/no-node-access */
 })

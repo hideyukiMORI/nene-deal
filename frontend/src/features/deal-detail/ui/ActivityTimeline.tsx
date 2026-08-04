@@ -116,7 +116,10 @@ export function ActivityTimeline({ activity, stages, locale }: ActivityTimelineP
 
   if (activity.length === 0) {
     return (
-      <section aria-label={t('detail.activity.title')} className="card card-pad stack gap-4">
+      <section
+        aria-label={t('detail.activity.title')}
+        className="card card-pad flex flex-col gap-4"
+      >
         <div className="panel-title" style={{ marginBottom: 0 }}>
           <h2 className="t-h2">{t('detail.activity.title')}</h2>
         </div>
@@ -131,7 +134,7 @@ export function ActivityTimeline({ activity, stages, locale }: ActivityTimelineP
   const hidden = activity.length - HEAD - TAIL
 
   return (
-    <section aria-label={t('detail.activity.title')} className="card card-pad stack gap-4">
+    <section aria-label={t('detail.activity.title')} className="card card-pad flex flex-col gap-4">
       <div className="panel-title" style={{ marginBottom: 0 }}>
         <h2 className="t-h2">{t('detail.activity.title')}</h2>
       </div>

@@ -81,8 +81,17 @@
       // (flex-direction/align-items) と `.user-ctrls` (display:none) に負けている
       // 箇所があり、utility 化すると全幅で勝って mobile が壊れる。
       //                                                     1426 / 32818.
-      "maxLines": 1426,
-      "maxBytes": 32818,
+      // G family flex-b: `.stack` を drain（38 call site → `flex flex-col`）し
+      // ルートごと削除。`.row` は park — `flex-direction: row` の宣言だけは全
+      // 174 観測で live 0（CSS 初期値と同値＝(a)冗長 166 / (b)負け 8）なので
+      // 削除し、`display` と `align-items` は残す。call site は 42 → 12（park 6
+      // ＝ `.page-head`×5 と `.user-ctrls`×1、構造フック 6 ＝ `:where(.list-row)`
+      // 系のセレクタが `.row` / `.stack` を祖先・子として参照するため token 保持）。
+      // `.notfound` の 1 箇所は `.stack` が元から死んでいた（同 layer の後方で
+      // `display: grid` が勝つ）ため utility を足さずに token だけ落とした。
+      //                                                     1422 / 32783.
+      "maxLines": 1422,
+      "maxBytes": 32783,
     },
     {
       "kind": "lint-baseline",
