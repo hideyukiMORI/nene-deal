@@ -16,7 +16,11 @@ const gapClasses: Record<StackGap, string> = {
 }
 
 export function Stack({ direction = 'vertical', gap = 'md', children, className }: StackProps) {
-  const classes = [direction === 'vertical' ? 'stack' : 'row', gapClasses[gap], className]
+  const classes = [
+    direction === 'vertical' ? 'flex flex-col' : 'flex items-center',
+    gapClasses[gap],
+    className,
+  ]
     .filter(Boolean)
     .join(' ')
 

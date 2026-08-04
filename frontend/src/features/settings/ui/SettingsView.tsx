@@ -30,20 +30,20 @@ export function SettingsView({ value, setDraft, loading, saving, save }: Setting
   }
 
   return (
-    <section className="content content-narrow stack">
+    <section className="content content-narrow flex flex-col">
       <div className="row justify-between flex-wrap g4 page-head">
-        <div className="stack gap-1">
+        <div className="flex flex-col gap-1">
           <h1 className="t-h1">{t('settings.title')}</h1>
           <span className="muted t-cap">{t('settings.subtitle')}</span>
         </div>
-        <span className="badge badge-accent row">
+        <span className="badge badge-accent">
           <IconShield />
           {t('audit.adminOnly')}
         </span>
       </div>
 
       <form
-        className="card card-pad stack gap-5"
+        className="card card-pad flex flex-col gap-5"
         onSubmit={(event) => {
           event.preventDefault()
         }}
@@ -69,7 +69,7 @@ export function SettingsView({ value, setDraft, loading, saving, save }: Setting
           {t('settings.closingDay.hint')}
         </span>
 
-        <div className="row gap-3">
+        <div className="flex items-center gap-3">
           <Button type="button" disabled={saving || loading} onClick={onSave}>
             {t('common.actions.save')}
           </Button>

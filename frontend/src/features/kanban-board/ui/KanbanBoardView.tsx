@@ -123,9 +123,9 @@ export function KanbanBoardView({
   const { boardRef, onPointerDown } = useKanbanDnd(handleMove)
 
   return (
-    <section className="content stack">
+    <section className="content flex flex-col">
       <div className="row justify-between flex-wrap g4 page-head">
-        <div className="stack gap-1">
+        <div className="flex flex-col gap-1">
           <h1 className="t-h1">{t('board.heading')}</h1>
           <span className="muted t-cap">
             {forecast !== null
@@ -136,7 +136,7 @@ export function KanbanBoardView({
               : t('app.subtitle')}
           </span>
         </div>
-        <div className="row gap-4 flex-wrap items-center">
+        <div className="flex gap-4 flex-wrap items-center">
           <div className="fchips">
             <span className="fchips-label">{t('board.show')}</span>
             <button
@@ -227,12 +227,12 @@ export function KanbanBoardView({
       {status === 'loading' ? <p className="muted t-body">{t('board.loading')}</p> : null}
 
       {status === 'error' ? (
-        <div className="stack gap-3">
+        <div className="flex flex-col gap-3">
           <h2 className="t-h2">{t('board.error.title')}</h2>
           <p className="muted t-body">
             {errorMessageKey !== null ? t(errorMessageKey) : t('common.error.unknown')}
           </p>
-          <div className="row gap-3">
+          <div className="flex items-center gap-3">
             <button type="button" className="btn btn-secondary" onClick={retry}>
               {t('common.actions.retry')}
             </button>
@@ -366,7 +366,7 @@ function BoardColumn({
                   <i />
                 </span>
               )}
-              <div className="row justify-between gap-2">
+              <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold text-body">{deal.accountLabel}</span>
                 {isDeleted ? (
                   <span className="badge badge-muted">{deletedBadgeLabel}</span>
@@ -389,7 +389,7 @@ function BoardColumn({
                 {isDeleted ? (
                   <button
                     type="button"
-                    className="row gap-1 faint t-tiny cursor-pointer"
+                    className="flex items-center gap-1 faint t-tiny cursor-pointer"
                     data-details-link
                     style={{
                       border: 'none',
@@ -407,7 +407,7 @@ function BoardColumn({
                 ) : (
                   <button
                     type="button"
-                    className="row gap-1 faint t-tiny cursor-pointer"
+                    className="flex items-center gap-1 faint t-tiny cursor-pointer"
                     data-details-link
                     style={{
                       border: 'none',

@@ -92,7 +92,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
           error={errors.accountLabel?.message}
           {...register('accountLabel')}
         />
-        <div className="row gap-4 flex-wrap">
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="flex-1">
             <Input
               id="edit-amount"

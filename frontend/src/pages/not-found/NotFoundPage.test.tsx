@@ -34,5 +34,26 @@ describe('NotFoundPage', () => {
     expect(root).toHaveClass('min-h-screen')
     expect(container.querySelector('.fs-wrap')).toBeNull()
   })
+
+  // C5 W3 #169 G family flex-b drain guard — the one call site where `.stack`
+  // was already dead. `.notfound` declares `display: grid` later in the same
+  // `@layer legacy` block, so it beat `.stack`'s `display: flex` on source
+  // order. Migrating this site to `flex flex-col` like the other 37 would have
+  // turned a centred grid into a flex column, and the route is outside the
+  // smoke matrix so nothing would have caught it. The token is dropped and
+  // deliberately NOT replaced by a utility: utilities beat `@layer legacy`
+  // unconditionally, so adding `flex` here would break what `.stack` never won.
+  it('drops the dead .stack without handing the layout to a utility', () => {
+    const { container } = renderPage()
+
+    const section = container.querySelector('.notfound')
+    expect(section).not.toBeNull()
+    expect(section).not.toHaveClass('stack')
+    // the grid must keep coming from `.notfound`
+    expect(section?.className).not.toMatch(/\bflex\b/)
+    expect(section?.className).not.toMatch(/\bflex-col\b/)
+    // the spacing utility from an earlier wave stays put
+    expect(section).toHaveClass('gap-4')
+  })
   /* eslint-enable testing-library/no-container, testing-library/no-node-access */
 })

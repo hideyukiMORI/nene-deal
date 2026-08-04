@@ -16,7 +16,7 @@ export interface EmptyStateProps {
  */
 export function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
-    <div className="empty stack gap-3" style={{ alignItems: 'center' }}>
+    <div className="empty flex flex-col gap-3" style={{ alignItems: 'center' }}>
       <Text as="h2" variant="heading-sm">
         {title}
       </Text>

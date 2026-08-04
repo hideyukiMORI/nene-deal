@@ -49,20 +49,20 @@ export function AuditExportView({
   }
 
   return (
-    <section className="content content-narrow stack">
+    <section className="content content-narrow flex flex-col">
       <div className="row justify-between flex-wrap g4 page-head">
-        <div className="stack gap-1">
+        <div className="flex flex-col gap-1">
           <h1 className="t-h1">{t('audit.title')}</h1>
           <span className="muted t-cap">{t('audit.subtitle')}</span>
         </div>
-        <span className="badge badge-accent row">
+        <span className="badge badge-accent">
           <IconShield />
           {t('audit.adminOnly')}
         </span>
       </div>
 
       <form
-        className="card card-pad stack gap-5"
+        className="card card-pad flex flex-col gap-5"
         onSubmit={(event) => {
           event.preventDefault()
         }}
@@ -71,7 +71,7 @@ export function AuditExportView({
           <h2 className="t-h2">{t('audit.rangeTitle')}</h2>
         </div>
 
-        <div className="row gap-4 flex-wrap">
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="flex-1">
             <Input
               id="audit-from"
@@ -96,9 +96,9 @@ export function AuditExportView({
           </div>
         </div>
 
-        <div className="stack gap-2">
+        <div className="flex flex-col gap-2">
           <span className="eyebrow">{t('audit.recorded')}</span>
-          <div className="row flex-wrap gap-2">
+          <div className="flex items-center flex-wrap gap-2">
             {RECORDED.map(
               ({ Icon, label }): ReactNode => (
                 <span key={label} className="audit-chip">
@@ -112,7 +112,7 @@ export function AuditExportView({
 
         {invalidRange ? <span className="t-cap danger">{t('audit.invalidRange')}</span> : null}
 
-        <div className="row gap-4 flex-wrap" style={{ alignItems: 'center' }}>
+        <div className="flex items-center gap-4 flex-wrap" style={{ alignItems: 'center' }}>
           <Button type="button" disabled={pending || invalidRange} onClick={onDownload}>
             {pending ? t('audit.downloading') : t('audit.download')}
           </Button>
@@ -122,7 +122,7 @@ export function AuditExportView({
         </div>
       </form>
 
-      <div className="card card-pad row justify-between flex-wrap audit-cols">
+      <div className="card card-pad flex items-center justify-between flex-wrap audit-cols">
         <span className="eyebrow">{t('audit.colsLabel')}</span>
         <code className="mono t-cap">{t('audit.colsVal')}</code>
       </div>

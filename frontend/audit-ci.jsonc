@@ -72,5 +72,58 @@
     // eslint-plugin-import and @redocly/openapi-core ship on minimatch@10 (which imports
     // `{ expand }` and is already on 5.0.8 here). Re-check at expiry; do not extend by reflex.
     "GHSA-mh99-v99m-4gvg",
+
+    // GHSA-rgw5-rvv9-x895 — brace-expansion, a SECOND unbounded-expansion advisory (high),
+    // published after 2026-07-31 and distinct from GHSA-mh99-v99m-4gvg above. It matters
+    // because its vulnerable range is wider — `<=1.1.17 || 2.0.0-2.1.3 || 4.0.0-5.0.8` — so
+    // it covers the 5.0.8 that the `overrides` entry deliberately pins to dodge the first
+    // advisory. Every installed copy is in range (measured 2026-08-04: 1.1.16 ×2, 2.1.3 ×1,
+    // 5.0.8 ×1).
+    //
+    // ⚠️ A PARTIAL fix exists and is NOT taken here — stated plainly rather than claiming
+    // there is none. brace-expansion 5.0.9 is published and fixes the v5 copy, and the
+    // existing `"brace-expansion@5": "^5.0.8"` override would accept it on a lockfile
+    // refresh. It is deferred on purpose: (a) the 1.1.16 / 2.1.3 copies stay vulnerable
+    // regardless, because minimatch@3 / minimatch@5 call the module's default export and
+    // throw on the v5 entry point (the breakage documented above), so the allowlist entry
+    // is needed either way; (b) the lockfile bump belongs to the fleet-wide dependency
+    // wave, not to a CSS drain PR. hub routed that as the cross-repo work order (board
+    // 2026-08-05). This PR touches the allowlist only — no lockfile, no overrides.
+    //
+    // Why it does not apply here (measured 2026-08-04, in this tree):
+    //   - `npm ls brace-expansion --omit=dev --all` → "(empty)" — absent from the
+    //     production dependency tree entirely
+    //   - `grep -rl 'brace-expansion|braceExpand' dist/` after `npm run build` → 0 files
+    // Same reasoning as GHSA-mh99-v99m-4gvg: the impact is an OOM crash from an adversarial
+    // brace pattern, which would require attacker-supplied globs to our lint/codegen
+    // commands. Those run on our own source, never on untrusted input, never at runtime.
+    //
+    // Expiry: 2026-08-31 (aligned with the two entries above). Removed when minimatch@3/@5
+    // leave the tree and the v5 copy reaches >=5.0.9. Re-check at expiry; do not extend by
+    // reflex.
+    "GHSA-rgw5-rvv9-x895",
+
+    // GHSA-7p8r-x3mc-p8w7 — fast-uri (high), published after 2026-07-31. Vulnerable range
+    // 3.0.0-3.1.4; installed copy is exactly one, fast-uri@3.1.4.
+    //
+    // No fix we can adopt. fast-uri 4.1.2 is published and out of range, but the only thing
+    // pulling fast-uri here is ajv@8.20.0, which declares `"fast-uri": "^3.0.1"` (measured
+    // in node_modules/table/node_modules/ajv/package.json). Overriding it to 4.x forces a
+    // major past the range its consumer accepts — the same class of mistake as npm's
+    // proposed react-router-dom "fix" above, and not something to do on a style PR.
+    //
+    // Why it does not apply here (measured 2026-08-04, in this tree): the single path is
+    // dev-only tooling —
+    //   `stylelint@16.26.1 -> table@6.9.0 -> ajv@8.20.0 -> fast-uri@3.1.4`
+    // and stylelint is a devDependency (`dependencies` → false, `devDependencies` → true).
+    // Confirmed by:
+    //   - `npm ls fast-uri --omit=dev --all` → "(empty)"
+    //   - `grep -rl 'fast-uri|fastUri' dist/` after `npm run build` → 0 files
+    // fast-uri parses URIs for ajv's JSON-Schema `format` keyword; the only schemas it sees
+    // are stylelint's own config schemas, authored by us, never user input.
+    //
+    // Expiry: 2026-08-31 (aligned with the entries above). Removed when stylelint ships an
+    // ajv that accepts fast-uri >=4 (or ajv backports to 3.x). Re-check at expiry.
+    "GHSA-7p8r-x3mc-p8w7",
   ],
 }

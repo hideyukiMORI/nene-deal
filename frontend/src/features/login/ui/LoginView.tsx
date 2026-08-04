@@ -71,7 +71,7 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
       <div className="auth" style={{ minHeight: '100vh' }}>
         <aside className="auth-brand">
           <div className="grid-deco" />
-          <div className="row gap-3">
+          <div className="flex items-center gap-3">
             <span className="block size-8 flex-none">
               <IconLogo className="block size-full" />
             </span>
@@ -79,11 +79,11 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
               NeNe&nbsp;Deal
             </span>
           </div>
-          <div className="stack gap-4" style={{ maxWidth: '32ch' }}>
+          <div className="flex flex-col gap-4" style={{ maxWidth: '32ch' }}>
             <span className="eyebrow">{t('login.heroEyebrow')}</span>
             <h2 className="t-display">{t('login.heroTitle')}</h2>
             <p className="muted t-body">{t('login.heroBody')}</p>
-            <div className="row flex-wrap gap-2" style={{ marginTop: 8 }}>
+            <div className="flex items-center flex-wrap gap-2" style={{ marginTop: 8 }}>
               <span className="kpi-chip">
                 {t('login.kpiActive')} <span className="v">12</span>
               </span>
@@ -104,9 +104,9 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
             onSubmit={(event) => {
               void submit(event)
             }}
-            className="bg-surface-raised rounded-lg stack gap-6 w-full max-w-sm p-8"
+            className="bg-surface-raised rounded-lg flex flex-col gap-6 w-full max-w-sm p-8"
           >
-            <div className="stack gap-2">
+            <div className="flex flex-col gap-2">
               <h1 className="t-h1">{t('login.title')}</h1>
               <span className="muted t-cap">{t('login.subtitle')}</span>
             </div>
@@ -145,7 +145,10 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
               {t('login.submit')}
             </button>
 
-            <div className="row gap-2 faint t-tiny" style={{ justifyContent: 'center' }}>
+            <div
+              className="flex items-center gap-2 faint t-tiny"
+              style={{ justifyContent: 'center' }}
+            >
               <IconShield />
               <span>{t('login.secure')}</span>
             </div>
