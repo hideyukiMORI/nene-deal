@@ -9,121 +9,97 @@
   // THIS codebase, measured — not assumed, (3) an expiry date, (4) what removes the need for it.
   // An expired entry is a task, not a renewal: re-check it, do not extend it by reflex.
   //
-  // Prefer the fix. Of the 11 advisories present on 2026-07-29, 8 were removed by upgrading
-  // (brace-expansion@5 5.0.8, postcss 8.5.24, react-router-dom 7.18.1) — see
-  // docs/development/dependency-audit.md. The two entries below have no fix we can adopt.
+  // ✅ The allowlist is EMPTY as of 2026-08-08. Every advisory is answered by a version we
+  // actually take. See "Removal notes" below for what used to be here and what killed it —
+  // and, more importantly, for the two facts that are still load-bearing.
   "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
   "moderate": false,
   "high": true,
   "critical": true,
-  "allowlist": [
-    // GHSA-qwww-vcr4-c8h2 — react-router "RSC Mode CSRF Bypass Allows Action Execution Before
-    // 400 Response" (high). Vulnerable range 7.12.0–8.2.0; there is NO fix in the 7.x line
-    // (react-router-dom ends at 7.18.1; the fix lands in react-router v8 >= 8.2.1, a different
-    // package and a breaking upgrade). npm's own `fixAvailable` proposes react-router-dom
-    // 7.11.0 — that is a *downgrade* below the four advisories 7.18.1 just fixed, not a fix.
-    //
-    // Why it does not apply here (measured 2026-07-29, in this tree — not copied from a
-    // sibling): the Deal console is a **static SPA built by Vite**. `src/app/router.tsx` is
-    // 64 lines of `createBrowserRouter` with **element-only routes** (13 routes, all
-    // `{ path, element }`) — no RSC mode, no server components, no route `action`/`loader`
-    // executing on a server, and no `@react-router/dev` runtime. Checked by:
-    //   - grep for route-level `action:` / `loader:` keys under src/ → 0
-    //     (the 3 textual matches are `DealActivity.action`, a domain field)
-    //   - grep for `@react-router/dev` / `react-router/rsc` / `createStaticHandler` /
-    //     `createStaticRouter` / `ServerRouter` / `StaticRouter` under src/ → 0
-    //   - `node_modules/@react-router` → absent
-    // The advisory's attack path (a server executing a route action before returning 400)
-    // has no counterpart in a client-only bundle.
-    //
-    // Expiry: 2026-08-31. Removed by the react-router v8 migration wave (bundled with the
-    // NENE2 RR8 re-evaluation). If that wave slips past the expiry, the entry must be
-    // re-argued in a PR — not silently extended.
-    "GHSA-qwww-vcr4-c8h2",
+  "allowlist": [],
 
-    // GHSA-mh99-v99m-4gvg — brace-expansion "DoS via unbounded expansion length" (high).
-    // Vulnerable range <=5.0.7, i.e. every 1.x and 2.x release as well; the fix exists only
-    // as 5.0.8.
-    //
-    // We take 5.0.8 wherever it can be taken — `overrides` carries `"brace-expansion@5":
-    // "^5.0.8"`. It CANNOT be taken everywhere: brace-expansion changed its entry point
-    // between v2 and v5 (`module.exports = expand` → `module.exports = { expand, ... }`),
-    // and minimatch@3 / minimatch@5 call the module's default export directly. Forcing v5 on
-    // them throws `TypeError: expand is not a function` on any brace pattern — measured
-    // 2026-07-29, and the reason this repo briefly shipped a broken eslint/codegen toolchain.
-    // So minimatch@3 keeps brace-expansion 1.1.16 and minimatch@5 keeps 2.1.3, both in range.
-    //
-    // Why it does not apply here (measured 2026-07-29): every remaining copy is **dev-only
-    // tooling that never reaches a user**. The packages pulling them in are
-    // eslint-plugin-import, eslint-plugin-jsx-a11y (via @hideyukimori/nene2-standards) and
-    // @redocly/openapi-core (via openapi-typescript) — all devDependencies. Verified by:
-    //   - `npm ls brace-expansion minimatch --omit=dev --all` → "(empty)": absent from the
-    //     production dependency tree entirely
-    //   - `npm run build` then grepping dist/ for `brace-expansion` / `braceExpand` → 0 files
-    // The advisory's impact (OOM crash from an adversarial brace pattern) would require an
-    // attacker-supplied glob to our lint/codegen commands, which are run by us on our own
-    // source, never on untrusted input, and never at runtime.
-    //
-    // A regression guard keeps this honest: tests/toolchain/brace-expansion-override.test.ts
-    // resolves every installed minimatch and runs a brace pattern through it, so a future
-    // override that reintroduces the break fails CI instead of passing quietly.
-    //
-    // Expiry: 2026-08-31. Removed when minimatch@3/@5 leave the tree — i.e. when
-    // eslint-plugin-import and @redocly/openapi-core ship on minimatch@10 (which imports
-    // `{ expand }` and is already on 5.0.8 here). Re-check at expiry; do not extend by reflex.
-    "GHSA-mh99-v99m-4gvg",
-
-    // GHSA-rgw5-rvv9-x895 — brace-expansion, a SECOND unbounded-expansion advisory (high),
-    // published after 2026-07-31 and distinct from GHSA-mh99-v99m-4gvg above. It matters
-    // because its vulnerable range is wider — `<=1.1.17 || 2.0.0-2.1.3 || 4.0.0-5.0.8` — so
-    // it covers the 5.0.8 that the `overrides` entry deliberately pins to dodge the first
-    // advisory. Every installed copy is in range (measured 2026-08-04: 1.1.16 ×2, 2.1.3 ×1,
-    // 5.0.8 ×1).
-    //
-    // ⚠️ A PARTIAL fix exists and is NOT taken here — stated plainly rather than claiming
-    // there is none. brace-expansion 5.0.9 is published and fixes the v5 copy, and the
-    // existing `"brace-expansion@5": "^5.0.8"` override would accept it on a lockfile
-    // refresh. It is deferred on purpose: (a) the 1.1.16 / 2.1.3 copies stay vulnerable
-    // regardless, because minimatch@3 / minimatch@5 call the module's default export and
-    // throw on the v5 entry point (the breakage documented above), so the allowlist entry
-    // is needed either way; (b) the lockfile bump belongs to the fleet-wide dependency
-    // wave, not to a CSS drain PR. hub routed that as the cross-repo work order (board
-    // 2026-08-05). This PR touches the allowlist only — no lockfile, no overrides.
-    //
-    // Why it does not apply here (measured 2026-08-04, in this tree):
-    //   - `npm ls brace-expansion --omit=dev --all` → "(empty)" — absent from the
-    //     production dependency tree entirely
-    //   - `grep -rl 'brace-expansion|braceExpand' dist/` after `npm run build` → 0 files
-    // Same reasoning as GHSA-mh99-v99m-4gvg: the impact is an OOM crash from an adversarial
-    // brace pattern, which would require attacker-supplied globs to our lint/codegen
-    // commands. Those run on our own source, never on untrusted input, never at runtime.
-    //
-    // Expiry: 2026-08-31 (aligned with the two entries above). Removed when minimatch@3/@5
-    // leave the tree and the v5 copy reaches >=5.0.9. Re-check at expiry; do not extend by
-    // reflex.
-    "GHSA-rgw5-rvv9-x895",
-
-    // GHSA-7p8r-x3mc-p8w7 — fast-uri (high), published after 2026-07-31. Vulnerable range
-    // 3.0.0-3.1.4; installed copy is exactly one, fast-uri@3.1.4.
-    //
-    // No fix we can adopt. fast-uri 4.1.2 is published and out of range, but the only thing
-    // pulling fast-uri here is ajv@8.20.0, which declares `"fast-uri": "^3.0.1"` (measured
-    // in node_modules/table/node_modules/ajv/package.json). Overriding it to 4.x forces a
-    // major past the range its consumer accepts — the same class of mistake as npm's
-    // proposed react-router-dom "fix" above, and not something to do on a style PR.
-    //
-    // Why it does not apply here (measured 2026-08-04, in this tree): the single path is
-    // dev-only tooling —
-    //   `stylelint@16.26.1 -> table@6.9.0 -> ajv@8.20.0 -> fast-uri@3.1.4`
-    // and stylelint is a devDependency (`dependencies` → false, `devDependencies` → true).
-    // Confirmed by:
-    //   - `npm ls fast-uri --omit=dev --all` → "(empty)"
-    //   - `grep -rl 'fast-uri|fastUri' dist/` after `npm run build` → 0 files
-    // fast-uri parses URIs for ajv's JSON-Schema `format` keyword; the only schemas it sees
-    // are stylelint's own config schemas, authored by us, never user input.
-    //
-    // Expiry: 2026-08-31 (aligned with the entries above). Removed when stylelint ships an
-    // ajv that accepts fast-uri >=4 (or ajv backports to 3.x). Re-check at expiry.
-    "GHSA-7p8r-x3mc-p8w7",
-  ],
+  // ── Removal notes (2026-08-08) ────────────────────────────────────────────────────────────
+  //
+  // Four entries were removed here. They are recorded rather than simply deleted because the
+  // reason each one died is the same reason the next exception should be distrusted, and
+  // because two measurements underneath them still constrain this tree.
+  //
+  // ## What actually happened: the exceptions did not expire — their REASONING went false.
+  //
+  // Every one of the four argued "no fix exists that we can adopt" (rule 4). Re-measured on
+  // 2026-08-08 with `gh api /advisories/<GHSA> --jq '.vulnerabilities[]|"\(.package.name)
+  // \(.vulnerable_version_range) → \(.first_patched_version)"'`, all four claims were false:
+  //
+  //   GHSA-qwww-vcr4-c8h2  react-router     claimed: fix only in v8 (breaking)
+  //                                         actual:  7.18.2 — backported into the 7.x line
+  //   GHSA-mh99-v99m-4gvg  brace-expansion  claimed: fix exists only as 5.0.8
+  //                                         actual:  1.1.17 / 2.1.3 / 5.0.8 — every series
+  //   GHSA-rgw5-rvv9-x895  brace-expansion  claimed: v5 only, 1.x/2.x unavoidable
+  //                                         actual:  1.1.18 / 2.1.4 / 5.0.9 — every series
+  //   GHSA-7p8r-x3mc-p8w7  fast-uri         claimed: only 4.1.2, outside ajv's ^3.0.1
+  //                                         actual:  3.1.5 — inside ajv's range
+  //
+  // Advisories get re-scoped and patches get backported after publication. So an exception has
+  // TWO ways to rot, and the expiry date only catches one of them:
+  //   (a) the advisory stops applying   — caught by re-running `npm audit`
+  //   (b) the stated reason stops being true — NOT caught by anything automatic
+  // (b) is the dangerous one: the entry keeps suppressing a real, now-fixable finding while
+  // every gate stays green. Check both at every touch, not just at expiry.
+  //
+  // All four were resolved by patch bumps inside existing ranges — `npm update` on the six
+  // affected packages, no `package.json` change, no override change, 32 lines of lockfile:
+  //   brace-expansion 1.1.16→1.1.18, 2.1.3→2.1.4, 5.0.8→5.0.9
+  //   fast-uri 3.1.4→3.1.5 · js-yaml 4.3.0→4.3.1 · nanoid 3.3.16→3.3.18
+  //   react-router(-dom) 7.18.1→7.18.2
+  //
+  // ## ⚠️ Still load-bearing #1: the scoped `brace-expansion@5` override must stay.
+  //
+  // `overrides` carries `"brace-expansion@5": "^5.0.8"` (the caret is what let 5.0.9 in). It is
+  // NOT leftover from the removed entries — dropping it to a flat `"brace-expansion"` override,
+  // or removing it so a v5 copy hoists, breaks the toolchain. brace-expansion changed its entry
+  // point between v2 and v5:
+  //     // v1 / v2                    // v5
+  //     module.exports = expand       module.exports = { expand, EXPANSION_MAX, ... }
+  // and minimatch@3 / minimatch@5 call the default export directly. Positive control, measured
+  // 2026-08-08 in this tree (not copied from a sibling):
+  //   node -e "const b=require('brace-expansion'); b('a{b,c}')"
+  //     → TypeError: b is not a function   (typeof = object; keys = EXPANSION_MAX,
+  //                                          EXPANSION_MAX_LENGTH, expand)
+  // and the scope is doing its job — resolving `brace-expansion` from each installed minimatch:
+  //   minimatch@3.1.5 → 1.1.18 · minimatch@5.1.9 → 2.1.4 · minimatch@10.2.5 → 5.0.9
+  //
+  // Note how this failure surfaces: NOWHERE on its own. In 2026-07-29 lint, the test suite,
+  // knip and the Storybook build all stayed green while the override was broken — none of them
+  // fed a brace pattern to a glob. "CI passed" is NOT evidence an override change is safe.
+  // `tests/toolchain/brace-expansion-override.test.ts` is the only thing that answers it: it
+  // resolves every installed minimatch and runs a brace pattern through each. Run it directly
+  // before touching the override.
+  //
+  // ## ⚠️ Still load-bearing #2: js-yaml only moves because of a flat override.
+  //
+  // `@redocly/openapi-core` pins js-yaml **exactly** (`"js-yaml": "4.2.0"` in its
+  // package.json), so GHSA-5p4m-2wfm-xmqj could not be answered by a lockfile refresh on its
+  // own. It moved here only because `overrides` already carries a flat `"js-yaml": "^4.3.0"`,
+  // which accepts 4.3.1. If that override is ever removed as "unnecessary", js-yaml silently
+  // falls back to the pinned 4.2.0 and the advisory returns.
+  //
+  // ## Known remaining finding: esbuild GHSA-g7r4-m6w7-qqqr (low) — deliberately not fixed.
+  //
+  // esbuild 0.27.7, vulnerable range 0.27.3–0.28.0, patched at 0.28.1. It is **below this
+  // gate** (`moderate: false`), so CI is green with it present — this is a recorded decision,
+  // not an oversight. It is not reachable here either: the advisory is an arbitrary file read
+  // by the esbuild **dev server on Windows**, and esbuild is absent from the production tree
+  // (`npm ls esbuild --omit=dev --all` → `(empty)`, measured 2026-08-08).
+  // It is not taken because it cannot be taken cheaply: `npm update esbuild vite` leaves
+  // esbuild at 0.27.7 (vite's transitive pin holds it) while churning 367 lines of lockfile.
+  // The fix rides along with a vite major upgrade. hub carries the fleet-wide vite wave on the
+  // board (several repos hold the same low); do not open a one-repo bump for it.
+  //
+  // ## Prod exposure, measured 2026-08-08 (`npm ls <pkg> --omit=dev --all`)
+  //
+  // brace-expansion · js-yaml · nanoid · fast-uri · esbuild → all `(empty)`. Every finding in
+  // this tree, past and present, has been dev-only tooling. Moderate count is 0, so nothing
+  // slipped under the gate either.
+  //
+  // Full narrative: docs/development/dependency-audit.md
 }
