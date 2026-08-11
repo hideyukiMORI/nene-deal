@@ -11,7 +11,7 @@ export interface TextProps {
 }
 
 const variantClasses: Record<TextVariant, string> = {
-  body: 't-body',
+  body: 'text-body',
   caption: 't-cap',
   'heading-sm': 't-h2',
   'heading-md': 't-h1',

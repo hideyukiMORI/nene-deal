@@ -224,12 +224,12 @@ export function KanbanBoardView({
         />
       ) : null}
 
-      {status === 'loading' ? <p className="muted t-body">{t('board.loading')}</p> : null}
+      {status === 'loading' ? <p className="muted text-body">{t('board.loading')}</p> : null}
 
       {status === 'error' ? (
         <div className="flex flex-col gap-3">
           <h2 className="t-h2">{t('board.error.title')}</h2>
-          <p className="muted t-body">
+          <p className="muted text-body">
             {errorMessageKey !== null ? t(errorMessageKey) : t('common.error.unknown')}
           </p>
           <div className="flex items-center gap-3">

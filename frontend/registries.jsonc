@@ -90,8 +90,18 @@
       // `.notfound` の 1 箇所は `.stack` が元から死んでいた（同 layer の後方で
       // `display: grid` が勝つ）ため utility を足さずに token だけ落とした。
       //                                                     1422 / 32783.
-      "maxLines": 1422,
-      "maxBytes": 32783,
+      // G family typography (t-body): `.t-body` の 1 ルール（font-size:14px のみ）
+      // を削除し、13 call site を `text-body` へ（10 literal ＋ `Text` primitive の
+      // variant map 経由 3）。`--text-body: 0.875rem` = 14px で 1:1、かつ `body` が
+      // 同じ 14px を供給しているため computed は全経路で不変。**同 family の他 5 種
+      // （`.t-display` `.t-h1` `.t-h2` `.t-cap` `.t-tiny`）はここに含めない** —
+      // legacy の実効値が @theme のスケールと一致せず（cap 12.5px vs `--text-caption`
+      // 12px・tiny 11px vs `--text-tiny` 10px・h1 30px vs `--text-heading-md` 28px・
+      // display 34px は対応トークン自体が無い）、utility へ移すと意匠が変わる。
+      // トークン側の裁定待ち（#169 へ実測を提出済み）。
+      //                                                     1419 / 32746.
+      "maxLines": 1419,
+      "maxBytes": 32746,
     },
     {
       "kind": "lint-baseline",

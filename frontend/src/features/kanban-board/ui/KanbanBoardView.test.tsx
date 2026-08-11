@@ -35,6 +35,32 @@ describe('KanbanBoardView', () => {
     expect(screen.getByText('Loading the board…')).toBeInTheDocument()
   })
 
+  // C5 W3 #169 G family typography drain guard. The loading and error copy are
+  // the two `.t-body` call sites on this route, and the seeded mock the probe
+  // drives never enters either state — so the wave's 0-diff computed evidence
+  // covers neither. The same `muted t-body` → `muted text-body` swap was made
+  // in three sibling views (deal-detail / stages / users) whose loading and
+  // error states have no test harness at all; this pair is the shape of the
+  // change, kept executable.
+  it('uses the text-body utility in the loading and error copy', () => {
+    const { unmount } = renderWithProviders(
+      <KanbanBoardView {...baseProps({ status: 'loading' })} />,
+    )
+    const loading = screen.getByText('Loading the board…')
+    expect(loading).toHaveClass('text-body')
+    expect(loading).not.toHaveClass('t-body')
+    unmount()
+
+    renderWithProviders(
+      <KanbanBoardView
+        {...baseProps({ status: 'error', errorMessageKey: 'common.error.serverError' })}
+      />,
+    )
+    const errorCopy = screen.getByText('A server error occurred.')
+    expect(errorCopy).toHaveClass('text-body')
+    expect(errorCopy).not.toHaveClass('t-body')
+  })
+
   it('renders the empty state when there are no columns', () => {
     renderWithProviders(<KanbanBoardView {...baseProps({ status: 'ready', columns: [] })} />)
     expect(screen.getByRole('heading', { name: 'No stages yet' })).toBeInTheDocument()

@@ -66,14 +66,14 @@ export function DealDetailView({
         {t('detail.back')}
       </button>
 
-      {status === 'loading' ? <p className="muted t-body">{t('detail.loading')}</p> : null}
+      {status === 'loading' ? <p className="muted text-body">{t('detail.loading')}</p> : null}
 
       {status === 'missing' ? <EmptyState title={t('detail.notFound')} /> : null}
 
       {status === 'error' ? (
         <div className="flex flex-col gap-3">
           <h1 className="t-h1">{t('detail.error.title')}</h1>
-          <p className="muted t-body">
+          <p className="muted text-body">
             {errorMessageKey !== null ? t(errorMessageKey) : t('common.error.unknown')}
           </p>
         </div>
