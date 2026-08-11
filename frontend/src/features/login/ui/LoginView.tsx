@@ -82,7 +82,7 @@ export function LoginView({ pending, errorMessage, onSubmit }: LoginViewProps) {
           <div className="flex flex-col gap-4" style={{ maxWidth: '32ch' }}>
             <span className="eyebrow">{t('login.heroEyebrow')}</span>
             <h2 className="t-display">{t('login.heroTitle')}</h2>
-            <p className="muted t-body">{t('login.heroBody')}</p>
+            <p className="muted text-body">{t('login.heroBody')}</p>
             <div className="flex items-center flex-wrap gap-2" style={{ marginTop: 8 }}>
               <span className="kpi-chip">
                 {t('login.kpiActive')} <span className="v">12</span>

@@ -55,5 +55,23 @@ describe('NotFoundPage', () => {
     // the spacing utility from an earlier wave stays put
     expect(section).toHaveClass('gap-4')
   })
+
+  // C5 W3 #169 G family typography drain guard — this route is outside the
+  // smoke matrix and outside the computed probe's net, so the 0-diff evidence
+  // for the wave says nothing about this call site. The drain is safe here by
+  // cascade argument: `.t-body` declared `font-size: 14px` and nothing in
+  // `@layer legacy` sets a font-size on a plain `<p>` inside `.notfound`
+  // (`.notfound .code` is the only rule under it, and it targets the 404
+  // numeral), so the paragraph was already inheriting 14px from `body`.
+  // `text-body` resolves to the same 14px. This test is what keeps that
+  // argument honest.
+  it('uses the text-body utility instead of the drained .t-body', () => {
+    const { container } = renderPage()
+
+    const copy = container.querySelector('.notfound p')
+    expect(copy).not.toBeNull()
+    expect(copy).toHaveClass('text-body')
+    expect(copy).not.toHaveClass('t-body')
+  })
   /* eslint-enable testing-library/no-container, testing-library/no-node-access */
 })

@@ -122,12 +122,12 @@ export function UserManagementView({
         />
       ) : null}
 
-      {status === 'loading' ? <p className="muted t-body">{t('users.loading')}</p> : null}
+      {status === 'loading' ? <p className="muted text-body">{t('users.loading')}</p> : null}
 
       {status === 'error' ? (
         <div className="flex flex-col gap-3">
           <h2 className="t-h2">{t('users.error.title')}</h2>
-          <p className="muted t-body">
+          <p className="muted text-body">
             {errorKey !== null ? t(errorKey) : t('common.error.unknown')}
           </p>
           <div className="flex items-center gap-3">

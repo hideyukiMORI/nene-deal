@@ -9,7 +9,7 @@ export function NotFoundPage() {
       <section className="notfound gap-4" style={{ alignContent: 'center' }}>
         <span className="code">404</span>
         <h1 className="t-h1">{t('common.error.notFound')}</h1>
-        <p className="muted t-body" style={{ maxWidth: '44ch' }}>
+        <p className="muted text-body" style={{ maxWidth: '44ch' }}>
           {t('common.error.unknown')}
         </p>
         <div className="flex items-center gap-3" style={{ justifyContent: 'center', marginTop: 8 }}>
