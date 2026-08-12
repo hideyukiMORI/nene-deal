@@ -13,6 +13,31 @@ on:
       - main
       - 'w3/**'
 
+  # 週次 schedule。この艦(nene-deal)には月曜 00:10 UTC = 09:10 JST を割り当て済み
+  # （フリート内の同時発火回避のため艦ごとに分をずらしている。
+  #   使用済み: 00=origin/fleet-tooling, 30=nene2-python, 40=records-commercial, 05=clear, 10=nene-deal）。
+  #
+  # 🔴 既知の限界: public リポジトリでは 60 日リポジトリ活動が無いと scheduled workflow は
+  # GitHub 側で自動的に無効化される。つまりこの装置は、それが検知しようとしている
+  # 休眠状態そのものによって止められうる（休眠が長い艦ほど検知が要るのに、その艦から
+  # 静かに止まる）。外部から run の新鮮さを監視する仕組みは別途 hub 側の課題。
+  schedule:
+    - cron: '10 0 * * 1'
+
+  # 手動トリガー。simulate_failure=true で「置いた ≠ 動いた」を即時検証できる。
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: '意図的に check を失敗させ、失敗通知の経路を検証する'
+        type: boolean
+        default: false
+
+# event_name をここに含めないと、schedule / workflow_dispatch の実行が push の実行に
+# cancel される（nene-origin で実測された罠）。
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
 jobs:
   frontend-check:
     runs-on: ubuntu-latest
@@ -21,6 +46,10 @@ jobs:
         working-directory: frontend
 
     steps:
+      - name: Simulate failure (validation only)
+        if: inputs.simulate_failure
+        run: exit 1
+
       - name: Checkout
         uses: actions/checkout@v5
 
@@ -45,3 +74,28 @@ jobs:
       # Policy: docs/development/dependency-audit.md
       - name: Audit (fail on high/critical)
         run: npm run audit
+
+  notify-failure:
+    name: Open an issue when the scheduled run fails
+    if: failure() && (github.event_name == 'schedule' || inputs.simulate_failure)
+    needs: [frontend-check]
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      ISSUE_TITLE: '🔴 nene-deal: 週次 CI（schedule）が失敗しています'
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Create or update the failure issue
+        run: |
+          set -euo pipefail
+          existing="$(gh issue list --state open --limit 100 --json number,title \
+            | jq -r --arg t "$ISSUE_TITLE" 'map(select(.title == $t)) | .[0].number // empty')"
+          body="週次の schedule 実行が失敗しました。 実行: ${RUN_URL}"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$ISSUE_TITLE" --body "$body"
+          fi
