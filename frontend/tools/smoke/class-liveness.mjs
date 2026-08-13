@@ -17,17 +17,67 @@
  *   変わる  → そのクラスが供給元 = 移行してよい
  *   変わらない → 別のルールが勝っている = **park**（レイヤ順で分割不能）
  *
+ * ⚠️ **問いが成立しない組は測る前に落とす。** クラスがそのプロパティを宣言して
+ * いなければ、外して変わらないのは当たり前であって park の材料ではない。2026-08-13
+ * に `.t-cap` / `.t-tiny`（`font-size` のみ）へ `font-weight` と `letter-spacing` を
+ * 問い合わせ、「DEAD 28/28」「DEAD 62/62」という無意味な表を作った（#208）。
+ * 姉妹ツール computed-probe の `PROBE_CONTROL` は 07-31 に同じ穴を塞いでいたが、
+ * 塞がったのは**対照側だけ**で、測定対象側はここまで素通りだった。
+ *
  * 使い方:
  *   npm run mock
  *   PROBE_CLASSES=g1,g2,g3,g4,g5,g6 PROBE_PROP=gap \
  *     node tools/smoke/class-liveness.mjs out.json
+ *
+ * 環境変数:
+ *   PROBE_PROP     測るプロパティ（既定 gap）
+ *   PROBE_CLASSES  測る対象クラス（カンマ区切り）。`PROBE_PROP` を供給しえない
+ *                  ものは authored CSS から自動判定して除外する。
+ *   PROBE_CSS_DIR  判定材料にする authored CSS の根（既定 src）
+ *   PROBE_BASE     既定 http://localhost:5187
  */
 import { chromium } from 'playwright'
 import fs from 'node:fs'
+import { collectCssFiles, declaredPropsByClass, filterProbeClasses } from './declared-props.mjs'
 
 const BASE = process.env.PROBE_BASE || 'http://localhost:5187'
 const PROP = process.env.PROBE_PROP || 'gap'
-const CLASSES = (process.env.PROBE_CLASSES || 'g1,g2,g3,g4,g5,g6').split(',')
+const REQUESTED = (process.env.PROBE_CLASSES || 'g1,g2,g3,g4,g5,g6')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean)
+const CSS_DIR = process.env.PROBE_CSS_DIR || 'src'
+
+// ── 測る前に、問いとして成立する組だけへ絞る ────────────────────────────
+const declared = new Map()
+for (const file of collectCssFiles(CSS_DIR))
+  declaredPropsByClass(fs.readFileSync(file, 'utf8'), declared)
+const { kept, dropped } = filterProbeClasses({ classes: REQUESTED, prop: PROP, declared })
+
+for (const k of kept) {
+  console.log(
+    k.reason === 'declares'
+      ? `probe .${k.cls}@${PROP}: 供給元候補（宣言: ${k.via.join(', ')}）`
+      : `probe .${k.cls}@${PROP}: authored CSS に無い（utility / JS 付与の可能性）— 判定材料が無いので測る`,
+  )
+}
+for (const d of dropped) {
+  console.log(
+    `skip  .${d.cls}@${PROP}: このクラスは ${PROP} を宣言していない（宣言: ${d.declares.join(', ')}）` +
+      ` — 外して変わらないのは当たり前なので、park の材料にならない`,
+  )
+}
+// 対照が 0 なら緑にしない（computed-probe と同型）。全部落ちたということは、
+// 問いの立て方そのものが間違っているということ。
+if (kept.length === 0) {
+  console.error(
+    `ERROR: prop=${PROP} を供給しうる対象クラスが 1 つも無い（渡されたのは ` +
+      `${REQUESTED.join(',')}）。無効な問いの結果を park 判定に使ってはいけない。`,
+  )
+  process.exit(1)
+}
+const CLASSES = kept.map((k) => k.cls)
+
 const OUT = process.argv[2] || '/tmp/class-liveness.json'
 const CREDS = { email: 'operator@nene-deal.test', password: 'password' }
 
@@ -124,7 +174,12 @@ if (reached !== ADMIN.length) {
   process.exit(1)
 }
 
-fs.writeFileSync(OUT, JSON.stringify({ prop: PROP, classes: CLASSES, rows }, null, 2))
+// 落とした組も出力へ残す。「測った」と「測れる問いではなかった」は別物なので、
+// 後から表を読む人が区別できるようにする。
+fs.writeFileSync(
+  OUT,
+  JSON.stringify({ prop: PROP, requested: REQUESTED, classes: CLASSES, dropped, rows }, null, 2),
+)
 
 // className ＋ 勝っている値でまとめる（同じ call site が複数ルートに出るため）
 const bySite = new Map()
