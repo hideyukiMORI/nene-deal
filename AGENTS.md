@@ -33,6 +33,10 @@ See [ADR 0002](docs/adr/0002-deal-is-pipeline-ssot-not-billing.md).
 - **Do not** copy Clear integration patterns into Deal docs or code (wrong upstream/downstream)
 - **Do not** write to Invoice or Clear databases — HTTP handoff only
 - **Namespace:** `NeneDeal\`; amounts: **integer cents** in API and DB
+
+> `cents` = the currency's **minor unit**, not 1/100 of the display amount.
+> **JPY has zero decimal places (ISO 4217), so `*_cents` stores whole yen — never multiply by 100.**
+> Example: ¥1,500 is stored as `1500`. A value like `116480` means ¥116,480, not ¥1,164.80.
 - **Product UI locales:** `ja`/`en` only (ADR 0004) — broader localization is a non-goal
 - **Repository docs: English**; Issues/PRs/commits may use Japanese in description/body
 - **No secrets** in git
