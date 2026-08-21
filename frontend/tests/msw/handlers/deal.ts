@@ -66,7 +66,7 @@ export const dealHandlers = [
     return HttpResponse.json(
       dealResponse(
         id,
-        { account_label: 'Acme Corp', amount_cents: 150_000_000, probability_percent: 100 },
+        { account_label: 'Acme Corp', amount_cents: 1_500_000, probability_percent: 100 },
         'won',
       ),
     )
@@ -133,7 +133,7 @@ export const dealHandlers = [
           actor_user_id: '01USER0000000000000000000A',
           actor_label: 'operator@nene-deal.test',
           changes: {
-            amount_cents: { from: 120_000_000, to: 150_000_000 },
+            amount_cents: { from: 1_200_000, to: 1_500_000 },
             probability_percent: { from: 60, to: 100 },
           },
           created_at: '2026-05-30 14:02:00',

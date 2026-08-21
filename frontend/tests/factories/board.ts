@@ -4,7 +4,7 @@ export function buildKanbanDeal(overrides: Partial<KanbanDeal> = {}): KanbanDeal
   return {
     id: '01DEALACME000000000000000A',
     accountLabel: 'Acme Corp',
-    amountCents: 150_000_000,
+    amountCents: 1_500_000,
     probabilityPercent: 40,
     ownerLabel: null,
     deletedAt: null,
@@ -21,8 +21,8 @@ export function buildKanbanColumn(overrides: Partial<KanbanColumn> = {}): Kanban
     isWon: false,
     deals,
     dealCount: deals.length,
-    totalCents: 150_000_000,
-    weightedTotalCents: 60_000_000,
+    totalCents: 1_500_000,
+    weightedTotalCents: 600_000,
     ...overrides,
   }
 }

@@ -351,8 +351,8 @@ export interface components {
         Ulid: string;
         /**
          * Format: int64
-         * @description Amount in JPY minor units (cents). No floats.
-         * @example 150000000
+         * @description Amount in JPY minor units. JPY has zero decimal places (ISO 4217), so one minor unit is ¥1 and the value is whole yen — never yen x100. No floats.
+         * @example 1500000
          */
         AmountCents: number;
         Deal: {
@@ -532,6 +532,19 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /**
+         * @description Problem Details for `validation-failed` (422) with the NENE2
+         *     `Nene2\Validation` field-level `errors` array.
+         */
+        ValidationProblem: components["schemas"]["Problem"] & {
+            errors: {
+                /** @description Failing field name (`body` for whole-body rules). */
+                field: string;
+                message: string;
+                /** @description Machine-readable code (e.g. `required`, `invalid`). */
+                code: string;
+            }[];
+        };
         LoginRequest: {
             /** Format: email */
             email: string;
@@ -626,13 +639,18 @@ export interface components {
                 "application/problem+json": components["schemas"]["Problem"];
             };
         };
-        /** @description Validation failed. */
+        /**
+         * @description Validation failed. The Problem Details body carries a structured
+         *     `errors` array with one entry per failing field (NENE2
+         *     `Nene2\Validation` shape). Malformed or non-object JSON bodies are
+         *     rejected earlier with **400** `invalid-json` (BadRequest).
+         */
         UnprocessableEntity: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
-                "application/problem+json": components["schemas"]["Problem"];
+                "application/problem+json": components["schemas"]["ValidationProblem"];
             };
         };
     };
@@ -713,6 +731,7 @@ export interface operations {
                     "application/json": components["schemas"]["Deal"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             422: components["responses"]["UnprocessableEntity"];
         };
@@ -790,6 +809,7 @@ export interface operations {
                     "application/json": components["schemas"]["Deal"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
             422: components["responses"]["UnprocessableEntity"];
@@ -820,6 +840,7 @@ export interface operations {
                     "application/json": components["schemas"]["Deal"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             404: components["responses"]["NotFound"];
             422: components["responses"]["UnprocessableEntity"];
@@ -959,6 +980,7 @@ export interface operations {
                     "application/json": components["schemas"]["PipelineStage"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             /** @description A stage with the same derived slug already exists. */
@@ -1031,6 +1053,7 @@ export interface operations {
                     "application/json": components["schemas"]["PipelineStage"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];
@@ -1109,6 +1132,7 @@ export interface operations {
                     "application/json": components["schemas"]["LoginResult"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             /** @description Invalid email or password. */
             401: {
                 headers: {
@@ -1119,6 +1143,19 @@ export interface operations {
                 };
             };
             422: components["responses"]["UnprocessableEntity"];
+            /**
+             * @description Too many failed login attempts for this email + client IP
+             *     (5 failures within 15 minutes lock the pair for 15 minutes).
+             *     `retry_after_seconds` reports the remaining lock time.
+             */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
         };
     };
     getCurrentUser: {
@@ -1188,6 +1225,7 @@ export interface operations {
                     "application/json": components["schemas"]["OperatorUser"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             /** @description Email already taken. */
@@ -1277,6 +1315,7 @@ export interface operations {
                     "application/json": components["schemas"]["OperatorUser"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["NotFound"];

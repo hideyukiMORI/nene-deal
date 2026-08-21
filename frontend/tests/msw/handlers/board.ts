@@ -10,14 +10,14 @@ export const boardHandlers = [
             {
               id: '01DEALACME000000000000000A',
               account_label: 'Acme Corp',
-              amount_cents: 150_000_000,
+              amount_cents: 1_500_000,
               stage_slug: 'lead',
               probability_percent: 40,
             },
           ],
           deal_count: 1,
-          total_cents: 150_000_000,
-          weighted_total_cents: 60_000_000,
+          total_cents: 1_500_000,
+          weighted_total_cents: 600_000,
         },
         {
           stage: {

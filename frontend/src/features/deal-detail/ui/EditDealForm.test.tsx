@@ -15,29 +15,35 @@ function baseProps(overrides: Partial<EditDealFormProps> = {}): EditDealFormProp
   }
 }
 
+// #80 was "the form shows and submits raw cents, so every amount is 100x off".
+// #81 removed the yen⇔cents boundary entirely (for JPY the minor unit IS the
+// yen), which would make a round-trip assertion on a round number tautological.
+// The amounts below are deliberately NOT multiples of 100: any re-introduced
+// /100 or *100 pair cannot survive them (123_456 / 100 rounds to 1_235, and
+// 1_235 * 100 is 123_500), so these stay real guards rather than identities.
 describe('EditDealForm', () => {
-  it('displays the amount in whole yen, not raw cents (regression #80)', () => {
+  it('displays the stored amount as-is, not scaled (regression #80)', () => {
     renderWithProviders(
-      <EditDealForm {...baseProps({ deal: buildDeal({ amountCents: 62_000_000 }) })} />,
+      <EditDealForm {...baseProps({ deal: buildDeal({ amountCents: 123_456 }) })} />,
     )
 
-    expect(screen.getByLabelText('Amount (JPY)')).toHaveValue(620_000)
+    expect(screen.getByLabelText('Amount (JPY)')).toHaveValue(123_456)
   })
 
-  it('submits the entered yen amount converted to cents (regression #80)', async () => {
+  it('submits the entered yen amount unscaled (regression #80)', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn(() => Promise.resolve(true))
     renderWithProviders(
-      <EditDealForm {...baseProps({ deal: buildDeal({ amountCents: 62_000_000 }), onSubmit })} />,
+      <EditDealForm {...baseProps({ deal: buildDeal({ amountCents: 123_456 }), onSubmit })} />,
     )
 
     const amount = screen.getByLabelText('Amount (JPY)')
     await user.clear(amount)
-    await user.type(amount, '650000')
+    await user.type(amount, '654321')
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     expect(onSubmit).toHaveBeenCalledOnce()
-    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ amountCents: 65_000_000 }))
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ amountCents: 654_321 }))
   })
 
   it('rejects a non-integer yen amount', async () => {

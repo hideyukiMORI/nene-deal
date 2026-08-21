@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import type { Deal, UpdateDealInput } from '@/entities/deal'
 import { useTranslation } from '@/shared/i18n'
-import { centsToYen, yenToCents } from '@/shared/lib/format-money'
 import { Button } from '@/shared/ui/primitives/Button'
 import { Input } from '@/shared/ui/primitives/Input'
 import { Stack } from '@/shared/ui/primitives/Stack'
@@ -50,7 +49,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
     resolver: zodResolver(schema),
     defaultValues: {
       accountLabel: deal.accountLabel,
-      amountYen: centsToYen(deal.amountCents),
+      amountYen: deal.amountCents,
       probabilityPercent: deal.probabilityPercent,
       note: deal.note ?? '',
       expectedCloseDate: deal.expectedCloseDate ?? '',
@@ -60,7 +59,7 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
   const submit = handleSubmit(async (values) => {
     await onSubmit({
       accountLabel: values.accountLabel,
-      amountCents: yenToCents(values.amountYen),
+      amountCents: values.amountYen,
       probabilityPercent: values.probabilityPercent,
       note: values.note.trim() === '' ? null : values.note,
       expectedCloseDate: values.expectedCloseDate.trim() === '' ? null : values.expectedCloseDate,

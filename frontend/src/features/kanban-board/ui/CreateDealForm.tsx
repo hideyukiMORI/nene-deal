@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import type { CreateDealInput } from '@/entities/deal'
 import { useTranslation } from '@/shared/i18n'
-import { yenToCents } from '@/shared/lib/format-money'
 import { Button } from '@/shared/ui/primitives/Button'
 import { Input } from '@/shared/ui/primitives/Input'
 import { Select, type SelectOption } from '@/shared/ui/primitives/Select'
@@ -69,7 +68,7 @@ export function CreateDealForm({
   const submit = handleSubmit(async (values) => {
     const created = await onSubmit({
       accountLabel: values.accountLabel,
-      amountCents: yenToCents(values.amountYen),
+      amountCents: values.amountYen,
       stageRef: values.stageRef,
       probabilityPercent: values.probabilityPercent,
       expectedCloseDate: values.expectedCloseDate.trim() === '' ? null : values.expectedCloseDate,

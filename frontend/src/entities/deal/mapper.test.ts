@@ -8,7 +8,7 @@ describe('deal mapper', () => {
       id: '01DEAL0000000000000000000A',
       organization_id: '01ORG0000000000000000000AA',
       account_label: 'Acme Corp',
-      amount_cents: 150_000_000,
+      amount_cents: 1_500_000,
       stage_id: '01STAGELEAD0000000000000AA',
       stage_slug: 'lead',
       probability_percent: 40,
@@ -23,7 +23,7 @@ describe('deal mapper', () => {
     expect(model).toEqual({
       id: toDealId('01DEAL0000000000000000000A'),
       accountLabel: 'Acme Corp',
-      amountCents: 150_000_000,
+      amountCents: 1_500_000,
       stageId: '01STAGELEAD0000000000000AA',
       stageSlug: 'lead',
       probabilityPercent: 40,
