@@ -351,8 +351,8 @@ export interface components {
         Ulid: string;
         /**
          * Format: int64
-         * @description Amount in JPY minor units (cents). No floats.
-         * @example 150000000
+         * @description Amount in JPY minor units. JPY has zero decimal places (ISO 4217), so one minor unit is ¥1 and the value is whole yen — never yen x100. No floats.
+         * @example 1500000
          */
         AmountCents: number;
         Deal: {

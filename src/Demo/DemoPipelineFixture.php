@@ -79,30 +79,31 @@ final readonly class DemoPipelineFixture
             return max(1, (int) $today->format('j') - $daysBack);
         };
 
-        $yen = static fn (int $yenAmount): int => $yenAmount * 100; // integer JPY minor units
+        // `amount` below is plain yen: `amount_cents` stores the JPY minor unit,
+        // which is ¥1 (ISO 4217). No scaling — see docs/development/coding-standards.md.
 
         $specs = [
             // --- lead (4) -------------------------------------------------
-            ['company' => '有限会社高橋電設', 'note' => '事務所・倉庫の照明LED化改修。紹介案件、来週初回訪問予定。', 'stage' => 'lead', 'amount' => $yen(620000), 'prob' => 10, 'close' => $closeDate(1, 20), 'created' => 4, 'owner' => 1, 'path' => ['lead']],
-            ['company' => '株式会社北斗商事', 'note' => '基幹システム更改の情報収集段階。予算感のヒアリングから。', 'stage' => 'lead', 'amount' => $yen(5400000), 'prob' => 10, 'close' => $closeDate(2, 25), 'created' => 6, 'owner' => 2, 'path' => ['lead']],
-            ['company' => '株式会社フジイ塗装', 'note' => '見積管理ツールの引き合い。展示会で名刺交換、資料送付済み。', 'stage' => 'lead', 'amount' => $yen(350000), 'prob' => 20, 'close' => $closeDate(2, 10), 'created' => 8, 'owner' => 1, 'path' => ['lead']],
-            ['company' => '株式会社カネコ金属', 'note' => '工場換気設備の更新。現場下見の日程調整中。', 'stage' => 'lead', 'amount' => $yen(540000), 'prob' => 20, 'close' => $closeDate(0, 26), 'created' => 3, 'owner' => 0, 'path' => ['lead']],
+            ['company' => '有限会社高橋電設', 'note' => '事務所・倉庫の照明LED化改修。紹介案件、来週初回訪問予定。', 'stage' => 'lead', 'amount' => 620000, 'prob' => 10, 'close' => $closeDate(1, 20), 'created' => 4, 'owner' => 1, 'path' => ['lead']],
+            ['company' => '株式会社北斗商事', 'note' => '基幹システム更改の情報収集段階。予算感のヒアリングから。', 'stage' => 'lead', 'amount' => 5400000, 'prob' => 10, 'close' => $closeDate(2, 25), 'created' => 6, 'owner' => 2, 'path' => ['lead']],
+            ['company' => '株式会社フジイ塗装', 'note' => '見積管理ツールの引き合い。展示会で名刺交換、資料送付済み。', 'stage' => 'lead', 'amount' => 350000, 'prob' => 20, 'close' => $closeDate(2, 10), 'created' => 8, 'owner' => 1, 'path' => ['lead']],
+            ['company' => '株式会社カネコ金属', 'note' => '工場換気設備の更新。現場下見の日程調整中。', 'stage' => 'lead', 'amount' => 540000, 'prob' => 20, 'close' => $closeDate(0, 26), 'created' => 3, 'owner' => 0, 'path' => ['lead']],
             // --- qualified (3) --------------------------------------------
-            ['company' => '株式会社青葉製作所', 'note' => '生産ライン保守契約（年間）。決裁者と面談済み、要件整理中。', 'stage' => 'qualified', 'amount' => $yen(1440000), 'prob' => 35, 'close' => $closeDate(1, 15), 'created' => 14, 'owner' => 2, 'path' => ['lead', 'qualified']],
-            ['company' => '中央メディカルサービス株式会社', 'note' => '予約システム保守の乗り換え検討。現行契約は再来月末まで。', 'stage' => 'qualified', 'amount' => $yen(864000), 'prob' => 35, 'close' => $closeDate(0, 24), 'created' => 12, 'owner' => 1, 'path' => ['lead', 'qualified']],
-            ['company' => '湘南ハウジング株式会社', 'note' => 'モデルハウスのスマートホーム対応。予算枠は確認済み。', 'stage' => 'qualified', 'amount' => $yen(980000), 'prob' => 40, 'close' => $closeDate(2, 15), 'created' => 18, 'owner' => 0, 'path' => ['lead', 'qualified']],
+            ['company' => '株式会社青葉製作所', 'note' => '生産ライン保守契約（年間）。決裁者と面談済み、要件整理中。', 'stage' => 'qualified', 'amount' => 1440000, 'prob' => 35, 'close' => $closeDate(1, 15), 'created' => 14, 'owner' => 2, 'path' => ['lead', 'qualified']],
+            ['company' => '中央メディカルサービス株式会社', 'note' => '予約システム保守の乗り換え検討。現行契約は再来月末まで。', 'stage' => 'qualified', 'amount' => 864000, 'prob' => 35, 'close' => $closeDate(0, 24), 'created' => 12, 'owner' => 1, 'path' => ['lead', 'qualified']],
+            ['company' => '湘南ハウジング株式会社', 'note' => 'モデルハウスのスマートホーム対応。予算枠は確認済み。', 'stage' => 'qualified', 'amount' => 980000, 'prob' => 40, 'close' => $closeDate(2, 15), 'created' => 18, 'owner' => 0, 'path' => ['lead', 'qualified']],
             // --- proposal (3) ---------------------------------------------
-            ['company' => '大和田印刷株式会社', 'note' => '会社案内・営業ツール一式のリニューアル。提案書提出済み、反応良好。', 'stage' => 'proposal', 'amount' => $yen(480000), 'prob' => 55, 'close' => $closeDate(1, 10), 'created' => 22, 'owner' => 1, 'path' => ['lead', 'qualified', 'proposal']],
-            ['company' => '株式会社みどり物流', 'note' => '倉庫管理システム導入。要件定義込みで提案中、競合1社。', 'stage' => 'proposal', 'amount' => $yen(3200000), 'prob' => 50, 'close' => $closeDate(0, 22), 'created' => 28, 'owner' => 2, 'path' => ['lead', 'qualified', 'proposal']],
-            ['company' => 'テクノ精機株式会社', 'note' => '検査装置の導入提案。デモ機貸出中、来月頭に評価結果が出る。', 'stage' => 'proposal', 'amount' => $yen(2300000), 'prob' => 60, 'close' => $closeDate(1, 25), 'created' => 25, 'owner' => 0, 'path' => ['lead', 'qualified', 'proposal']],
+            ['company' => '大和田印刷株式会社', 'note' => '会社案内・営業ツール一式のリニューアル。提案書提出済み、反応良好。', 'stage' => 'proposal', 'amount' => 480000, 'prob' => 55, 'close' => $closeDate(1, 10), 'created' => 22, 'owner' => 1, 'path' => ['lead', 'qualified', 'proposal']],
+            ['company' => '株式会社みどり物流', 'note' => '倉庫管理システム導入。要件定義込みで提案中、競合1社。', 'stage' => 'proposal', 'amount' => 3200000, 'prob' => 50, 'close' => $closeDate(0, 22), 'created' => 28, 'owner' => 2, 'path' => ['lead', 'qualified', 'proposal']],
+            ['company' => 'テクノ精機株式会社', 'note' => '検査装置の導入提案。デモ機貸出中、来月頭に評価結果が出る。', 'stage' => 'proposal', 'amount' => 2300000, 'prob' => 60, 'close' => $closeDate(1, 25), 'created' => 25, 'owner' => 0, 'path' => ['lead', 'qualified', 'proposal']],
             // --- negotiation (2) ------------------------------------------
-            ['company' => '株式会社山川設備工業', 'note' => '空調設備更新工事一式。金額調整の最終段階、今月中の契約見込み。', 'stage' => 'negotiation', 'amount' => $yen(2850000), 'prob' => 75, 'close' => $closeDate(0, 18), 'created' => 38, 'owner' => 1, 'path' => ['lead', 'qualified', 'proposal', 'negotiation']],
-            ['company' => '株式会社ワタナベ食品', 'note' => 'HACCP対応の設備改修。法務確認が済み次第、契約書締結へ。', 'stage' => 'negotiation', 'amount' => $yen(1980000), 'prob' => 70, 'close' => $closeDate(1, 5), 'created' => 32, 'owner' => 2, 'path' => ['lead', 'qualified', 'proposal', 'negotiation']],
+            ['company' => '株式会社山川設備工業', 'note' => '空調設備更新工事一式。金額調整の最終段階、今月中の契約見込み。', 'stage' => 'negotiation', 'amount' => 2850000, 'prob' => 75, 'close' => $closeDate(0, 18), 'created' => 38, 'owner' => 1, 'path' => ['lead', 'qualified', 'proposal', 'negotiation']],
+            ['company' => '株式会社ワタナベ食品', 'note' => 'HACCP対応の設備改修。法務確認が済み次第、契約書締結へ。', 'stage' => 'negotiation', 'amount' => 1980000, 'prob' => 70, 'close' => $closeDate(1, 5), 'created' => 32, 'owner' => 2, 'path' => ['lead', 'qualified', 'proposal', 'negotiation']],
             // --- won (2) --------------------------------------------------
-            ['company' => '桜井建設株式会社', 'note' => '現場事務所のIT環境整備。受注済み、今週キックオフ。', 'stage' => 'won', 'amount' => $yen(750000), 'prob' => 100, 'close' => $closeDate(0, $landedDay(6)), 'created' => 42, 'owner' => 0, 'path' => ['lead', 'qualified', 'proposal', 'negotiation', 'won']],
-            ['company' => '東都ビルメンテナンス株式会社', 'note' => '業務用清掃ロボット導入。受注済み、納品は月末予定。', 'stage' => 'won', 'amount' => $yen(1650000), 'prob' => 100, 'close' => $closeDate(0, $landedDay(11)), 'created' => 48, 'owner' => 1, 'path' => ['lead', 'qualified', 'proposal', 'negotiation', 'won']],
+            ['company' => '桜井建設株式会社', 'note' => '現場事務所のIT環境整備。受注済み、今週キックオフ。', 'stage' => 'won', 'amount' => 750000, 'prob' => 100, 'close' => $closeDate(0, $landedDay(6)), 'created' => 42, 'owner' => 0, 'path' => ['lead', 'qualified', 'proposal', 'negotiation', 'won']],
+            ['company' => '東都ビルメンテナンス株式会社', 'note' => '業務用清掃ロボット導入。受注済み、納品は月末予定。', 'stage' => 'won', 'amount' => 1650000, 'prob' => 100, 'close' => $closeDate(0, $landedDay(11)), 'created' => 48, 'owner' => 1, 'path' => ['lead', 'qualified', 'proposal', 'negotiation', 'won']],
             // --- lost (1) -------------------------------------------------
-            ['company' => '株式会社アオキ興産', 'note' => '社内ネットワーク刷新。予算凍結のため今期は見送りに。来期に再アプローチ。', 'stage' => 'lost', 'amount' => $yen(1200000), 'prob' => 0, 'close' => $closeDate(0, $landedDay(9)), 'created' => 45, 'owner' => 2, 'path' => ['lead', 'qualified', 'proposal', 'lost']],
+            ['company' => '株式会社アオキ興産', 'note' => '社内ネットワーク刷新。予算凍結のため今期は見送りに。来期に再アプローチ。', 'stage' => 'lost', 'amount' => 1200000, 'prob' => 0, 'close' => $closeDate(0, $landedDay(9)), 'created' => 45, 'owner' => 2, 'path' => ['lead', 'qualified', 'proposal', 'lost']],
         ];
 
         $deals = [];

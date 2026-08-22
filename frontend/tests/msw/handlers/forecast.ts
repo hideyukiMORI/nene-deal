@@ -6,15 +6,15 @@ export const forecastHandlers = [
     return HttpResponse.json({
       month,
       open_deal_count: 1,
-      pipeline_total_cents: 150_000_000,
-      weighted_total_cents: 60_000_000,
+      pipeline_total_cents: 1_500_000,
+      weighted_total_cents: 600_000,
       by_stage: [
         {
           stage_id: '01STAGELEAD0000000000000AA',
           slug: 'lead',
           deal_count: 1,
-          total_cents: 150_000_000,
-          weighted_total_cents: 60_000_000,
+          total_cents: 1_500_000,
+          weighted_total_cents: 600_000,
         },
       ],
     })

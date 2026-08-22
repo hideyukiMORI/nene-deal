@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { centsToYen, formatMoneyJpy, yenToCents } from './format-money'
+import * as formatMoney from './format-money'
+import { formatMoneyJpy } from './format-money'
 
 describe('formatMoneyJpy', () => {
-  it('converts cents to whole yen and groups thousands', () => {
-    expect(formatMoneyJpy(150_000_000, 'en')).toContain('1,500,000')
+  it('formats the stored value as whole yen without dividing', () => {
+    expect(formatMoneyJpy(1_500_000, 'en')).toContain('1,500,000')
   })
 
-  it('rounds to whole yen', () => {
-    expect(formatMoneyJpy(149, 'en')).toContain('1')
+  it('formats a value that is not a multiple of 100 exactly', () => {
+    // The old x100 reading could not represent this: it would have rendered
+    // ¥1,235. Under the canon, 123_456 is ¥123,456.
+    expect(formatMoneyJpy(123_456, 'en')).toContain('123,456')
   })
 
   it('renders zero', () => {
@@ -15,20 +18,23 @@ describe('formatMoneyJpy', () => {
   })
 })
 
-describe('centsToYen', () => {
-  it('converts cents to whole yen', () => {
-    expect(centsToYen(62_000_000)).toBe(620_000)
+describe('yen⇔cents conversion boundary (positive control for #81)', () => {
+  // This suite guards an ABSENCE, so it needs a control that can actually fail.
+  // Asserting "the amount round-trips unchanged" would be trivially true once
+  // the converters are gone, and would stay green if someone re-added them and
+  // wired them in elsewhere. Asserting the module surface does not.
+  it('does not export a yen→cents converter', () => {
+    expect(formatMoney).not.toHaveProperty('yenToCents')
   })
 
-  it('rounds like formatMoneyJpy', () => {
-    expect(centsToYen(149)).toBe(1)
-    expect(centsToYen(150)).toBe(2)
+  it('does not export a cents→yen converter', () => {
+    expect(formatMoney).not.toHaveProperty('centsToYen')
   })
-})
 
-describe('yenToCents', () => {
-  it('converts whole yen to cents', () => {
-    expect(yenToCents(620_000)).toBe(62_000_000)
-    expect(yenToCents(0)).toBe(0)
+  it('exports formatMoneyJpy only', () => {
+    // The control that proves the two assertions above are reachable: if the
+    // module were empty or failed to load, `not.toHaveProperty` would pass for
+    // the wrong reason.
+    expect(Object.keys(formatMoney)).toEqual(['formatMoneyJpy'])
   })
 })

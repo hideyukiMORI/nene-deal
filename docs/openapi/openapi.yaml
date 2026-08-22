@@ -719,8 +719,11 @@ components:
       type: integer
       format: int64
       minimum: 0
-      description: Amount in JPY minor units (cents). No floats.
-      example: 150000000
+      description: >-
+        Amount in JPY minor units. JPY has zero decimal places (ISO 4217), so
+        one minor unit is ¥1 and the value is whole yen — never yen x100.
+        No floats.
+      example: 1500000
 
     Deal:
       type: object

@@ -4,7 +4,7 @@ export function buildDeal(overrides: Partial<Deal> = {}): Deal {
   return {
     id: toDealId('01DEALACME000000000000000A'),
     accountLabel: 'Acme Corp',
-    amountCents: 150_000_000,
+    amountCents: 1_500_000,
     stageId: '01STAGEWON00000000000000AA',
     stageSlug: 'won',
     probabilityPercent: 100,

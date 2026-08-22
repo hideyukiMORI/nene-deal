@@ -3,44 +3,27 @@
  * amount. JPY has zero decimal places (ISO 4217), so `*_cents` stores whole yen
  * — never multiply by 100. ¥1,500 is stored as `1500`.
  *
- * THIS FILE DOES NOT FOLLOW THAT CANON TODAY. Deal stores x100 values, and the
- * helpers below divide and multiply by 100 to compensate. That is a known
- * deviation, not the standard. Correction is tracked separately as the fleet
- * money-unit remediation (order 1 of: 0. define -> 1. deal -> 2. serve ->
- * 3. clear); background in `_work/reports/2026-08-20-money-unit-archaeology.md`.
+ * This file follows that canon as of #81. It previously did not: `centsToYen()`
+ * and `yenToCents()` divided and multiplied by 100 to compensate for Deal
+ * storing x100 values, and their removal is the point of the change. There is
+ * no yen⇔cents boundary any more, because for JPY there is nothing to convert.
  *
- * DO NOT COPY THIS FILE AS A TEMPLATE. `nene-serve`'s copy inherited the same
- * deviation verbatim — its first six lines are identical to this file's.
+ * If you are here to add one back, you are re-opening #81 — read
+ * `docs/development/coding-standards.md` first.
  */
 
 /**
- * Format an integer JPY minor-unit (cents) amount as a localized currency
- * string. Amounts are stored as cents (1/100 yen) across the API; display
- * rounds to whole yen.
+ * Format an integer JPY minor-unit amount as a localized currency string.
+ * For JPY the minor unit is ¥1, so the stored value is already whole yen and
+ * is formatted as-is.
  *
- * @param amountCents integer minor units (JPY cents)
+ * @param amountYen integer minor units (for JPY: whole yen)
  * @param locale BCP 47 locale tag (e.g. `ja`, `en`)
  */
-export function formatMoneyJpy(amountCents: number, locale: string): string {
+export function formatMoneyJpy(amountYen: number, locale: string): string {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: 'JPY',
     maximumFractionDigits: 0,
-  }).format(centsToYen(amountCents))
-}
-
-/**
- * Convert an integer cents amount to whole yen for form display.
- * Rounding matches {@link formatMoneyJpy} (sub-yen amounts do not occur).
- */
-export function centsToYen(amountCents: number): number {
-  return Math.round(amountCents / 100)
-}
-
-/**
- * Convert a whole-yen form input back to integer cents for the API.
- * Inputs are validated as integers; rounding guards against float artifacts.
- */
-export function yenToCents(amountYen: number): number {
-  return Math.round(amountYen * 100)
+  }).format(amountYen)
 }
