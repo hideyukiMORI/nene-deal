@@ -73,6 +73,17 @@ jobs:
       - name: Check (type-check, lint, format, test, knip, storybook build)
         run: npm run check
 
+      # `schema.gen.ts` は openapi.yaml から生成されるコミット済みの生成物。生成物は
+      # 「型として整合している」限り古くても tsc / eslint / vitest / build を全部通るので、
+      # openapi.yaml を編集して codegen を回し忘れても、それまでの check は何も言わなかった。
+      # 実際 #215 の作業中に、この PR と無関係な 43 行が出た＝コミット済みの生成物が、
+      # その生成元より古いまま main に載っていた（#216 で実測・57 diff 行）。
+      #
+      # 独立ステップにしているのは、走ったかどうかがログから判別できるようにするため。
+      # 痕跡を残さないチェックは、無いチェックと区別がつかない（`composer audit` と同じ理由）。
+      - name: Codegen drift (schema.gen.ts must be regenerable from openapi.yaml)
+        run: npm run codegen:check
+
       # audit-ci = npm audit + a per-advisory allowlist, so a not-yet-fixable advisory can be
       # excepted with a written, expiring reason instead of blunting the whole gate. Anything
       # high/critical that is not listed in frontend/audit-ci.jsonc still fails.

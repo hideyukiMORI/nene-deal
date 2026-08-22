@@ -25,6 +25,7 @@
     "storybook": "storybook dev -p 6106",
     "build-storybook": "storybook build",
     "codegen": "openapi-typescript ../docs/openapi/openapi.yaml -o src/shared/api/schema.gen.ts",
+    "codegen:check": "npm run codegen && git diff --exit-code -- src/shared/api/schema.gen.ts",
     "knip": "knip",
     "check:fast": "npm run type-check && npm run lint && npm run format && npm run test",
     "check": "npm run type-check && npm run lint && npm run lint:styles && npm run check:registries && npm run format && npm run coverage:check && npm run knip && npm run build && npm run build-storybook",
