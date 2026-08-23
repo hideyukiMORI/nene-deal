@@ -38,4 +38,6 @@ deliberately will not meet, so the supported locale set is bounded on purpose.
 - `docs/explanation/product-vision.md`
 - `docs/explanation/scope-contract.md`
 - `docs/explanation/terminology.md`
-- `docs/todo/current.md` (Kanban UI scaffold — i18n catalogs)
+- Current work and hand-off (Kanban UI scaffold — i18n catalogs): the private
+  mirror `nene-origin/internal-docs/deal/todo/`, not a path in this repo — the
+  operational logs moved there in `#146`/`#147` (see `AGENTS.md`)
