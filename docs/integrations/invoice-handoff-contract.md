@@ -31,10 +31,52 @@ Operator marks deal **won** (terminal won stage) and clicks **Send to Invoice**
 
 ## HTTP calls (Deal → Invoice)
 
-Sequence (Invoice admin API — exact paths follow Invoice OpenAPI):
+Sequence (Invoice admin API):
 
 1. `POST /admin/clients` — draft client from `account_label` (+ optional address fields Phase 2)
 2. `POST /admin/quotes` — draft quote with `client_id`, headline amount mapped to line item(s)
+
+### Wire shape (binding)
+
+🔴 This section exists because its absence caused `#212`. The sentence above —
+"headline amount mapped to line item(s)" — never named a single field, so the
+implementation guessed three of them wrong and **every handoff was a 422 from
+the day it was written**. An underspecified contract is not a lenient one; it
+just moves the specification into whoever writes the client first.
+
+Measured against `nene-invoice` `origin/main` on **2026-08-23**
+(`LineItemRequest::parseLines`, `CreateQuoteHandler`, `CreateQuoteUseCase`):
+
+```jsonc
+// POST /admin/clients
+{ "name": "<account_label>" }              // `name` is the only required field
+
+// POST /admin/quotes
+{
+  "client_id": 4821,                       // required
+  "line_items": [                          // required, non-empty — NOT `lines`
+    {
+      "description": "<account_label>",    // required, non-empty string
+      "quantity": 1,                       // required, int
+      "unit_price_cents": 250000,          // required, int — NOT `unit_amount_cents`
+      "tax_rate_bps": 1000                 // required, int, and only 800 or 1000
+    }
+  ]
+}
+```
+
+| Trap | Detail |
+| --- | --- |
+| `tax_rate_bps` is not free-form | `ALLOWED_TAX_RATES_BPS = [800, 1000]`. `0` is **rejected**, not neutral. See the constant in `HttpInvoiceClient` — it is provisional and disappears when Invoice owns the rate |
+| `currency` is not read | Deal sent `"currency": "JPY"` for months; `CreateQuoteHandler` never looks at it. Removed in `#212` — a field the receiver ignores reads as contract and is not one |
+| Amounts are **whole yen** | `*_cents` is the minor unit; JPY has zero decimals (`#81`). `unit_price_cents: 250000` is ¥250,000 |
+| Optional, unused by Deal | `valid_until`, `notes` |
+
+Both endpoints return the new id at **`id`** on the top-level object.
+
+⚠️ Deal pins this shape in `tests/Handoff/HttpInvoiceClientTest.php`. That test
+proves **Deal matches what was measured**; it cannot see Invoice changing the
+contract. The live cross-check is QA `#168` A-3 (not yet run).
 
 Deal **does not**:
 
