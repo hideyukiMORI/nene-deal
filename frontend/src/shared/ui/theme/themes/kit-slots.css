@@ -94,6 +94,25 @@
   --spacing-x-slot-control-pad-x: var(--spacing-x-xs);
   --text-x-slot-control-size: var(--text-x-sm);
 
+  /* ⑥ 🔴 バッジの字と gap は**まだ寄せられない**（fleet-tooling#463 待ち）。
+   *
+   *    実測（本番 vs 0.17.1）: gap 5px / normal・font-size 11.5px / 14px(継承)・
+   *    font-weight 600 / 400(継承)。キットに該当スロットが**無い**ので、
+   *    `--text-x-slot-badge-size` 等をここに書いても**誰も読まない**。
+   *
+   *    ⚠️ 効かない宣言は置かない。同じ判断で `select-chevron` から
+   *    `padding-right: 30px` を外している（theme/index.css）——「指定してあるのに
+   *    効かない」は、無いことより厄介。
+   *
+   *    #463 が入ったら、下の3行のコメントを外すだけで済む（値は実測済み）:
+   *
+   *      --spacing-x-slot-badge-gap: var(--spacing-x-3xs);        （4px ≒ 実測 5px）
+   *      --text-x-slot-badge-size: var(--text-x-2xs);             （11px ≒ 実測 11.5px）
+   *      --font-weight-x-slot-badge: var(--font-weight-semibold); （実測 600）
+   *
+   *    🔴 スロット名は #463 の決着で変わりうる。**入った版の themes/default.css を見てから**
+   *    書き写すこと（この3行は deal の希望であって、キットの契約ではない）。 */
+
   --color-x-slot-badge-neutral-bg: var(--surface-2);
   --color-x-slot-badge-neutral-fg: var(--fg-muted);
   --color-x-slot-badge-neutral-border: var(--line);
