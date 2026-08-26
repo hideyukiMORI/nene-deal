@@ -133,6 +133,34 @@
   --color-x-slot-badge-neutral-bg: var(--surface-2);
   --color-x-slot-badge-neutral-fg: var(--fg-muted);
   --color-x-slot-badge-neutral-border: var(--line);
+
+  /* ═══ ⑧ ボタンとラベルの寸法 — 🔴 W1a では色しか見ていなかった ═════════════
+   *
+   * 0.19.0 で目視束を撮る直前に、本番とローカルの computed 値を突合して見つけた
+   * （2026-08-26）。バッジと同じ「色は合っているのに形が合っていない」で、
+   * ⑤の時に **Button と Field label を測っていなかった**のが漏れの原因。
+   *
+   * 🔴 ①と同じ罠だった。素の `.btn` は `--radius-sm`(4px) / `padding: 9px 15px` だが、
+   *    **それは描画されていない**——`[data-design='calm'] .btn`（`designs.css:468`）が
+   *    ピルと 10/20px で上書きしており、calm は常時オン。**基底の規則を読むと外す。**
+   *
+   * 段との対応（本番実測 → 採用）:
+   *   角丸    999px → --radius-x-pill    〔完全一致。8px とはピル/箱で**形が別物**〕
+   *   横 pad   20px → --spacing-x-md     〔完全一致〕
+   *   gap       8px → --spacing-x-2xs    〔完全一致〕
+   *   太さ      600 → semibold           〔完全一致〕
+   * 既定に任せる（±2px snap・目視束 §A に記載）:
+   *   縦 pad   10px / 既定 12px、字 13.5px / 既定 14px（inherit）*/
+  --radius-x-slot-button: var(--radius-x-pill);
+  --spacing-x-slot-button-pad-x: var(--spacing-x-md);
+  --spacing-x-slot-button-gap: var(--spacing-x-2xs);
+  --font-weight-x-slot-button: var(--font-weight-semibold);
+
+  /*    ラベルは**色が違う**（`.field > label` は `var(--fg)`＝濃い前景。キット既定は
+   *    `--color-text-muted` で一段淡い）。±2px の話ではないので寄せる。
+   *    字の大きさ 12.5px / 既定 12px は snap 範囲なので既定のまま。 */
+  --color-x-slot-field-label: var(--fg);
+  --font-weight-x-slot-field-label: var(--font-weight-semibold);
 }
 
 /* ═══ ダーク: @theme だけでは届かない ════════════════════════════════════

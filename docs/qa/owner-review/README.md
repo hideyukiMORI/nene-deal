@@ -90,26 +90,50 @@ byte-identical to production", and the reason for each.
 
 deal's production value is **not a step on the kit's scale**, and the kit's `slot-values`
 checker rejects a literal (inventing a step is forbidden). So the kit's default ships.
-Values measured 2026-08-26 against production `e361d3e`.
 
-| where | production | ships as | delta | why not written |
-| --- | --- | --- | --- | --- |
-| Badge `gap` | 5px | 4px (`--spacing-x-3xs`) | −1px | scale is 4 / 8 / 12. nene-vault's badge is 6px — matching either ship canonises one ship's drift |
-| Badge `font-size` | 11.5px | 11px (`--text-x-2xs`) | −0.5px | same |
-| Badge `padding-block` | 2px | 4px | +2px | ±2px snap |
-| Input / Select `padding-block` | 11px | 12px | +1px | no step below `xs` |
+**Every row here was measured**, both sides, `getComputedStyle` on the same element of
+`/settings`, on nene2-ui 0.19.0 against production `e361d3e` (2026-08-26). Nothing in this
+table was reasoned from the CSS source — see the warning below for why that matters.
 
-🔴 **These four are the whole list.** Everything else that differed was fixed rather than
-accepted — badge radius 8px → pill, control radius 13px → 12px, control `padding-inline`
-14px → 12px, control font 14px (exact), and the accent, border, danger-outline and
-soft-pill colours — all in `frontend/src/shared/ui/theme/themes/kit-slots.css`, all by
-pointing a slot at an existing step, never by redefining one.
+| where | production | ships as | delta |
+| --- | --- | --- | --- |
+| Badge `gap` | 5px | 4px | −1px |
+| Badge `font-size` | 11.5px | 11px | −0.5px |
+| Badge `padding-block` | 2px | 4px | +2px |
+| Button `padding-block` | 10px | 12px | +2px |
+| Button `font-size` | 13.5px | 14px | +0.5px |
+| Input / Select `padding-block` | 11px | 12px | +1px |
+| Input / Select `padding-inline` | 14px | 12px | −2px |
+| Input / Select `border-radius` | 13px | 12px | −1px |
+| Field label `font-size` | 12.5px | 12px | −0.5px |
+
+The knock-on: the primary button is **4.8px taller** and a control **2px taller** than in
+production. Nothing else moves.
+
+The spacing scale is 4 / 8 / 12 / 16 / 20 / 24 / 32 / 48px — 5px, 10px, 11px, 13px, 13.5px
+and 14px are simply not on it. nene-vault's badge gap is 6px, so matching either ship's
+number would canonise one ship's drift as the fleet's step.
+
+Everything else that differed **was written**, in
+`frontend/src/shared/ui/theme/themes/kit-slots.css`, by pointing a slot at a step that
+already exists — never by inventing one: badge and button radius (both are pills; the kit's
+8px box is a different shape, not a near miss), button `padding-inline` 20px, button `gap`
+8px, button and label weight 600, control font 14px, the field label's colour, and the
+accent, border, danger-outline and soft-pill colours. All exact matches.
 
 ⚠️ The three Badge rows **only hold on nene2-ui 0.19.0** (fleet-tooling#463 / PR #470).
 Before 0.19.0 the kit's Badge has no gap and inherits body type — 14px / 400 — which is a
 visibly different part, not a snap. **Capture the bundle on 0.19.0 or the badges in it are
 not the ones being proposed**; `meta.json` names the installed version, so check that field
 before reading a badge.
+
+🔴 **Measure the rendered value; do not read deal's CSS for it.** The button rows above were
+missing from the first version of this table — the migration had matched the button's
+colours and left its shape alone, and reading `styles.css` would not have caught it either:
+the base `.btn` says `border-radius: 4px; padding: 9px 15px`, and **none of that renders**,
+because `[data-design='calm'] .btn` (always on) overrides it with a pill and 10/20px. The
+accent colour has the same shape — `--accent` is re-declared as a literal in the calm skin.
+**deal's stylesheet has a layer that describes a design nobody sees.**
 
 ### B. Behaviour that changed on purpose — not visual, and not reversible by a slot
 
