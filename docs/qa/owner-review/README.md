@@ -80,6 +80,48 @@ Every one of these was added because the harness produced something that looked 
 - **`local worktree`** is in `meta.json` and says `clean` or `🔴 DIRTY`. vault #443: a bundle
   that names only its HEAD can be a build with uncommitted changes in it.
 
+## What the owner is being asked to accept (W1)
+
+Two lists, kept apart because they are two different decisions. **Neither is a defect
+report** — they are the places where "it looks put together" was chosen over "it is
+byte-identical to production", and the reason for each.
+
+### A. Snapped to the kit's scale — small, visual
+
+deal's production value is **not a step on the kit's scale**, and the kit's `slot-values`
+checker rejects a literal (inventing a step is forbidden). So the kit's default ships.
+Values measured 2026-08-26 against production `e361d3e`.
+
+| where | production | ships as | delta | why not written |
+| --- | --- | --- | --- | --- |
+| Badge `gap` | 5px | 4px (`--spacing-x-3xs`) | −1px | scale is 4 / 8 / 12. nene-vault's badge is 6px — matching either ship canonises one ship's drift |
+| Badge `font-size` | 11.5px | 11px (`--text-x-2xs`) | −0.5px | same |
+| Badge `padding-block` | 2px | 4px | +2px | ±2px snap |
+| Input / Select `padding-block` | 11px | 12px | +1px | no step below `xs` |
+
+🔴 **These four are the whole list.** Everything else that differed was fixed rather than
+accepted — badge radius 8px → pill, control radius 13px → 12px, control `padding-inline`
+14px → 12px, control font 14px (exact), and the accent, border, danger-outline and
+soft-pill colours — all in `frontend/src/shared/ui/theme/themes/kit-slots.css`, all by
+pointing a slot at an existing step, never by redefining one.
+
+⚠️ The three Badge rows **only hold on nene2-ui 0.19.0** (fleet-tooling#463 / PR #470).
+Before 0.19.0 the kit's Badge has no gap and inherits body type — 14px / 400 — which is a
+visibly different part, not a snap. **Capture the bundle on 0.19.0 or the badges in it are
+not the ones being proposed**; `meta.json` names the installed version, so check that field
+before reading a badge.
+
+### B. Behaviour that changed on purpose — not visual, and not reversible by a slot
+
+- **Toasts last 5s, not deal's 2.6s.** A notification that disappears before a screen
+  reader finishes reading it was never delivered.
+- **The toast live region now exists before there is anything to announce.** deal's own
+  `Toaster` returned `null` on an empty queue, so the region was born together with its
+  first toast — on screen, and silent to assistive technology.
+- **`EmptyState` is `role="status"`, no longer `<h2>`.** The wording is unchanged; the
+  empty-state text has left heading navigation.
+- **`useToast` outside its provider throws** instead of doing nothing.
+
 ## For another ship
 
 Copy `tests/e2e/live/owner-review.spec.ts` and `frontend/playwright.live.config.ts`, replace
