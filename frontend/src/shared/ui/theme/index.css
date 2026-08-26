@@ -27,3 +27,35 @@
 @source '../../../../node_modules/@hideyukimori/nene2-ui/dist';
 
 @import './active.css';
+
+/* ── select のシェブロン（W1・#225）─────────────────────────────────────
+ *
+ * キットの `Select` は `appearance` を触らず、**OS 標準の矢印**のまま出す
+ * （`dist/primitives/Select.js` の BASE_CLASS に appearance も background も無い・実測）。
+ * deal の legacy `.select` は `appearance: none` ＋ 2枚の linear-gradient で三角を描いており、
+ * これが無いと Windows の Chrome では枠だけ deal・矢印だけ OS という半端な見た目になる。
+ *
+ * 🔴 キットへ足す話ではなく**艦が持つ**もの、という判断は nene-vault の前例に従った
+ * （vault は同名の `@utility select-chevron` を自艦の theme に持っている）。1つの
+ * アフォーダンスを表す不可分な宣言で、子孫セレクタも擬似要素も状態も含まない。
+ *
+ * 値は legacy `.select`（`app/design/styles.css:290-301`）から literal で写している＝意匠は不変。
+ * C5 で `--fg-faint` が drain される時に、ここも契約トークンへ振り替える。 */
+@utility select-chevron {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--fg-faint) 50%),
+    linear-gradient(135deg, var(--fg-faint) 50%, transparent 50%);
+  background-position:
+    calc(100% - 16px) 52%,
+    calc(100% - 11px) 52%;
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+  /* 🔴 legacy `.select` の `padding-right: 30px` は写していない。理由は2つで、
+   *    ①本番の実測 padding-right は **14px**（calm 側の別ルールが勝っており、30px は
+   *      そもそも描画されていない＝写すと現行と違う見た目になる）
+   *    ②キットの `px-x-slot-control-pad-x` と同じ utilities 層なので、書いても
+   *      生成順で負ける。**効かない宣言を残すと「指定してあるのに効かない」に見える。** */
+}

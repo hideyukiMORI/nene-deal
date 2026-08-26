@@ -55,6 +55,7 @@ export function SettingsView({ value, setDraft, loading, saving, save }: Setting
         <div style={{ maxWidth: 280 }}>
           <FormField id="forecast-closing-day" label={t('settings.closingDay.label')}>
             <Select
+              className="select-chevron"
               value={value}
               disabled={loading}
               onChange={(event) => {

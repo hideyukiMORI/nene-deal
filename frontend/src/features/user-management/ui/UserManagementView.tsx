@@ -46,6 +46,7 @@ export function UserManagementView({
   const roleSelect = (user: OperatorUser, labelHidden: boolean) => {
     const select = (
       <Select
+        className="select-chevron"
         id={`role-${user.id}`}
         value={user.role}
         disabled={user.id === currentUserId}

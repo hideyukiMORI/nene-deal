@@ -78,7 +78,7 @@ export function CreateUserForm({ pending, errorMessage, onSubmit, onCancel }: Cr
           label={t('users.field.role')}
           error={errors.role?.message ?? null}
         >
-          <Select {...register('role')}>
+          <Select className="select-chevron" {...register('role')}>
             {roleOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}

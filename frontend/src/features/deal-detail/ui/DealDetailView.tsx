@@ -114,6 +114,7 @@ export function DealDetailView({
               <div style={{ maxWidth: 240 }}>
                 <FormField id="detail-stage" label={t('deal.field.stage')}>
                   <Select
+                    className="select-chevron"
                     value={deal.stageId}
                     disabled={stagePending}
                     onChange={(event) => {

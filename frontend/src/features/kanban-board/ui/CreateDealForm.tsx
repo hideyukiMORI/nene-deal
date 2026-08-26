@@ -130,7 +130,7 @@ export function CreateDealForm({
           label={t('deal.field.stage')}
           error={errors.stageRef?.message ?? null}
         >
-          <Select {...register('stageRef')}>
+          <Select className="select-chevron" {...register('stageRef')}>
             {stageOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
