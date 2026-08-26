@@ -91,11 +91,8 @@ export function StageManagementView({
         </div>
       ) : null}
 
-      {/* 🔴 EmptyState: description が落ちている（fleet-tooling#456 待ち）。キットは
-                message 1本しか取らないので title だけを渡している＝意匠差ではなく**文言の欠落**。
-                目視束の「キット既定に任せた箇所」に明記すること（hub 指示 2026-08-26）。 */}
       {status === 'ready' && stages.length === 0 ? (
-        <EmptyState message={t('stages.empty.title')} />
+        <EmptyState message={t('stages.empty.title')} description={t('stages.empty.description')} />
       ) : null}
 
       {status === 'ready' && stages.length > 0 ? (

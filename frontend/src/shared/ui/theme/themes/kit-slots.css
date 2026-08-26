@@ -56,6 +56,9 @@
    *       入ったらここに1行足す（画面側に className の特例は作らない＝受入ゲート③）。 */
   --color-x-slot-button-danger-bg: transparent;
   --color-x-slot-button-danger-fg: var(--danger);
+  /* 🏁 0.18.0（fleet-tooling#455）で枠のスロットが入った。deal の実測値は
+   *    `color-mix(in oklch, var(--danger) 40%, var(--line))`（`styles.css:.btn-danger`）。 */
+  --color-x-slot-button-danger-border: color-mix(in oklch, var(--danger) 40%, var(--line));
 
   /* ④ バッジは「原色べた塗り」ではなく「淡色ピル」。
    *    キット既定は bg=原色 / fg=反転色 / border=原色。deal は bg=淡色 / fg=状態色 /
@@ -93,6 +96,13 @@
   --radius-x-slot-control: var(--radius-x-xl);
   --spacing-x-slot-control-pad-x: var(--spacing-x-xs);
   --text-x-slot-control-size: var(--text-x-sm);
+
+  /* ⑦ Toast（0.18.0・fleet-tooling#457）。deal の legacy トーストは本文が faint、
+   *    成功が --ok。tone の色はキット側が --color-success を見るので、
+   *    そこは①の accent と同じく legacy 実描画へ向けてある。 */
+  --color-x-slot-toast-description-fg: var(--fg-faint);
+  --color-x-slot-toast-success-fg: var(--ok);
+  --color-x-slot-toast-success-border: var(--ok);
 
   /* ⑥ 🔴 バッジの字と gap は**まだ寄せられない**（fleet-tooling#463 待ち）。
    *
