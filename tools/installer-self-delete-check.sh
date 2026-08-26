@@ -77,9 +77,15 @@ if ! grep -q 'if (false) {' "$B"; then
   echo "  ❌ 変異が当たっていない＝この対照は何も検査していない（install.php の該当行が変わった？）"
   fail=1
 else
-  curl -s -o /dev/null "$BASE/$(basename "$B")"
-  if [ -e "$B" ]; then
-    echo "  ✅ 消えない（削除は guard の枝の中でだけ起きている）"
+  b_code=$(curl -s -o /dev/null -w '%{http_code}' "$BASE/$(basename "$B")")
+  # 🔴 「届いたこと」を先に確かめる。サーバが落ちていればファイルは当然残るので、
+  #    到達を見ずに「消えなかった」を合格にすると、**何も実行していないのに緑**になる
+  #    （2026-08-26 に死んだポートへ向けて実測: B だけが ✅ を出した）。
+  if [ "$b_code" = "000" ]; then
+    echo "  ❌ 判定不能 — リクエストが届いていない（$BASE に接続できない）"
+    fail=1
+  elif [ -e "$B" ]; then
+    echo "  ✅ 消えない（削除は guard の枝の中でだけ起きている・HTTP $b_code）"
   else
     echo "  ❌ guard を通らなくても消えた — **常に消す実装**になっている（初回設置が不可能）"
     fail=1
