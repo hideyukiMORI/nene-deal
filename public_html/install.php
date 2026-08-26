@@ -74,6 +74,64 @@ function refuse_install(string $message): never
     exit;
 }
 
+/**
+ * Delete this installer when the target is already installed, and answer as if the
+ * path had never existed (nene-deal#224, owner ruling (c) of 2026-08-26).
+ *
+ * A successful install already self-unlinks on the way out. That was not enough: a
+ * release that lays the distribution over the directory **restores every file the
+ * server was missing — together with the reason it was missing**. On 2026-08-23 that
+ * put `install.php` back on production, four weeks after it had removed itself. The
+ * guard still refused, so nothing was exploitable; what was lost was the shape the
+ * structural audit named as deal's target (`docs/review/2026-07-11-structural-audit.md:48`),
+ * and the file had been the site of a real vulnerability before (#78).
+ *
+ * So: **the installer removes itself the first time it is reached on an installed
+ * target**, not only on the run that installs. A restored copy survives until someone
+ * requests it once. That is weaker than never shipping it, which is why the release
+ * runbook also carries a mechanical `test ! -e public_html/install.php` — the two
+ * guards fail in different ways and neither is asked to be sufficient alone.
+ *
+ * 🔴 Fail-closed. If the unlink does not take, the caller still refuses the install.
+ * **Deleting is the improvement; refusing is the requirement.**
+ *
+ * ⚠️ And a failed unlink is **invisible from the outside** — the blocked page comes back
+ * exactly as before, so nothing in the response distinguishes "removed itself" from
+ * "could not". Measured 2026-08-26 in the local container, where the document root is
+ * root-owned and PHP runs as `www-data`: `unlink(): Permission denied`, response
+ * unchanged. Production's own installer did unlink itself on 2026-07-12, so the real
+ * host permits it — but that is a property of one host, not of this code. **The release
+ * runbook's `test ! -e public_html/install.php` is the only thing that surfaces the
+ * failure**, which is why the ruling asked for both and neither is asked to stand alone.
+ *
+ * On success the request is handed to the front controller instead of rendering the
+ * blocked page, so the response is the one any unknown path gets — deal answers those
+ * with `401` and a problem document, not `404` (measured 2026-08-26; a check written
+ * as "not 200" would have passed against the blocked page's own `403`). Delegating
+ * rather than imitating keeps this from drifting the day that response changes.
+ */
+function remove_installed_installer(): void
+{
+    if (!@unlink(__FILE__) || is_file(__FILE__)) {
+        return; // caller refuses; the installer stays but stays blocked
+    }
+
+    $frontController = __DIR__ . '/index.php';
+    if (!is_file($frontController)) {
+        return;
+    }
+
+    try {
+        require $frontController;
+    } catch (Throwable) {
+        // The installer is already gone, so this request is the only one that can see
+        // this. Say nothing rather than emit a trace from a half-booted application.
+        http_response_code(500);
+    }
+
+    exit;
+}
+
 /** SVG icons (static, trusted markup). */
 function ico(string $name): string
 {
@@ -1027,6 +1085,7 @@ if ($vendorPresent) {
         DatabaseProvisioningProbe::fromEnvFile($envFile, $root),
     );
     if ($reinstallGuard->isBlocked()) {
+        remove_installed_installer();
         refuse_install('NeNe Deal は既にインストールされています。再インストールするには var/.installed と既存データベースを削除してください。');
     }
 }
