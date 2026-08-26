@@ -38,7 +38,8 @@
     "probe:liveness": "node tools/smoke/class-liveness.mjs",
     "lint:styles": "stylelint 'src/**/*.css'",
     "tokens:validate": "nene2-tokens validate src/shared/ui/theme/themes/default.css",
-    "check:registries": "nene2-check init --check --repo nene-deal --enforce-legacy-size"
+    "check:registries": "nene2-check init --check --repo nene-deal --enforce-legacy-size",
+    "e2e:live": "NODE_PATH=./node_modules playwright test --config playwright.live.config.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
