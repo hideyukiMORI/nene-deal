@@ -73,15 +73,23 @@
    *    deal:  background transparent / color danger / border は danger の 40% 混色
    *    キット: background danger      / color on-accent（白）/ 枠なし
    *
-   *    🔴 枠だけは寄せられない。キットの `danger` variant は border 系クラスを出さず
-   *    （`bg-…-danger-bg text-…-danger-fg` のみ）、BASE_CLASS の `border-transparent`
-   *    が残る。スロットが存在しないので艦側では足せない。
-   *    ⇒ nene2-fleet-tooling#455 で `--color-x-slot-button-danger-border` を要求済み。
-   *       入ったらここに1行足す（画面側に className の特例は作らない＝受入ゲート③）。 */
+   *    🏁 **決着済み。** 起票時は枠だけ寄せられなかった——キットの `danger` variant は
+   *    border 系クラスを出さず（`bg-…-danger-bg text-…-danger-fg` のみ）、BASE_CLASS の
+   *    `border-transparent` が残るため。艦側では足せないので `fleet-tooling#455` で
+   *    スロットを要求し、**0.18.0 で入った**。下の3行で寄せてある
+   *    （画面側に className の特例は作らない＝受入ゲート③）。
+   *
+   *    ⚠️ この欄には「入ったらここに1行足す」と書いてあり、**足したあとも残っていた**
+   *    （hub のレビューが発見・2026-08-26）。読む人は「未対応」と読む。
+   *    🔑 **保留のメモは、解消したときに消えない。** 保留を書くこと自体は正しいが、
+   *    解消の手順に「メモを畳む」が入っていないと、**期限も理由も無いまま嘘だけが残る**。
+   *    本 W1 で3度目（バッジの字・冗長行の検査・これ）。
+   *
+   *    🔴 非スケール値2つ（owner-review README §A の「非スケール値」と対応）:
+   *      `transparent` … キットに transparent トークンが無いのでキーワード直書き
+   *      `color-mix(…)` … legacy `.btn-danger` の実測値の写し。契約語彙に対応キーが無い */
   --color-x-slot-button-danger-bg: transparent;
   --color-x-slot-button-danger-fg: var(--danger);
-  /* 🏁 0.18.0（fleet-tooling#455）で枠のスロットが入った。deal の実測値は
-   *    `color-mix(in oklch, var(--danger) 40%, var(--line))`（`styles.css:.btn-danger`）。 */
   --color-x-slot-button-danger-border: color-mix(in oklch, var(--danger) 40%, var(--line));
 
   /* ④ バッジは「原色べた塗り」ではなく「淡色ピル」。

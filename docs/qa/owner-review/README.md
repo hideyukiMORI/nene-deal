@@ -114,6 +114,13 @@ The spacing scale is 4 / 8 / 12 / 16 / 20 / 24 / 32 / 48px — 5px, 10px, 11px, 
 and 14px are simply not on it. nene-vault's badge gap is 6px, so matching either ship's
 number would canonise one ship's drift as the fleet's step.
 
+**Two values are not steps and are written anyway** — they are not sizes, so the scale has
+nothing to say about them: the danger button's background is the keyword `transparent` (the
+kit has no transparent token), and its border is
+`color-mix(in oklch, var(--danger) 40%, var(--line))`, copied from what production's
+`.btn-danger` measures. The contract has no key for that mix, so writing the vocabulary
+would change the colour rather than move it (判例24).
+
 Everything else that differed **was written**, in
 `frontend/src/shared/ui/theme/themes/kit-slots.css`, by pointing a slot at a step that
 already exists — never by inventing one: badge and button radius (both are pills; the kit's
