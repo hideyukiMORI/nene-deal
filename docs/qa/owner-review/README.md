@@ -16,8 +16,8 @@ Written from `nene-vault/docs/qa/owner-review/README.md` and its
 
 ```bash
 # 1. local target up: docker compose app with DEMO_MODE=1, and the frontend dev server
-DEMO_MODE=1 docker compose up -d app
-npm run dev --prefix frontend
+DEMO_MODE=1 docker compose up -d        # DEMO_MODE は compose の pass-through
+npm run dev --prefix frontend           # 5187（strictPort）
 
 # 2. capture
 npm run e2e:live --prefix frontend

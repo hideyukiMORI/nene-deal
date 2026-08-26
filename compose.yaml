@@ -39,6 +39,13 @@ services:
       # Recycle bin: soft-deleted deals stay recoverable this many days, then
       # `php tools/purge-trash.php` (run from cron) permanently removes them.
       NENE_DEAL_TRASH_RETENTION_DAYS: ${NENE_DEAL_TRASH_RETENTION_DAYS:-30}
+      # Disposable demo (#69). Pass-through with an empty default, so it stays
+      # fail-closed unless the host asks for it: `DEMO_MODE=1 docker compose up -d`.
+      # Without this line the documented dev flow (docs/demo.md §0,
+      # docs/qa/owner-review/README.md) silently does nothing — `DEMO_MODE` never
+      # reaches the container and `/demo/{template}` keeps answering 404, which reads
+      # as "the demo is broken" rather than "the switch was never wired". #225
+      DEMO_MODE: ${DEMO_MODE:-}
     depends_on:
       mysql:
         condition: service_healthy

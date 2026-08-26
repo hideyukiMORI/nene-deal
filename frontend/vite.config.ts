@@ -29,6 +29,12 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/api': { target, changeOrigin: true },
         '/health': { target, changeOrigin: true },
+        // The disposable demo seat (#69) is a backend route that parks a token and
+        // redirects into the SPA. Without it here, `/demo/standard` on the dev server
+        // falls through to Vite's SPA fallback: the app boots with no seat and renders
+        // the login screen — which looks like "the demo is broken" rather than "the dev
+        // server never asked the backend". #225
+        '/demo': { target, changeOrigin: true },
       },
     },
   }
