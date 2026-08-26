@@ -1,4 +1,4 @@
-import { EmptyState } from '@hideyukimori/nene2-ui'
+import { Badge, EmptyState } from '@hideyukimori/nene2-ui'
 import type { SelectOption } from '@/shared/ui/select-option'
 import { useState } from 'react'
 import type { KanbanColumn } from '@/entities/board'
@@ -372,12 +372,12 @@ function BoardColumn({
               <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold text-body">{deal.accountLabel}</span>
                 {isDeleted ? (
-                  <span className="badge badge-muted">{deletedBadgeLabel}</span>
+                  <Badge tone="neutral">{deletedBadgeLabel}</Badge>
                 ) : isWon ? (
-                  <span className="badge badge-ok">
+                  <Badge tone="success">
                     <span className="dot" />
                     {wonBadgeLabel}
-                  </span>
+                  </Badge>
                 ) : null}
               </div>
               <span className="amt">{formatMoneyJpy(deal.amountCents, moneyLocale)}</span>

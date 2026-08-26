@@ -1,4 +1,4 @@
-import { Button, FormField, Select } from '@hideyukimori/nene2-ui'
+import { Badge, Button, FormField, Select } from '@hideyukimori/nene2-ui'
 import type { SelectOption } from '@/shared/ui/select-option'
 import { useTranslation } from '@/shared/i18n'
 import { useToast } from '@/shared/ui/toast/use-toast'
@@ -36,10 +36,10 @@ export function SettingsView({ value, setDraft, loading, saving, save }: Setting
           <h1 className="t-h1">{t('settings.title')}</h1>
           <span className="muted t-cap">{t('settings.subtitle')}</span>
         </div>
-        <span className="badge badge-accent">
+        <Badge tone="accent">
           <IconShield />
           {t('audit.adminOnly')}
-        </span>
+        </Badge>
       </div>
 
       <form

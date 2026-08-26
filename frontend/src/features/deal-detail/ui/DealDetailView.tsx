@@ -1,4 +1,4 @@
-import { EmptyState, FormField, Select } from '@hideyukimori/nene2-ui'
+import { Badge, EmptyState, FormField, Select } from '@hideyukimori/nene2-ui'
 import type { Deal, DealActivity, InvoiceHandoffResult, UpdateDealInput } from '@/entities/deal'
 import type { PipelineStage } from '@/entities/pipeline-stage'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
@@ -84,10 +84,10 @@ export function DealDetailView({
             <div className="flex items-center justify-between flex-wrap gap-3">
               <h1 className="t-h1">{deal.accountLabel}</h1>
               {deal.stageSlug === 'won' ? (
-                <span className="badge badge-ok">
+                <Badge tone="success">
                   <span className="dot" />
                   {t('stages.badge.won')}
-                </span>
+                </Badge>
               ) : null}
             </div>
             <div className="flex items-center gap-4 flex-wrap muted t-cap">

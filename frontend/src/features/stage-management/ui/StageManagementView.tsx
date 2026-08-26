@@ -1,4 +1,4 @@
-import { Button, EmptyState, FormField, Input } from '@hideyukimori/nene2-ui'
+import { Badge, Button, EmptyState, FormField, Input } from '@hideyukimori/nene2-ui'
 import { useState } from 'react'
 import type { CreateStageInput, PipelineStage, UpdateStageInput } from '@/entities/pipeline-stage'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
@@ -161,12 +161,12 @@ function StageReadRow({
           <span className="row gap-2 flex items-center">
             <span className="medium">{stage.label}</span>
             {stage.isWon ? (
-              <span className="badge badge-ok">
+              <Badge tone="success">
                 <span className="dot" />
                 {t('stages.badge.won')}
-              </span>
+              </Badge>
             ) : stage.isTerminal ? (
-              <span className="badge badge-muted">{t('stages.badge.terminal')}</span>
+              <Badge tone="neutral">{t('stages.badge.terminal')}</Badge>
             ) : null}
           </span>
           <span className="faint t-tiny mono">

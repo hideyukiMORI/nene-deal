@@ -1,4 +1,4 @@
-import { EmptyState, FormField, Select } from '@hideyukimori/nene2-ui'
+import { Badge, EmptyState, FormField, Select } from '@hideyukimori/nene2-ui'
 import type { SelectOption } from '@/shared/ui/select-option'
 import { useState } from 'react'
 import type { CreateUserInput, OperatorRole, OperatorUser, UserStatus } from '@/entities/user'
@@ -182,9 +182,9 @@ export function UserManagementView({
                     <div className="stack gap-1 flex flex-col">
                       <span className="row gap-2 flex items-center">
                         <span className="medium">{user.email}</span>
-                        {you ? <span className="badge badge-accent">{t('users.you')}</span> : null}
+                        {you ? <Badge tone="accent">{t('users.you')}</Badge> : null}
                         {user.status === 'disabled' ? (
-                          <span className="badge badge-muted">{t('users.status.disabled')}</span>
+                          <Badge tone="neutral">{t('users.status.disabled')}</Badge>
                         ) : null}
                       </span>
                       <span className="faint t-tiny mono">{user.id}</span>
@@ -253,9 +253,9 @@ export function UserManagementView({
               <div className="flex flex-col gap-1" style={{ minWidth: 0 }}>
                 <span className="medium us-email">{openUser.email}</span>
                 {openUser.id === currentUserId ? (
-                  <span className="badge badge-accent" style={{ alignSelf: 'flex-start' }}>
+                  <Badge tone="accent" className="self-start">
                     {t('users.you')}
-                  </span>
+                  </Badge>
                 ) : (
                   <span className="faint t-tiny">
                     {t('users.field.role')}:{' '}

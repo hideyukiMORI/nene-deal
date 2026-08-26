@@ -1,4 +1,4 @@
-import { Button, FormField, Input } from '@hideyukimori/nene2-ui'
+import { Badge, Button, FormField, Input } from '@hideyukimori/nene2-ui'
 import { type ReactNode } from 'react'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { useToast } from '@/shared/ui/toast/use-toast'
@@ -54,10 +54,10 @@ export function AuditExportView({
           <h1 className="t-h1">{t('audit.title')}</h1>
           <span className="muted t-cap">{t('audit.subtitle')}</span>
         </div>
-        <span className="badge badge-accent">
+        <Badge tone="accent">
           <IconShield />
           {t('audit.adminOnly')}
-        </span>
+        </Badge>
       </div>
 
       <form

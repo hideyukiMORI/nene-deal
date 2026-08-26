@@ -3,35 +3,100 @@
  * キット部品は編集しない。意匠の差はここでスロット値を上書きして吸収する
  * （キットが用意した正規の上書き点。design principle: 値はスロットから来る）。
  *
- * 🔴 読む順の前提: `theme/index.css` が
- *      キット theme → この層を含む active.css
- *    の順で import しているので、ここの宣言はキット既定に勝つ。
+ * 🔴 読む順の前提: `theme/index.css` が キット theme → active.css（この層を含む）の順で
+ *    import している。この層は **@layer に入れない**ので、キットと deal の `@theme`
+ *    （どちらも layered）に無条件で勝つ。
  *
- * 🟢 色そのものは何も書いていない。`--color-accent` を deal ティールにしてあるだけで、
- *    キットのスロットは軒並み `var(--color-accent)` 等の派生なので全部 deal 色になる。
- *    ここに並ぶのは **色ではなく「意匠の形」が違う箇所だけ**。
+ * ⚠️ ダーク／calm の分岐をここで書き写さない。参照先の legacy 変数が
+ *    `[data-theme]` と `[data-design='calm'][data-theme]` で入れ替わるので、
+ *    var() 経由にしておけば**この層は1組だけで全条件に追従する**。
+ */
+
+/* ═══ ① 🔴 accent は「契約トークン」と「実描画」が食い違っていた ═══════════
  *
- * ⚠️ ダークの上書きは不要。参照先（--color-border-strong / --color-danger）が
- *    `[data-theme='dark']` で入れ替わるので、この層はそのまま追従する。
+ * `data-design` は常に `calm`（`src/shared/theme/index.ts:26` が無条件に設定し、
+ * `index.html` にも書いてある）。その calm ブロックは `--accent` 系を**リテラルで
+ * 上書き**しているため、実際に描画される deal のティールは:
+ *
+ *     light  --accent: oklch(46% 0.068 186)      （calm-skin.css:129）
+ *     dark   --accent: oklch(77% 0.072 184)      （calm-skin.css:117）
+ *
+ * ところが契約の `--color-accent` は **calm でない方**の値を持っている:
+ *
+ *     light  oklch(52% 0.1 188)  /  dark  oklch(74% 0.12 182)   （default.css:48,179）
+ *
+ * 🔬 ビルド済み CSS で実測（2026-08-26）: `--accent` は4値（calm 込み）、
+ *    `--color-accent` は2値。⇒ **キット部品だけが一段濃く鮮やかなティールになる。**
+ *    同じ画面で legacy のボタンとキットのボタンが違う色になる、という形。
+ *
+ * ⇒ キットが読む口を、**実際に描画されている値**へ向ける。C5 で legacy が消えるときは、
+ *    ここを calm のリテラルへ置き換える（その時点で「契約の accent はどちらが正か」の
+ *    裁定が要る＝板 L15 の v2 材料）。
  */
 @theme {
-  /* ① 枠は一段濃い。
-   *    deal の `.input` / `.select` / `.btn-secondary` はいずれも legacy `--line-strong`
-   *    （＝契約の --color-border-strong と 1:1）を使う。キット既定は --color-border で一段淡い。
-   *    ⇒ 差の原因は1つなので、上書きも1箇所ずつで足りる。 */
-  --color-x-slot-button-secondary-border: var(--color-border-strong);
-  --color-x-slot-control-border: var(--color-border-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-focus-ring: var(--focus-ring, var(--accent));
 
-  /* ② danger ボタンは「塗り」ではなく「輪郭」。
+  /* ② 枠は一段濃い。deal の `.input` `.select` `.btn-secondary` は揃って legacy
+   *    `--line-strong`（契約の --color-border-strong と 1:1）を使う。キット既定は
+   *    一段淡い --color-border。⇒ 差の原因は1つなので上書きも1箇所ずつ。 */
+  --color-x-slot-button-secondary-border: var(--line-strong);
+  --color-x-slot-control-border: var(--line-strong);
+
+  /* ③ danger ボタンは「塗り」ではなく「輪郭」。
    *    deal:  background transparent / color danger / border は danger の 40% 混色
-   *    キット: background danger      / color on-accent（＝白）/ 枠なし
-   *    ⇒ そのまま置換すると、削除ボタンが淡い輪郭から原色のべた塗りに変わる。
+   *    キット: background danger      / color on-accent（白）/ 枠なし
    *
-   *    🔴 枠だけは寄せられない。キットの `danger` variant は border 系のクラスを出さず
-   *    （`bg-…-danger-bg text-…-danger-fg` のみ）、BASE_CLASS の `border-transparent` が残る。
-   *    スロットが存在しないので艦側では足せない。
+   *    🔴 枠だけは寄せられない。キットの `danger` variant は border 系クラスを出さず
+   *    （`bg-…-danger-bg text-…-danger-fg` のみ）、BASE_CLASS の `border-transparent`
+   *    が残る。スロットが存在しないので艦側では足せない。
    *    ⇒ nene2-fleet-tooling#455 で `--color-x-slot-button-danger-border` を要求済み。
    *       入ったらここに1行足す（画面側に className の特例は作らない＝受入ゲート③）。 */
   --color-x-slot-button-danger-bg: transparent;
-  --color-x-slot-button-danger-fg: var(--color-danger);
+  --color-x-slot-button-danger-fg: var(--danger);
+
+  /* ④ バッジは「原色べた塗り」ではなく「淡色ピル」。
+   *    キット既定は bg=原色 / fg=反転色 / border=原色。deal は bg=淡色 / fg=状態色 /
+   *    border=混色。⇒ そのまま置換すると 08-23 vault の W1b NG（「バッジがキット既定の
+   *    意匠」）を再演する。3プロパティを**セットで**寄せる（bg だけ寄せると
+   *    「淡色ピルに濃い枠」という第三の意匠になる）。
+   *
+   *    値は legacy を参照する。`--accent-weak` / `--accent-line` は契約 v1 に対応キーが
+   *    無く（板 L15 に deal 実需として登録済み・v2 昇格審査待ち）、`--ok-weak` は
+   *    `color-mix(in srgb, …)` で契約の `-soft`（`in oklch`）と色空間が違うため、
+   *    契約語彙へ写すと値が変わる＝drain ではなく設計変更になる（判例24）。 */
+  --color-x-slot-badge-accent-bg: var(--accent-weak);
+  --color-x-slot-badge-accent-fg: var(--accent);
+  --color-x-slot-badge-accent-border: var(--accent-line);
+
+  --color-x-slot-badge-success-bg: var(--ok-weak);
+  --color-x-slot-badge-success-fg: var(--ok);
+  --color-x-slot-badge-success-border: color-mix(in oklch, var(--ok) 35%, var(--line));
+
+  --color-x-slot-badge-neutral-bg: var(--surface-2);
+  --color-x-slot-badge-neutral-fg: var(--fg-muted);
+  --color-x-slot-badge-neutral-border: var(--line);
+}
+
+/* ═══ ダーク: @theme だけでは届かない ════════════════════════════════════
+ *
+ * 🔬 実測（2026-08-26・実ブラウザの computed 値）: 上の `@theme` だけだと
+ * **light は一致するのに dark は一致しない**。
+ *
+ * `@theme` は `@layer theme` の中の `:root` として出るが、`themes/default.css` の
+ * ダークは **`[data-theme='dark']` の素のルール（レイヤ外）** で書かれている。
+ * **レイヤ外は無条件にレイヤ内へ勝つ**ので、ダークでは default.css の
+ * `--color-accent: oklch(74% 0.12 182)` が残り、キットだけが別のティールになる。
+ *
+ * ⇒ default.css と同じ二層構造（layer 1 = @theme / layer 2 = [data-theme='dark']）に
+ *    合わせる。ここで上書きが要るのは **default.css がダークブロックで再宣言している
+ *    トークンだけ**（accent 系4本）。`--color-x-slot-*` は誰もレイヤ外で触らないので
+ *    @theme 側の1回で足り、値も legacy var 経由でダークに追従する（実測で確認済み）。 */
+[data-theme='dark'] {
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-focus-ring: var(--focus-ring, var(--accent));
 }
