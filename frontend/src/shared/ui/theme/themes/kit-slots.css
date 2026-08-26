@@ -104,24 +104,31 @@
   --color-x-slot-toast-success-fg: var(--ok);
   --color-x-slot-toast-success-border: var(--ok);
 
-  /* ⑥ バッジの字と gap は **上書きしない**（#463 が着地したので、その必要が消えた）。
+  /* ⑥ バッジの字と gap は **上書きしない**（fleet-tooling#463 → 0.19.0 で確定）。
    *
-   *    🏁 fleet-tooling#463 → PR #470 マージ（2026-08-26）。0.19.0 で3スロットが入る。
-   *    起票時に測った deal の本番値と、入った既定を突き合わせると:
+   *    🔬 実測（2026-08-26・**インストール済み 0.19.0 の成果物**で解決の連鎖まで追った。
+   *    宣言でも `themes/default.css` でもなく、ビルド後の CSS が最終的な答え）:
    *
-   *      gap     キット既定 4px   / deal 本番 5px     → 1px    snap 範囲
-   *      size    キット既定 11px  / deal 本番 11.5px  → 0.5px  snap 範囲
-   *      weight  キット既定 600   / deal 本番 600     → 一致
+   *      gap    --spacing-x-slot-badge-gap → --spacing-x-3xs        →   4px  / 本番 5px
+   *      size   --text-x-slot-badge        → --text-x-2xs           →  11px  / 本番 11.5px
+   *      weight --font-weight-x-slot-badge → --font-weight-semibold →   600  / 本番 600
    *
-   *    ⇒ **1つも書かなくて済む。** ①②と同じ「±2px はスケールへ snap する」の適用で、
-   *    書けば書けるが、書くと deal だけがスケールから外れた値を持つことになる。
+   *    ⇒ **1つも書かない。** 5px も 11.5px もスケールの段ではなく（4/8/12…）、キットの
+   *    `slot-values` 検査器はリテラルを落とす＝**寄せられない差**。①②と同じ snap 扱いで、
+   *    目視束の「受け入れた差」に理由つきで載せてある（`docs/qa/owner-review/README.md` §A）。
+   *    既定と同値の行を書くのも誤り——**次に読む人に「ここは特別だ」と誤解させる**
+   *    （0.19.0 の配布メモの指示: 現行値を測り、既定と違うものだけ再定義せよ）。
+   *
+   *    🔴 weight だけ経路が違う。`--font-weight-semibold` は **キットが定義していない**
+   *    （Tailwind 内蔵の theme 変数）。`@theme` の変数は参照されないと tree-shake される
+   *    ので、成果物に `--font-weight-semibold:600` が実在することを確認した上での「600」。
+   *    キット側の1行だけ見て 600 と断じると、消えていても気づけない。
    *
    *    ⚠️ この欄は起票時「入ったらコメント3行を外すだけ」と書いてあった。**外す前に前提が
-   *    変わった**——weight の既定が medium(500) から semibold(600) へ是正されたため
+   *    2回変わった**——weight の既定が medium(500) から semibold(600) へ是正され
    *    （既存6本が medium なのは「既にインラインに在った font-medium の保存」であって
-   *    設計された慣習ではなく、Badge には保存すべきものが無かった）。
-   *    🔑 **保留のメモは、使う前に古くなる。** 0.19.0 を実際に入れたら、上の3行を
-   *    **その版の themes/default.css で測り直してから**「不要」を確定すること。 */
+   *    設計された慣習ではない）、さらに snap 判断そのものが fleet 裁定で確定した。
+   *    🔑 **保留のメモは、使う前に古くなる。** 保留の値は保留した時点の測定でしかない。 */
 
   --color-x-slot-badge-neutral-bg: var(--surface-2);
   --color-x-slot-badge-neutral-fg: var(--fg-muted);
