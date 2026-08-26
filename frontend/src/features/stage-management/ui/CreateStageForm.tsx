@@ -1,12 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Button, FormField, Input, Stack } from '@hideyukimori/nene2-ui'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import type { CreateStageInput } from '@/entities/pipeline-stage'
 import { useTranslation } from '@/shared/i18n'
-import { Button } from '@/shared/ui/primitives/Button'
-import { Input } from '@/shared/ui/primitives/Input'
-import { Stack } from '@/shared/ui/primitives/Stack'
-import { Text } from '@/shared/ui/primitives/Text'
 interface CreateStageFormProps {
   pending: boolean
   errorMessage: string | null
@@ -55,32 +52,32 @@ export function CreateStageForm({
       }}
       className="card card-pad"
     >
-      <Stack gap="sm">
-        <Text as="h2" variant="heading-sm">
-          {t('stages.create.title')}
-        </Text>
+      {/* gap: local `sm` was gap-2 = 8px → kit `2xs` (0.5rem). 名前が2段ずれる（#225） */}
+      <Stack gap="2xs">
+        {/* park（板 L15）: 見出し・caption の legacy タイポは契約語彙に無い（21/16/12.5px・
+            leading 1.2/1.25・tracking はトークン0本）。utility 化は arbitrary value になる。 */}
+        <h2 className="t-h2">{t('stages.create.title')}</h2>
 
-        {errorMessage !== null ? (
-          <Text variant="caption" className="danger">
-            {errorMessage}
-          </Text>
-        ) : null}
+        {errorMessage !== null ? <p className="t-cap danger">{errorMessage}</p> : null}
 
-        <Input
+        <FormField
           id="stage-label"
           label={t('stages.field.label')}
-          error={errors.label?.message}
-          {...register('label')}
-        />
-        <Input
+          error={errors.label?.message ?? null}
+        >
+          <Input {...register('label')} />
+        </FormField>
+        <FormField
           id="stage-sort-order"
           label={t('stages.field.sortOrder')}
-          type="number"
-          error={errors.sortOrder?.message}
-          {...register('sortOrder', { valueAsNumber: true })}
-        />
+          error={errors.sortOrder?.message ?? null}
+        >
+          <Input type="number" {...register('sortOrder', { valueAsNumber: true })} />
+        </FormField>
 
-        <Stack direction="horizontal" gap="sm">
+        {/* align="center": ローカル Stack は horizontal で常に items-center だったが、
+            キットは align を渡した時だけ付く（#225 の地雷） */}
+        <Stack direction="horizontal" align="center" gap="2xs">
           <Button type="submit" disabled={pending}>
             {t('stages.create.submit')}
           </Button>

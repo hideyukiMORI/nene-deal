@@ -1,8 +1,8 @@
+import { EmptyState, FormField, Select } from '@hideyukimori/nene2-ui'
+import type { SelectOption } from '@/shared/ui/select-option'
 import { useState } from 'react'
 import type { CreateUserInput, OperatorRole, OperatorUser, UserStatus } from '@/entities/user'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
-import { EmptyState } from '@/shared/ui/components/EmptyState'
-import { Select, type SelectOption } from '@/shared/ui/primitives/Select'
 import { IconChevron, IconClose, IconPlus } from '@/shared/ui/icons'
 import type { UserManagementStatus } from '../model/use-user-management-page'
 import { CreateUserForm } from './CreateUserForm'
@@ -43,19 +43,35 @@ export function UserManagementView({
     { value: 'admin', label: t('users.role.admin') },
   ]
 
-  const roleSelect = (user: OperatorUser, labelHidden: boolean) => (
-    <Select
-      id={`role-${user.id}`}
-      label={t('users.field.role')}
-      labelHidden={labelHidden}
-      options={roleOptions}
-      value={user.role}
-      disabled={user.id === currentUserId}
-      onChange={(e) => {
-        void updateRole(user.id, e.target.value as OperatorRole)
-      }}
-    />
-  )
+  const roleSelect = (user: OperatorUser, labelHidden: boolean) => {
+    const select = (
+      <Select
+        id={`role-${user.id}`}
+        value={user.role}
+        disabled={user.id === currentUserId}
+        {...(labelHidden ? { 'aria-label': t('users.field.role') } : {})}
+        onChange={(e) => {
+          void updateRole(user.id, e.target.value as OperatorRole)
+        }}
+      >
+        {roleOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </Select>
+    )
+    // labelHidden: キットの FormField に「ラベルを視覚的に隠す」入口が無い（ローカル
+    // Select は sr-only を持っていた）。表の行では見出しが列側にあるので FormField を
+    // 使わず aria-label で名前を与える＝意匠の特例ではなく支援技術向けの属性。
+    return labelHidden ? (
+      select
+    ) : (
+      <FormField id={`role-${user.id}`} label={t('users.field.role')}>
+        {select}
+      </FormField>
+    )
+  }
 
   const confirmDelete = (user: OperatorUser) => {
     if (window.confirm(t('users.delete.confirm'))) {
@@ -138,8 +154,11 @@ export function UserManagementView({
         </div>
       ) : null}
 
+      {/* 🔴 EmptyState: description が落ちている（fleet-tooling#456 待ち）。キットは
+                message 1本しか取らないので title だけを渡している＝意匠差ではなく**文言の欠落**。
+                目視束の「キット既定に任せた箇所」に明記すること（hub 指示 2026-08-26）。 */}
       {status === 'ready' && users.length === 0 ? (
-        <EmptyState title={t('users.empty.title')} description={t('users.empty.description')} />
+        <EmptyState message={t('users.empty.title')} />
       ) : null}
 
       {status === 'ready' && users.length > 0 ? (

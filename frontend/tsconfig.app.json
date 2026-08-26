@@ -26,5 +26,7 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true
   },
-  "include": ["src", "tests"]
+  "include": ["src", "tests"],
+  // tests/toolchain は node 型が要るので別プロジェクト（tsconfig.toolchain.json）へ。#225
+  "exclude": ["tests/toolchain"]
 }

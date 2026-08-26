@@ -1,0 +1,37 @@
+/* ── nene2-ui のスロット上書き — deal の意匠に寄せる層（W1・#225）──────────
+ *
+ * キット部品は編集しない。意匠の差はここでスロット値を上書きして吸収する
+ * （キットが用意した正規の上書き点。design principle: 値はスロットから来る）。
+ *
+ * 🔴 読む順の前提: `theme/index.css` が
+ *      キット theme → この層を含む active.css
+ *    の順で import しているので、ここの宣言はキット既定に勝つ。
+ *
+ * 🟢 色そのものは何も書いていない。`--color-accent` を deal ティールにしてあるだけで、
+ *    キットのスロットは軒並み `var(--color-accent)` 等の派生なので全部 deal 色になる。
+ *    ここに並ぶのは **色ではなく「意匠の形」が違う箇所だけ**。
+ *
+ * ⚠️ ダークの上書きは不要。参照先（--color-border-strong / --color-danger）が
+ *    `[data-theme='dark']` で入れ替わるので、この層はそのまま追従する。
+ */
+@theme {
+  /* ① 枠は一段濃い。
+   *    deal の `.input` / `.select` / `.btn-secondary` はいずれも legacy `--line-strong`
+   *    （＝契約の --color-border-strong と 1:1）を使う。キット既定は --color-border で一段淡い。
+   *    ⇒ 差の原因は1つなので、上書きも1箇所ずつで足りる。 */
+  --color-x-slot-button-secondary-border: var(--color-border-strong);
+  --color-x-slot-control-border: var(--color-border-strong);
+
+  /* ② danger ボタンは「塗り」ではなく「輪郭」。
+   *    deal:  background transparent / color danger / border は danger の 40% 混色
+   *    キット: background danger      / color on-accent（＝白）/ 枠なし
+   *    ⇒ そのまま置換すると、削除ボタンが淡い輪郭から原色のべた塗りに変わる。
+   *
+   *    🔴 枠だけは寄せられない。キットの `danger` variant は border 系のクラスを出さず
+   *    （`bg-…-danger-bg text-…-danger-fg` のみ）、BASE_CLASS の `border-transparent` が残る。
+   *    スロットが存在しないので艦側では足せない。
+   *    ⇒ nene2-fleet-tooling#455 で `--color-x-slot-button-danger-border` を要求済み。
+   *       入ったらここに1行足す（画面側に className の特例は作らない＝受入ゲート③）。 */
+  --color-x-slot-button-danger-bg: transparent;
+  --color-x-slot-button-danger-fg: var(--color-danger);
+}

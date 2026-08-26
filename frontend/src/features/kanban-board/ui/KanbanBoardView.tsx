@@ -1,11 +1,11 @@
+import { EmptyState } from '@hideyukimori/nene2-ui'
+import type { SelectOption } from '@/shared/ui/select-option'
 import { useState } from 'react'
 import type { KanbanColumn } from '@/entities/board'
 import type { CreateDealInput } from '@/entities/deal'
 import type { ForecastSummary } from '@/entities/forecast'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { formatMoneyJpy } from '@/shared/lib/format-money'
-import { EmptyState } from '@/shared/ui/components/EmptyState'
-import { type SelectOption } from '@/shared/ui/primitives/Select'
 import { useToast } from '@/shared/ui/toast/use-toast'
 import { IconAccount, IconBack, IconCheck, IconChevron, IconEye, IconPlus } from '@/shared/ui/icons'
 import { useKanbanDnd } from '../model/use-kanban-dnd'
@@ -240,8 +240,11 @@ export function KanbanBoardView({
         </div>
       ) : null}
 
+      {/* 🔴 EmptyState: description が落ちている（fleet-tooling#456 待ち）。キットは
+                message 1本しか取らないので title だけを渡している＝意匠差ではなく**文言の欠落**。
+                目視束の「キット既定に任せた箇所」に明記すること（hub 指示 2026-08-26）。 */}
       {status === 'ready' && columns.length === 0 ? (
-        <EmptyState title={t('board.empty.title')} description={t('board.empty.description')} />
+        <EmptyState message={t('board.empty.title')} />
       ) : null}
 
       {status === 'ready' && columns.length > 0 ? (

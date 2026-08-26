@@ -1,7 +1,6 @@
+import { Button, FormField, Input } from '@hideyukimori/nene2-ui'
 import { type ReactNode } from 'react'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
-import { Button } from '@/shared/ui/primitives/Button'
-import { Input } from '@/shared/ui/primitives/Input'
 import { useToast } from '@/shared/ui/toast/use-toast'
 import {
   IconArrowRight,
@@ -73,26 +72,26 @@ export function AuditExportView({
 
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex-1">
-            <Input
-              id="audit-from"
-              label={t('audit.from')}
-              type="date"
-              value={from}
-              onChange={(event) => {
-                setFrom(event.target.value)
-              }}
-            />
+            <FormField id="audit-from" label={t('audit.from')}>
+              <Input
+                type="date"
+                value={from}
+                onChange={(event) => {
+                  setFrom(event.target.value)
+                }}
+              />
+            </FormField>
           </div>
           <div className="flex-1">
-            <Input
-              id="audit-to"
-              label={t('audit.to')}
-              type="date"
-              value={to}
-              onChange={(event) => {
-                setTo(event.target.value)
-              }}
-            />
+            <FormField id="audit-to" label={t('audit.to')}>
+              <Input
+                type="date"
+                value={to}
+                onChange={(event) => {
+                  setTo(event.target.value)
+                }}
+              />
+            </FormField>
           </div>
         </div>
 

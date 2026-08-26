@@ -1,0 +1,22 @@
+{
+  // tests/toolchain/* は Node の組み込みモジュール（node:fs / node:child_process …）を直に使う。
+  //
+  // 🔴 これまで型が付いていたのは偶然だった。tsconfig.app.json の `types` は
+  // `["vite/client"]` で node を含まないが、`src/**/*.stories.tsx` が
+  // `@storybook/react-vite` の型を引き、それが @types/node をプログラムへ巻き込んでいた。
+  // 2026-08-26 の W1（#225）でローカル部品6つを消したとき stories も6本すべて消え、
+  // その瞬間に `node:fs` が解決しなくなって TS2591 が12件出た。
+  // ⇒ 依存は「テスト → @types/node」なのに、経路が「テスト → Storybook → @types/node」
+  //    だった。無関係なファイルを消すと型検査が壊れる状態だったので、ここで明示する。
+  //
+  // 別プロジェクトに切ってあるのは、`types` に "node" を足す先を tests/toolchain だけに
+  // 限るため。app 側へ足すと src でも `process` / `Buffer` が型エラーにならなくなり、
+  // ブラウザ向けコードに node 由来の記述が紛れても検出できなくなる。
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.toolchain.tsbuildinfo",
+    "types": ["node"]
+  },
+  "include": ["tests/toolchain"],
+  "exclude": []
+}

@@ -1,13 +1,10 @@
+import { Button, FormField, Input, Select, Stack } from '@hideyukimori/nene2-ui'
+import type { SelectOption } from '@/shared/ui/select-option'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import type { CreateDealInput } from '@/entities/deal'
 import { useTranslation } from '@/shared/i18n'
-import { Button } from '@/shared/ui/primitives/Button'
-import { Input } from '@/shared/ui/primitives/Input'
-import { Select, type SelectOption } from '@/shared/ui/primitives/Select'
-import { Stack } from '@/shared/ui/primitives/Stack'
-import { Text } from '@/shared/ui/primitives/Text'
 export interface CreateDealFormProps {
   stageOptions: SelectOption[]
   pending: boolean
@@ -86,63 +83,70 @@ export function CreateDealForm({
       }}
       className="card card-pad"
     >
-      <Stack gap="md">
-        <Text as="h2" variant="heading-sm">
-          {t('deal.create.title')}
-        </Text>
+      <Stack gap="sm">
+        <h2 className="t-h2">{t('deal.create.title')}</h2>
 
-        {errorMessage !== null ? (
-          <Text variant="caption" className="danger">
-            {errorMessage}
-          </Text>
-        ) : null}
+        {errorMessage !== null ? <p className="t-cap danger">{errorMessage}</p> : null}
 
-        <Input
+        <FormField
           id="deal-account-label"
           label={t('deal.field.accountLabel')}
-          error={errors.accountLabel?.message}
-          {...register('accountLabel')}
-        />
+          error={errors.accountLabel?.message ?? null}
+        >
+          <Input {...register('accountLabel')} />
+        </FormField>
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex-1">
-            <Input
+            <FormField
               id="deal-amount"
               label={t('deal.field.amount')}
-              type="number"
-              min={0}
-              step={1}
-              error={errors.amountYen?.message}
-              {...register('amountYen', { valueAsNumber: true })}
-            />
+              error={errors.amountYen?.message ?? null}
+            >
+              <Input
+                type="number"
+                min={0}
+                step={1}
+                {...register('amountYen', { valueAsNumber: true })}
+              />
+            </FormField>
           </div>
           <div className="flex-1">
-            <Input
+            <FormField
               id="deal-probability"
               label={t('deal.field.probability')}
-              type="number"
-              min={0}
-              max={100}
-              error={errors.probabilityPercent?.message}
-              {...register('probabilityPercent', { valueAsNumber: true })}
-            />
+              error={errors.probabilityPercent?.message ?? null}
+            >
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                {...register('probabilityPercent', { valueAsNumber: true })}
+              />
+            </FormField>
           </div>
         </div>
-        <Select
+        <FormField
           id="deal-stage"
           label={t('deal.field.stage')}
-          options={stageOptions}
-          error={errors.stageRef?.message}
-          {...register('stageRef')}
-        />
-        <Input
+          error={errors.stageRef?.message ?? null}
+        >
+          <Select {...register('stageRef')}>
+            {stageOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
+        </FormField>
+        <FormField
           id="deal-expected-close-date"
           label={t('deal.field.expectedCloseDate')}
-          type="date"
-          error={errors.expectedCloseDate?.message}
-          {...register('expectedCloseDate')}
-        />
+          error={errors.expectedCloseDate?.message ?? null}
+        >
+          <Input type="date" {...register('expectedCloseDate')} />
+        </FormField>
 
-        <Stack direction="horizontal" gap="sm">
+        <Stack direction="horizontal" align="center" gap="2xs">
           <Button type="submit" disabled={pending}>
             {t('deal.create.submit')}
           </Button>

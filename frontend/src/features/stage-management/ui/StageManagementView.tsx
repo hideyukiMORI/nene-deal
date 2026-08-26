@@ -1,9 +1,7 @@
+import { Button, EmptyState, FormField, Input } from '@hideyukimori/nene2-ui'
 import { useState } from 'react'
 import type { CreateStageInput, PipelineStage, UpdateStageInput } from '@/entities/pipeline-stage'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
-import { EmptyState } from '@/shared/ui/components/EmptyState'
-import { Button } from '@/shared/ui/primitives/Button'
-import { Input } from '@/shared/ui/primitives/Input'
 import { IconPlus } from '@/shared/ui/icons'
 import type { StageManagementStatus } from '../model/use-stage-management-page'
 import { CreateStageForm } from './CreateStageForm'
@@ -93,8 +91,11 @@ export function StageManagementView({
         </div>
       ) : null}
 
+      {/* 🔴 EmptyState: description が落ちている（fleet-tooling#456 待ち）。キットは
+                message 1本しか取らないので title だけを渡している＝意匠差ではなく**文言の欠落**。
+                目視束の「キット既定に任せた箇所」に明記すること（hub 指示 2026-08-26）。 */}
       {status === 'ready' && stages.length === 0 ? (
-        <EmptyState title={t('stages.empty.title')} description={t('stages.empty.description')} />
+        <EmptyState message={t('stages.empty.title')} />
       ) : null}
 
       {status === 'ready' && stages.length > 0 ? (
@@ -226,25 +227,25 @@ function StageEditRow({
         </div>
         <div className="row gap-4 flex-wrap flex items-center">
           <div className="flex-1">
-            <Input
-              id={`stage-label-edit-${stage.id}`}
-              label={t('stages.field.label')}
-              value={label}
-              onChange={(e) => {
-                setLabel(e.target.value)
-              }}
-            />
+            <FormField id={`stage-label-edit-${stage.id}`} label={t('stages.field.label')}>
+              <Input
+                value={label}
+                onChange={(e) => {
+                  setLabel(e.target.value)
+                }}
+              />
+            </FormField>
           </div>
           <div style={{ width: 150 }}>
-            <Input
-              id={`stage-sort-edit-${stage.id}`}
-              label={t('stages.field.sortOrder')}
-              type="number"
-              value={sortOrder}
-              onChange={(e) => {
-                setSortOrder(e.target.value)
-              }}
-            />
+            <FormField id={`stage-sort-edit-${stage.id}`} label={t('stages.field.sortOrder')}>
+              <Input
+                type="number"
+                value={sortOrder}
+                onChange={(e) => {
+                  setSortOrder(e.target.value)
+                }}
+              />
+            </FormField>
           </div>
         </div>
         <div className="flex items-center gap-2">
