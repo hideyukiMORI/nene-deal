@@ -1,12 +1,9 @@
+import { Button, FormField, Input, Stack } from '@hideyukimori/nene2-ui'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import type { Deal, UpdateDealInput } from '@/entities/deal'
 import { useTranslation } from '@/shared/i18n'
-import { Button } from '@/shared/ui/primitives/Button'
-import { Input } from '@/shared/ui/primitives/Input'
-import { Stack } from '@/shared/ui/primitives/Stack'
-import { Text } from '@/shared/ui/primitives/Text'
 export interface EditDealFormProps {
   deal: Deal
   pending: boolean
@@ -74,57 +71,60 @@ export function EditDealForm({ deal, pending, errorMessage, onSubmit }: EditDeal
       }}
       className="card card-pad"
     >
-      <Stack gap="md">
-        <Text as="h2" variant="heading-sm">
-          {t('detail.edit.title')}
-        </Text>
+      <Stack gap="sm">
+        <h2 className="t-h2">{t('detail.edit.title')}</h2>
 
-        {errorMessage !== null ? (
-          <Text variant="caption" className="danger">
-            {errorMessage}
-          </Text>
-        ) : null}
+        {errorMessage !== null ? <p className="t-cap danger">{errorMessage}</p> : null}
 
-        <Input
+        <FormField
           id="edit-account-label"
           label={t('deal.field.accountLabel')}
-          error={errors.accountLabel?.message}
-          {...register('accountLabel')}
-        />
+          error={errors.accountLabel?.message ?? null}
+        >
+          <Input {...register('accountLabel')} />
+        </FormField>
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex-1">
-            <Input
+            <FormField
               id="edit-amount"
               label={t('deal.field.amount')}
-              type="number"
-              min={0}
-              step={1}
-              error={errors.amountYen?.message}
-              {...register('amountYen', { valueAsNumber: true })}
-            />
+              error={errors.amountYen?.message ?? null}
+            >
+              <Input
+                type="number"
+                min={0}
+                step={1}
+                {...register('amountYen', { valueAsNumber: true })}
+              />
+            </FormField>
           </div>
           <div className="flex-1">
-            <Input
+            <FormField
               id="edit-probability"
               label={t('deal.field.probability')}
-              type="number"
-              min={0}
-              max={100}
-              error={errors.probabilityPercent?.message}
-              {...register('probabilityPercent', { valueAsNumber: true })}
-            />
+              error={errors.probabilityPercent?.message ?? null}
+            >
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                {...register('probabilityPercent', { valueAsNumber: true })}
+              />
+            </FormField>
           </div>
         </div>
-        <Input
+        <FormField
           id="edit-expected-close-date"
           label={t('deal.field.expectedCloseDate')}
-          type="date"
-          error={errors.expectedCloseDate?.message}
-          {...register('expectedCloseDate')}
-        />
-        <Input id="edit-note" label={t('deal.field.note')} {...register('note')} />
+          error={errors.expectedCloseDate?.message ?? null}
+        >
+          <Input type="date" {...register('expectedCloseDate')} />
+        </FormField>
+        <FormField id="edit-note" label={t('deal.field.note')}>
+          <Input {...register('note')} />
+        </FormField>
 
-        <Stack direction="horizontal" gap="sm">
+        <Stack direction="horizontal" align="center" gap="2xs">
           <Button type="submit" disabled={pending}>
             {t('common.actions.save')}
           </Button>

@@ -1,9 +1,8 @@
+import { Badge, EmptyState, FormField, Select } from '@hideyukimori/nene2-ui'
 import type { Deal, DealActivity, InvoiceHandoffResult, UpdateDealInput } from '@/entities/deal'
 import type { PipelineStage } from '@/entities/pipeline-stage'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { formatMoneyJpy } from '@/shared/lib/format-money'
-import { EmptyState } from '@/shared/ui/components/EmptyState'
-import { Select } from '@/shared/ui/primitives/Select'
 import { useToast } from '@/shared/ui/toast/use-toast'
 import { IconBack, IconCheck, IconInvoice, IconOwner, IconTrash } from '@/shared/ui/icons'
 import type { DealDetailStatus } from '../model/use-deal-detail-page'
@@ -68,7 +67,7 @@ export function DealDetailView({
 
       {status === 'loading' ? <p className="muted text-body">{t('detail.loading')}</p> : null}
 
-      {status === 'missing' ? <EmptyState title={t('detail.notFound')} /> : null}
+      {status === 'missing' ? <EmptyState message={t('detail.notFound')} /> : null}
 
       {status === 'error' ? (
         <div className="flex flex-col gap-3">
@@ -85,10 +84,10 @@ export function DealDetailView({
             <div className="flex items-center justify-between flex-wrap gap-3">
               <h1 className="t-h1">{deal.accountLabel}</h1>
               {deal.stageSlug === 'won' ? (
-                <span className="badge badge-ok">
+                <Badge tone="success">
                   <span className="dot" />
                   {t('stages.badge.won')}
-                </span>
+                </Badge>
               ) : null}
             </div>
             <div className="flex items-center gap-4 flex-wrap muted t-cap">
@@ -113,20 +112,26 @@ export function DealDetailView({
             <p className="muted t-cap">{deal.note ?? t('detail.note.empty')}</p>
             {stages.length > 0 ? (
               <div style={{ maxWidth: 240 }}>
-                <Select
-                  id="detail-stage"
-                  label={t('deal.field.stage')}
-                  options={stages.map((stage) => ({ value: stage.id, label: stage.label }))}
-                  value={deal.stageId}
-                  disabled={stagePending}
-                  onChange={(event) => {
-                    const toStageId = event.target.value
-                    const stageLabel = stages.find((stage) => stage.id === toStageId)?.label
-                    void changeStage(toStageId).then((ok) => {
-                      if (ok) toast.success(t('toast.moved.title'), stageLabel)
-                    })
-                  }}
-                />
+                <FormField id="detail-stage" label={t('deal.field.stage')}>
+                  <Select
+                    className="select-chevron"
+                    value={deal.stageId}
+                    disabled={stagePending}
+                    onChange={(event) => {
+                      const toStageId = event.target.value
+                      const stageLabel = stages.find((stage) => stage.id === toStageId)?.label
+                      void changeStage(toStageId).then((ok) => {
+                        if (ok) toast.success(t('toast.moved.title'), stageLabel)
+                      })
+                    }}
+                  >
+                    {stages.map((stage) => (
+                      <option key={stage.id} value={stage.id}>
+                        {stage.label}
+                      </option>
+                    ))}
+                  </Select>
+                </FormField>
               </div>
             ) : null}
           </div>

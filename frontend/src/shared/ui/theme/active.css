@@ -6,3 +6,7 @@
    /`--surface`/…) and this one retires with the C5 drain — keeping them apart
    means deleting a file, not editing one. #169 */
 @import './themes/calm-skin.css';
+/* nene2-ui のスロットを deal の意匠へ寄せる層（W1・#225）。契約トークンを定義した後に
+   置く必要がある（--color-border-strong 等を参照するため）。C5 の drain とは独立で、
+   legacy が消えても残る＝キットを使う限り必要な層。 */
+@import './themes/kit-slots.css';

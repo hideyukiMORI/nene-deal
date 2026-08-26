@@ -1,13 +1,9 @@
+import { Button, FormField, Input, Select, Stack } from '@hideyukimori/nene2-ui'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import type { CreateUserInput, OperatorRole } from '@/entities/user'
 import { useTranslation } from '@/shared/i18n'
-import { Button } from '@/shared/ui/primitives/Button'
-import { Input } from '@/shared/ui/primitives/Input'
-import { Select } from '@/shared/ui/primitives/Select'
-import { Stack } from '@/shared/ui/primitives/Stack'
-import { Text } from '@/shared/ui/primitives/Text'
 interface CreateUserFormProps {
   pending: boolean
   errorMessage: string | null
@@ -58,40 +54,40 @@ export function CreateUserForm({ pending, errorMessage, onSubmit, onCancel }: Cr
       }}
       className="card card-pad"
     >
-      <Stack gap="sm">
-        <Text as="h2" variant="heading-sm">
-          {t('users.create.title')}
-        </Text>
+      <Stack gap="2xs">
+        <h2 className="t-h2">{t('users.create.title')}</h2>
 
-        {errorMessage !== null ? (
-          <Text variant="caption" className="danger">
-            {errorMessage}
-          </Text>
-        ) : null}
+        {errorMessage !== null ? <p className="t-cap danger">{errorMessage}</p> : null}
 
-        <Input
+        <FormField
           id="user-email"
           label={t('users.field.email')}
-          type="email"
-          error={errors.email?.message}
-          {...register('email')}
-        />
-        <Input
+          error={errors.email?.message ?? null}
+        >
+          <Input type="email" {...register('email')} />
+        </FormField>
+        <FormField
           id="user-password"
           label={t('users.field.password')}
-          type="password"
-          error={errors.password?.message}
-          {...register('password')}
-        />
-        <Select
+          error={errors.password?.message ?? null}
+        >
+          <Input type="password" {...register('password')} />
+        </FormField>
+        <FormField
           id="user-role"
           label={t('users.field.role')}
-          options={roleOptions}
-          error={errors.role?.message}
-          {...register('role')}
-        />
+          error={errors.role?.message ?? null}
+        >
+          <Select className="select-chevron" {...register('role')}>
+            {roleOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
+        </FormField>
 
-        <Stack direction="horizontal" gap="sm">
+        <Stack direction="horizontal" align="center" gap="2xs">
           <Button type="submit" disabled={pending}>
             {t('users.create.submit')}
           </Button>

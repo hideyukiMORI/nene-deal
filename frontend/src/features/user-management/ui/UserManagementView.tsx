@@ -1,8 +1,8 @@
+import { Badge, EmptyState, FormField, Select } from '@hideyukimori/nene2-ui'
+import type { SelectOption } from '@/shared/ui/select-option'
 import { useState } from 'react'
 import type { CreateUserInput, OperatorRole, OperatorUser, UserStatus } from '@/entities/user'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
-import { EmptyState } from '@/shared/ui/components/EmptyState'
-import { Select, type SelectOption } from '@/shared/ui/primitives/Select'
 import { IconChevron, IconClose, IconPlus } from '@/shared/ui/icons'
 import type { UserManagementStatus } from '../model/use-user-management-page'
 import { CreateUserForm } from './CreateUserForm'
@@ -43,19 +43,36 @@ export function UserManagementView({
     { value: 'admin', label: t('users.role.admin') },
   ]
 
-  const roleSelect = (user: OperatorUser, labelHidden: boolean) => (
-    <Select
-      id={`role-${user.id}`}
-      label={t('users.field.role')}
-      labelHidden={labelHidden}
-      options={roleOptions}
-      value={user.role}
-      disabled={user.id === currentUserId}
-      onChange={(e) => {
-        void updateRole(user.id, e.target.value as OperatorRole)
-      }}
-    />
-  )
+  const roleSelect = (user: OperatorUser, labelHidden: boolean) => {
+    const select = (
+      <Select
+        className="select-chevron"
+        id={`role-${user.id}`}
+        value={user.role}
+        disabled={user.id === currentUserId}
+        {...(labelHidden ? { 'aria-label': t('users.field.role') } : {})}
+        onChange={(e) => {
+          void updateRole(user.id, e.target.value as OperatorRole)
+        }}
+      >
+        {roleOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </Select>
+    )
+    // labelHidden: キットの FormField に「ラベルを視覚的に隠す」入口が無い（ローカル
+    // Select は sr-only を持っていた）。表の行では見出しが列側にあるので FormField を
+    // 使わず aria-label で名前を与える＝意匠の特例ではなく支援技術向けの属性。
+    return labelHidden ? (
+      select
+    ) : (
+      <FormField id={`role-${user.id}`} label={t('users.field.role')}>
+        {select}
+      </FormField>
+    )
+  }
 
   const confirmDelete = (user: OperatorUser) => {
     if (window.confirm(t('users.delete.confirm'))) {
@@ -139,7 +156,7 @@ export function UserManagementView({
       ) : null}
 
       {status === 'ready' && users.length === 0 ? (
-        <EmptyState title={t('users.empty.title')} description={t('users.empty.description')} />
+        <EmptyState message={t('users.empty.title')} description={t('users.empty.description')} />
       ) : null}
 
       {status === 'ready' && users.length > 0 ? (
@@ -163,9 +180,9 @@ export function UserManagementView({
                     <div className="stack gap-1 flex flex-col">
                       <span className="row gap-2 flex items-center">
                         <span className="medium">{user.email}</span>
-                        {you ? <span className="badge badge-accent">{t('users.you')}</span> : null}
+                        {you ? <Badge tone="accent">{t('users.you')}</Badge> : null}
                         {user.status === 'disabled' ? (
-                          <span className="badge badge-muted">{t('users.status.disabled')}</span>
+                          <Badge tone="neutral">{t('users.status.disabled')}</Badge>
                         ) : null}
                       </span>
                       <span className="faint t-tiny mono">{user.id}</span>
@@ -234,9 +251,9 @@ export function UserManagementView({
               <div className="flex flex-col gap-1" style={{ minWidth: 0 }}>
                 <span className="medium us-email">{openUser.email}</span>
                 {openUser.id === currentUserId ? (
-                  <span className="badge badge-accent" style={{ alignSelf: 'flex-start' }}>
+                  <Badge tone="accent" className="self-start">
                     {t('users.you')}
-                  </span>
+                  </Badge>
                 ) : (
                   <span className="faint t-tiny">
                     {t('users.field.role')}:{' '}

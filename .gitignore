@@ -28,3 +28,8 @@ frontend/playwright-report/
 frontend/blob-report/
 test-results/
 playwright-report/
+
+# Owner-review material (#225). Per-wave and disposable: PNGs + index.html + meta.json.
+# What persists is the verdict on the wave's issue and the generator that made these.
+/docs/qa/owner-review/*/
+!/docs/qa/owner-review/README.md

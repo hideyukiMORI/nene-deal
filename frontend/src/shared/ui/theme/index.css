@@ -3,4 +3,59 @@
    既存 app CSS のリセット優先は不変。app は utilities を使わないため utilities との勝敗も不変。 */
 @layer theme, base, vendor, legacy, components, utilities;
 @import 'tailwindcss';
+
+/* ── nene2-ui キット（W1・#225）─────────────────────────────────────────
+   キットの theme は 197 トークンを定義し、その大半は deal に無いスロット
+   （--color-x-slot-* / --text-x-slot-* / --radius-x-* / --brightness-x-slot-*）。
+   キット部品はこれらを Tailwind utility 経由でしか参照しないので、
+   **この import が無いとキット部品は素の見た目になる**。
+
+   🔴 順序が意匠を決める: キット theme が先・deal の active.css が後。
+   スロットは軒並み `var(--color-accent)` のような**派生**で書かれているため
+   （例 --color-x-slot-button-primary-bg: var(--color-accent)）、
+   後から deal の @theme が --color-accent を deal ティール
+   （oklch(52% 0.1 188)）へ上書きすると、**スロット側は触らずに全部 deal 色になる**。
+   ダークも同じ経路で追従する（themes/default.css の layer 2）。
+   ⇒ キットの既定値を deal 側で書き写さないこと。上書きするのは base だけでよい。 */
+@import '@hideyukimori/nene2-ui/themes/default.css';
+
+/* 🔴 必須。Tailwind v4 の自動コンテント検出は `node_modules` を歩かず、
+   キットが出すクラスは全部その `dist/` にある。**この行が無いと build は緑のまま
+   キットのクラスを1つも生成しない**（vault が 2026-08-23 に実測: 58.6KB → 47.1KB、
+   間隔・フォーカスリング・disabled の意匠が丸ごと消える。nene-vault #387）。
+   `npm run source-probe` がこの行の消失を検出する（陽性対照つき）。 */
+@source '../../../../node_modules/@hideyukimori/nene2-ui/dist';
+
 @import './active.css';
+
+/* ── select のシェブロン（W1・#225）─────────────────────────────────────
+ *
+ * キットの `Select` は `appearance` を触らず、**OS 標準の矢印**のまま出す
+ * （`dist/primitives/Select.js` の BASE_CLASS に appearance も background も無い・実測）。
+ * deal の legacy `.select` は `appearance: none` ＋ 2枚の linear-gradient で三角を描いており、
+ * これが無いと Windows の Chrome では枠だけ deal・矢印だけ OS という半端な見た目になる。
+ *
+ * 🔴 キットへ足す話ではなく**艦が持つ**もの、という判断は nene-vault の前例に従った
+ * （vault は同名の `@utility select-chevron` を自艦の theme に持っている）。1つの
+ * アフォーダンスを表す不可分な宣言で、子孫セレクタも擬似要素も状態も含まない。
+ *
+ * 値は legacy `.select`（`app/design/styles.css:290-301`）から literal で写している＝意匠は不変。
+ * C5 で `--fg-faint` が drain される時に、ここも契約トークンへ振り替える。 */
+@utility select-chevron {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--fg-faint) 50%),
+    linear-gradient(135deg, var(--fg-faint) 50%, transparent 50%);
+  background-position:
+    calc(100% - 16px) 52%,
+    calc(100% - 11px) 52%;
+  background-size:
+    5px 5px,
+    5px 5px;
+  background-repeat: no-repeat;
+  /* 🔴 legacy `.select` の `padding-right: 30px` は写していない。理由は2つで、
+   *    ①本番の実測 padding-right は **14px**（calm 側の別ルールが勝っており、30px は
+   *      そもそも描画されていない＝写すと現行と違う見た目になる）
+   *    ②キットの `px-x-slot-control-pad-x` と同じ utilities 層なので、書いても
+   *      生成順で負ける。**効かない宣言を残すと「指定してあるのに効かない」に見える。** */
+}

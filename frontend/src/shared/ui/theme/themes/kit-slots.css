@@ -1,0 +1,217 @@
+/* ── nene2-ui のスロット上書き — deal の意匠に寄せる層（W1・#225）──────────
+ *
+ * キット部品は編集しない。意匠の差はここでスロット値を上書きして吸収する
+ * （キットが用意した正規の上書き点。design principle: 値はスロットから来る）。
+ *
+ * 🔴 読む順の前提: `theme/index.css` が キット theme → active.css（この層を含む）の順で
+ *    import している。この層は **@layer に入れない**ので、キットと deal の `@theme`
+ *    （どちらも layered）に無条件で勝つ。
+ *
+ * ⚠️ ダーク／calm の分岐をここで書き写さない。参照先の legacy 変数が
+ *    `[data-theme]` と `[data-design='calm'][data-theme]` で入れ替わるので、
+ *    var() 経由にしておけば**この層は1組だけで全条件に追従する**。
+ *
+ * ── 冗長行の検査（2026-08-26・nene2-ui 0.19.0・全35行）────────────────────
+ *
+ * nene-vault が #481 で「**既定を受け入れるとは、何も書かないこと**」を出した
+ * （既定と同一テキストの行を撤回した。将来キットがスケールを直したとき、
+ * 誰も決めていない値を黙って固定する箇所が増えるだけなので）。deal でも全行に当てた。
+ *
+ * **削るべき行は 0 本。** ただし「既定と*同じ値に解決する*行」は **6本**ある:
+ *   `--color-x-slot-toast-success-fg` / `-border`（`var(--ok)` ≡ `var(--color-success)`）
+ *   `--color-x-slot-badge-neutral-fg`（`var(--fg-muted)` ≡ `var(--color-text-muted)`）
+ *   `--color-x-slot-badge-neutral-border`（`var(--line)` ≡ `var(--color-border)`）
+ *   `--color-on-accent`（`var(--on-accent)` ≡ リテラル `oklch(99% 0 0)`）
+ *
+ * 🔑 **「同一の参照」と「今は同じ値」は別物。** vault が消したのは前者
+ *    （`var(--spacing-x-3xs)` を `var(--spacing-x-3xs)` で上書き＝**永久に no-op**）。
+ *    上の6本は後者で、**deal の legacy 側とキットの契約側が、たまたま今一致している**
+ *    だけ。消すと deal のトーストとバッジは**キットが色を変えた日に一緒に動く**。
+ *    この層の趣意は「キットを deal の実描画へ向ける」なので、それは逆向きの事故になる。
+ *    ⇒ 撤回してよいのは **式が既定と同一参照の行だけ**。値の一致は根拠にならない。
+ *
+ * ⚠️ 検査は実ブラウザの computed 値まで解決してから比べること。テキスト比較では
+ *    `var(--radius-x-pill)` と `9999px` を別物と見る。そして**未定義の var は
+ *    `getPropertyValue` が空文字を返す**ので、空同士を「一致」と数えない番人が要る
+ *    （`'' === ''` で「✅ 一致」を出した事故が本 W1 に1件ある）。
+ */
+
+/* ═══ ① 🔴 accent は「契約トークン」と「実描画」が食い違っていた ═══════════
+ *
+ * `data-design` は常に `calm`（`src/shared/theme/index.ts:26` が無条件に設定し、
+ * `index.html` にも書いてある）。その calm ブロックは `--accent` 系を**リテラルで
+ * 上書き**しているため、実際に描画される deal のティールは:
+ *
+ *     light  --accent: oklch(46% 0.068 186)      （calm-skin.css:129）
+ *     dark   --accent: oklch(77% 0.072 184)      （calm-skin.css:117）
+ *
+ * ところが契約の `--color-accent` は **calm でない方**の値を持っている:
+ *
+ *     light  oklch(52% 0.1 188)  /  dark  oklch(74% 0.12 182)   （default.css:48,179）
+ *
+ * 🔬 ビルド済み CSS で実測（2026-08-26）: `--accent` は4値（calm 込み）、
+ *    `--color-accent` は2値。⇒ **キット部品だけが一段濃く鮮やかなティールになる。**
+ *    同じ画面で legacy のボタンとキットのボタンが違う色になる、という形。
+ *
+ * ⇒ キットが読む口を、**実際に描画されている値**へ向ける。C5 で legacy が消えるときは、
+ *    ここを calm のリテラルへ置き換える（その時点で「契約の accent はどちらが正か」の
+ *    裁定が要る＝板 L15 の v2 材料）。
+ */
+@theme {
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-focus-ring: var(--focus-ring, var(--accent));
+
+  /* ② 枠は一段濃い。deal の `.input` `.select` `.btn-secondary` は揃って legacy
+   *    `--line-strong`（契約の --color-border-strong と 1:1）を使う。キット既定は
+   *    一段淡い --color-border。⇒ 差の原因は1つなので上書きも1箇所ずつ。 */
+  --color-x-slot-button-secondary-border: var(--line-strong);
+  --color-x-slot-control-border: var(--line-strong);
+
+  /* ③ danger ボタンは「塗り」ではなく「輪郭」。
+   *    deal:  background transparent / color danger / border は danger の 40% 混色
+   *    キット: background danger      / color on-accent（白）/ 枠なし
+   *
+   *    🏁 **決着済み。** 起票時は枠だけ寄せられなかった——キットの `danger` variant は
+   *    border 系クラスを出さず（`bg-…-danger-bg text-…-danger-fg` のみ）、BASE_CLASS の
+   *    `border-transparent` が残るため。艦側では足せないので `fleet-tooling#455` で
+   *    スロットを要求し、**0.18.0 で入った**。下の3行で寄せてある
+   *    （画面側に className の特例は作らない＝受入ゲート③）。
+   *
+   *    ⚠️ この欄には「入ったらここに1行足す」と書いてあり、**足したあとも残っていた**
+   *    （hub のレビューが発見・2026-08-26）。読む人は「未対応」と読む。
+   *    🔑 **保留のメモは、解消したときに消えない。** 保留を書くこと自体は正しいが、
+   *    解消の手順に「メモを畳む」が入っていないと、**期限も理由も無いまま嘘だけが残る**。
+   *    本 W1 で3度目（バッジの字・冗長行の検査・これ）。
+   *
+   *    🔴 非スケール値2つ（owner-review README §A の「非スケール値」と対応）:
+   *      `transparent` … キットに transparent トークンが無いのでキーワード直書き
+   *      `color-mix(…)` … legacy `.btn-danger` の実測値の写し。契約語彙に対応キーが無い */
+  --color-x-slot-button-danger-bg: transparent;
+  --color-x-slot-button-danger-fg: var(--danger);
+  --color-x-slot-button-danger-border: color-mix(in oklch, var(--danger) 40%, var(--line));
+
+  /* ④ バッジは「原色べた塗り」ではなく「淡色ピル」。
+   *    キット既定は bg=原色 / fg=反転色 / border=原色。deal は bg=淡色 / fg=状態色 /
+   *    border=混色。⇒ そのまま置換すると 08-23 vault の W1b NG（「バッジがキット既定の
+   *    意匠」）を再演する。3プロパティを**セットで**寄せる（bg だけ寄せると
+   *    「淡色ピルに濃い枠」という第三の意匠になる）。
+   *
+   *    値は legacy を参照する。`--accent-weak` / `--accent-line` は契約 v1 に対応キーが
+   *    無く（板 L15 に deal 実需として登録済み・v2 昇格審査待ち）、`--ok-weak` は
+   *    `color-mix(in srgb, …)` で契約の `-soft`（`in oklch`）と色空間が違うため、
+   *    契約語彙へ写すと値が変わる＝drain ではなく設計変更になる（判例24）。 */
+  --color-x-slot-badge-accent-bg: var(--accent-weak);
+  --color-x-slot-badge-accent-fg: var(--accent);
+  --color-x-slot-badge-accent-border: var(--accent-line);
+
+  --color-x-slot-badge-success-bg: var(--ok-weak);
+  --color-x-slot-badge-success-fg: var(--ok);
+  --color-x-slot-badge-success-border: color-mix(in oklch, var(--ok) 35%, var(--line));
+
+  /* ⑤ 寸法。色だけ寄せて出したら、実物で**形**がずれていた（2026-08-26・本番と
+   *    ローカルの computed 値を突合）。ここは**スケールの step を指す**だけで、
+   *    step 自体は再定義しない（地雷: キットのスケールを書き換えない）。
+   *
+   *    バッジは「角の丸い箱」ではなく**ピル**。8px と 999px は ±2px の話ではなく
+   *    形が別物なので、snap ではなく step の指し替えで直す。 */
+  --radius-x-slot-badge: var(--radius-x-pill);
+
+  /*    コントロール（Input / Select）は deal のほうが小さく、丸く、字が小さい。
+   *    実測 prod / kit既定 → 採用する step:
+   *      角丸      13px / 8px  → --radius-x-xl (12px)   〔1px 差で snap〕
+   *      横 padding 14px / 8px  → --spacing-x-xs (12px)  〔2px 差で snap〕
+   *      文字      14px / 16px → --text-x-sm (14px)     〔完全一致〕
+   *    縦 padding は 11px / 12px で既定のまま（1px 差・step は xs しか無い）。
+   *    🔴 `--text-x-slot-control-touch-size` は触らない（iOS の下限・地雷）。 */
+  --radius-x-slot-control: var(--radius-x-xl);
+  --spacing-x-slot-control-pad-x: var(--spacing-x-xs);
+  --text-x-slot-control-size: var(--text-x-sm);
+
+  /* ⑦ Toast（0.18.0・fleet-tooling#457）。deal の legacy トーストは本文が faint、
+   *    成功が --ok。tone の色はキット側が --color-success を見るので、
+   *    そこは①の accent と同じく legacy 実描画へ向けてある。 */
+  --color-x-slot-toast-description-fg: var(--fg-faint);
+  --color-x-slot-toast-success-fg: var(--ok);
+  --color-x-slot-toast-success-border: var(--ok);
+
+  /* ⑥ バッジの字と gap は **上書きしない**（fleet-tooling#463 → 0.19.0 で確定）。
+   *
+   *    🔬 実測（2026-08-26・**インストール済み 0.19.0 の成果物**で解決の連鎖まで追った。
+   *    宣言でも `themes/default.css` でもなく、ビルド後の CSS が最終的な答え）:
+   *
+   *      gap    --spacing-x-slot-badge-gap → --spacing-x-3xs        →   4px  / 本番 5px
+   *      size   --text-x-slot-badge        → --text-x-2xs           →  11px  / 本番 11.5px
+   *      weight --font-weight-x-slot-badge → --font-weight-semibold →   600  / 本番 600
+   *
+   *    ⇒ **1つも書かない。** 5px も 11.5px もスケールの段ではなく（4/8/12…）、キットの
+   *    `slot-values` 検査器はリテラルを落とす＝**寄せられない差**。①②と同じ snap 扱いで、
+   *    目視束の「受け入れた差」に理由つきで載せてある（`docs/qa/owner-review/README.md` §A）。
+   *    既定と同値の行を書くのも誤り——**次に読む人に「ここは特別だ」と誤解させる**
+   *    （0.19.0 の配布メモの指示: 現行値を測り、既定と違うものだけ再定義せよ）。
+   *
+   *    🔴 weight だけ経路が違う。`--font-weight-semibold` は **キットが定義していない**
+   *    （Tailwind 内蔵の theme 変数）。`@theme` の変数は参照されないと tree-shake される
+   *    ので、成果物に `--font-weight-semibold:600` が実在することを確認した上での「600」。
+   *    キット側の1行だけ見て 600 と断じると、消えていても気づけない。
+   *
+   *    ⚠️ この欄は起票時「入ったらコメント3行を外すだけ」と書いてあった。**外す前に前提が
+   *    2回変わった**——weight の既定が medium(500) から semibold(600) へ是正され
+   *    （既存6本が medium なのは「既にインラインに在った font-medium の保存」であって
+   *    設計された慣習ではない）、さらに snap 判断そのものが fleet 裁定で確定した。
+   *    🔑 **保留のメモは、使う前に古くなる。** 保留の値は保留した時点の測定でしかない。 */
+
+  --color-x-slot-badge-neutral-bg: var(--surface-2);
+  --color-x-slot-badge-neutral-fg: var(--fg-muted);
+  --color-x-slot-badge-neutral-border: var(--line);
+
+  /* ═══ ⑧ ボタンとラベルの寸法 — 🔴 W1a では色しか見ていなかった ═════════════
+   *
+   * 0.19.0 で目視束を撮る直前に、本番とローカルの computed 値を突合して見つけた
+   * （2026-08-26）。バッジと同じ「色は合っているのに形が合っていない」で、
+   * ⑤の時に **Button と Field label を測っていなかった**のが漏れの原因。
+   *
+   * 🔴 ①と同じ罠だった。素の `.btn` は `--radius-sm`(4px) / `padding: 9px 15px` だが、
+   *    **それは描画されていない**——`[data-design='calm'] .btn`（`designs.css:468`）が
+   *    ピルと 10/20px で上書きしており、calm は常時オン。**基底の規則を読むと外す。**
+   *
+   * 段との対応（本番実測 → 採用）:
+   *   角丸    999px → --radius-x-pill    〔完全一致。8px とはピル/箱で**形が別物**〕
+   *   横 pad   20px → --spacing-x-md     〔完全一致〕
+   *   gap       8px → --spacing-x-2xs    〔完全一致〕
+   *   太さ      600 → semibold           〔完全一致〕
+   * 既定に任せる（±2px snap・目視束 §A に記載）:
+   *   縦 pad   10px / 既定 12px、字 13.5px / 既定 14px（inherit）*/
+  --radius-x-slot-button: var(--radius-x-pill);
+  --spacing-x-slot-button-pad-x: var(--spacing-x-md);
+  --spacing-x-slot-button-gap: var(--spacing-x-2xs);
+  --font-weight-x-slot-button: var(--font-weight-semibold);
+
+  /*    ラベルは**色が違う**（`.field > label` は `var(--fg)`＝濃い前景。キット既定は
+   *    `--color-text-muted` で一段淡い）。±2px の話ではないので寄せる。
+   *    字の大きさ 12.5px / 既定 12px は snap 範囲なので既定のまま。 */
+  --color-x-slot-field-label: var(--fg);
+  --font-weight-x-slot-field-label: var(--font-weight-semibold);
+}
+
+/* ═══ ダーク: @theme だけでは届かない ════════════════════════════════════
+ *
+ * 🔬 実測（2026-08-26・実ブラウザの computed 値）: 上の `@theme` だけだと
+ * **light は一致するのに dark は一致しない**。
+ *
+ * `@theme` は `@layer theme` の中の `:root` として出るが、`themes/default.css` の
+ * ダークは **`[data-theme='dark']` の素のルール（レイヤ外）** で書かれている。
+ * **レイヤ外は無条件にレイヤ内へ勝つ**ので、ダークでは default.css の
+ * `--color-accent: oklch(74% 0.12 182)` が残り、キットだけが別のティールになる。
+ *
+ * ⇒ default.css と同じ二層構造（layer 1 = @theme / layer 2 = [data-theme='dark']）に
+ *    合わせる。ここで上書きが要るのは **default.css がダークブロックで再宣言している
+ *    トークンだけ**（accent 系4本）。`--color-x-slot-*` は誰もレイヤ外で触らないので
+ *    @theme 側の1回で足り、値も legacy var 経由でダークに追従する（実測で確認済み）。 */
+[data-theme='dark'] {
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-focus-ring: var(--focus-ring, var(--accent));
+}

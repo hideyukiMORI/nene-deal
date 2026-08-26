@@ -51,7 +51,9 @@ describe('DealDetailView', () => {
 
   it('renders the missing state', () => {
     renderWithProviders(<DealDetailView {...baseProps({ status: 'missing', deal: null })} />)
-    expect(screen.getByRole('heading', { name: 'Deal not found.' })).toBeInTheDocument()
+    // キットの EmptyState は <h2> ではなく <div role="status"> を出す（0.17.1 実測）。
+    // 文言は残るが見出しではなくなる＝見出しナビゲーションからは外れる（#225 で記録）。
+    expect(screen.getByRole('status')).toHaveTextContent('Deal not found.')
   })
 
   it('invokes the handoff action', async () => {

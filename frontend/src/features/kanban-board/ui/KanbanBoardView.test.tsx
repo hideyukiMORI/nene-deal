@@ -63,7 +63,8 @@ describe('KanbanBoardView', () => {
 
   it('renders the empty state when there are no columns', () => {
     renderWithProviders(<KanbanBoardView {...baseProps({ status: 'ready', columns: [] })} />)
-    expect(screen.getByRole('heading', { name: 'No stages yet' })).toBeInTheDocument()
+    // 同上（#225）: EmptyState は role="status" のライブリージョンになった。
+    expect(screen.getByRole('status')).toHaveTextContent('No stages yet')
   })
 
   it('renders the error state with a retry action', () => {

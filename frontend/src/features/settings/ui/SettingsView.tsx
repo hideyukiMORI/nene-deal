@@ -1,6 +1,6 @@
+import { Badge, Button, FormField, Select } from '@hideyukimori/nene2-ui'
+import type { SelectOption } from '@/shared/ui/select-option'
 import { useTranslation } from '@/shared/i18n'
-import { Button } from '@/shared/ui/primitives/Button'
-import { Select, type SelectOption } from '@/shared/ui/primitives/Select'
 import { useToast } from '@/shared/ui/toast/use-toast'
 import { IconShield } from '@/shared/ui/icons'
 import { MONTH_END, type SettingsPage } from '../model/use-settings-page'
@@ -36,10 +36,10 @@ export function SettingsView({ value, setDraft, loading, saving, save }: Setting
           <h1 className="t-h1">{t('settings.title')}</h1>
           <span className="muted t-cap">{t('settings.subtitle')}</span>
         </div>
-        <span className="badge badge-accent">
+        <Badge tone="accent">
           <IconShield />
           {t('audit.adminOnly')}
-        </span>
+        </Badge>
       </div>
 
       <form
@@ -53,16 +53,22 @@ export function SettingsView({ value, setDraft, loading, saving, save }: Setting
         </div>
 
         <div style={{ maxWidth: 280 }}>
-          <Select
-            id="forecast-closing-day"
-            label={t('settings.closingDay.label')}
-            options={dayOptions(t('settings.closingDay.monthEnd'))}
-            value={value}
-            disabled={loading}
-            onChange={(event) => {
-              setDraft(event.target.value)
-            }}
-          />
+          <FormField id="forecast-closing-day" label={t('settings.closingDay.label')}>
+            <Select
+              className="select-chevron"
+              value={value}
+              disabled={loading}
+              onChange={(event) => {
+                setDraft(event.target.value)
+              }}
+            >
+              {dayOptions(t('settings.closingDay.monthEnd')).map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
+          </FormField>
         </div>
 
         <span className="faint t-tiny" style={{ maxWidth: '52ch' }}>

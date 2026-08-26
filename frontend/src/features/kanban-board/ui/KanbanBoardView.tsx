@@ -1,11 +1,11 @@
+import { Badge, EmptyState } from '@hideyukimori/nene2-ui'
+import type { SelectOption } from '@/shared/ui/select-option'
 import { useState } from 'react'
 import type { KanbanColumn } from '@/entities/board'
 import type { CreateDealInput } from '@/entities/deal'
 import type { ForecastSummary } from '@/entities/forecast'
 import { useTranslation, type MessageKey } from '@/shared/i18n'
 import { formatMoneyJpy } from '@/shared/lib/format-money'
-import { EmptyState } from '@/shared/ui/components/EmptyState'
-import { type SelectOption } from '@/shared/ui/primitives/Select'
 import { useToast } from '@/shared/ui/toast/use-toast'
 import { IconAccount, IconBack, IconCheck, IconChevron, IconEye, IconPlus } from '@/shared/ui/icons'
 import { useKanbanDnd } from '../model/use-kanban-dnd'
@@ -241,7 +241,7 @@ export function KanbanBoardView({
       ) : null}
 
       {status === 'ready' && columns.length === 0 ? (
-        <EmptyState title={t('board.empty.title')} description={t('board.empty.description')} />
+        <EmptyState message={t('board.empty.title')} description={t('board.empty.description')} />
       ) : null}
 
       {status === 'ready' && columns.length > 0 ? (
@@ -369,12 +369,12 @@ function BoardColumn({
               <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold text-body">{deal.accountLabel}</span>
                 {isDeleted ? (
-                  <span className="badge badge-muted">{deletedBadgeLabel}</span>
+                  <Badge tone="neutral">{deletedBadgeLabel}</Badge>
                 ) : isWon ? (
-                  <span className="badge badge-ok">
+                  <Badge tone="success">
                     <span className="dot" />
                     {wonBadgeLabel}
-                  </span>
+                  </Badge>
                 ) : null}
               </div>
               <span className="amt">{formatMoneyJpy(deal.amountCents, moneyLocale)}</span>

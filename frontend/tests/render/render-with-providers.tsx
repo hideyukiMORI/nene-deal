@@ -8,7 +8,38 @@ import {
   type RenderResult,
 } from '@testing-library/react'
 import type { ReactElement, ReactNode } from 'react'
+import { ToastProvider } from '@hideyukimori/nene2-ui'
 import { I18nProvider } from '@/shared/i18n'
+
+/**
+ * The app's provider tree, minus the router and the error boundary.
+ *
+ * 🔴 `ToastProvider` is here because the kit's `useToast` **throws** outside one — on purpose,
+ * so a `show()` that silently does nothing cannot exist. deal's previous toast store was
+ * module-level and worked with no provider at all, so these tests never needed one; when the
+ * queue moved to the kit (#225) five specs failed at once. That is the harness having drifted
+ * from the app, not a regression: `providers.tsx` wraps the tree the same way.
+ *
+ * ⚠️ Keep this in step with `src/app/providers.tsx`. A helper that renders under fewer
+ * providers than the app passes tests the app would fail.
+ */
+function TestProviders({
+  children,
+  queryClient,
+}: {
+  children: ReactNode
+  queryClient: QueryClient
+}) {
+  return (
+    <I18nProvider>
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider regionLabel="Notifications" dismissLabel="Dismiss">
+          {children}
+        </ToastProvider>
+      </QueryClientProvider>
+    </I18nProvider>
+  )
+}
 
 export function createTestQueryClient(): QueryClient {
   return new QueryClient({
@@ -23,11 +54,7 @@ export function renderWithProviders(ui: ReactElement, options?: RenderOptions): 
   const queryClient = createTestQueryClient()
 
   return render(ui, {
-    wrapper: ({ children }) => (
-      <I18nProvider>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      </I18nProvider>
-    ),
+    wrapper: ({ children }) => <TestProviders queryClient={queryClient}>{children}</TestProviders>,
     ...options,
   })
 }
@@ -44,9 +71,7 @@ export function renderHookWithProviders<Result, Props>(
 
   return renderHook(hook, {
     wrapper: ({ children }: { children: ReactNode }) => (
-      <I18nProvider>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      </I18nProvider>
+      <TestProviders queryClient={queryClient}>{children}</TestProviders>
     ),
     ...options,
   })
