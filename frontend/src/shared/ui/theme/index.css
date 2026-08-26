@@ -3,4 +3,27 @@
    既存 app CSS のリセット優先は不変。app は utilities を使わないため utilities との勝敗も不変。 */
 @layer theme, base, vendor, legacy, components, utilities;
 @import 'tailwindcss';
+
+/* ── nene2-ui キット（W1・#225）─────────────────────────────────────────
+   キットの theme は 197 トークンを定義し、その大半は deal に無いスロット
+   （--color-x-slot-* / --text-x-slot-* / --radius-x-* / --brightness-x-slot-*）。
+   キット部品はこれらを Tailwind utility 経由でしか参照しないので、
+   **この import が無いとキット部品は素の見た目になる**。
+
+   🔴 順序が意匠を決める: キット theme が先・deal の active.css が後。
+   スロットは軒並み `var(--color-accent)` のような**派生**で書かれているため
+   （例 --color-x-slot-button-primary-bg: var(--color-accent)）、
+   後から deal の @theme が --color-accent を deal ティール
+   （oklch(52% 0.1 188)）へ上書きすると、**スロット側は触らずに全部 deal 色になる**。
+   ダークも同じ経路で追従する（themes/default.css の layer 2）。
+   ⇒ キットの既定値を deal 側で書き写さないこと。上書きするのは base だけでよい。 */
+@import '@hideyukimori/nene2-ui/themes/default.css';
+
+/* 🔴 必須。Tailwind v4 の自動コンテント検出は `node_modules` を歩かず、
+   キットが出すクラスは全部その `dist/` にある。**この行が無いと build は緑のまま
+   キットのクラスを1つも生成しない**（vault が 2026-08-23 に実測: 58.6KB → 47.1KB、
+   間隔・フォーカスリング・disabled の意匠が丸ごと消える。nene-vault #387）。
+   `npm run source-probe` がこの行の消失を検出する（陽性対照つき）。 */
+@source '../../../../node_modules/@hideyukimori/nene2-ui/dist';
+
 @import './active.css';

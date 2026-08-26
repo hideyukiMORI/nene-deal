@@ -28,7 +28,8 @@
     "codegen:check": "npm run codegen && git diff --exit-code -- src/shared/api/schema.gen.ts",
     "knip": "knip",
     "check:fast": "npm run type-check && npm run lint && npm run format && npm run test",
-    "check": "npm run type-check && npm run lint && npm run lint:styles && npm run check:registries && npm run format && npm run coverage:check && npm run knip && npm run build && npm run build-storybook",
+    "check": "npm run type-check && npm run lint && npm run lint:styles && npm run check:registries && npm run format && npm run coverage:check && npm run knip && npm run build && npm run source-probe && npm run build-storybook",
+    "source-probe": "node tools/source-probe.mjs",
     "smoke": "node tools/smoke/visual-smoke.mjs",
     "smoke:diff": "node tools/smoke/visual-diff.mjs",
     "smoke:focus": "node tools/smoke/focus-shot.mjs",
@@ -42,8 +43,9 @@
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
     "@fontsource/noto-sans-jp": "^5.2.9",
-    "@hideyukimori/nene2-client": "^1.1.0",
-    "@hideyukimori/nene2-tokens": "1.2.0",
+    "@hideyukimori/nene2-client": "^1.4.0",
+    "@hideyukimori/nene2-tokens": "1.3.0",
+    "@hideyukimori/nene2-ui": "^0.17.1",
     "@hookform/resolvers": "^5.2.2",
     "@tanstack/react-query": "^5.90.11",
     "react": "^19.2.6",
@@ -53,7 +55,7 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@hideyukimori/nene2-standards": "^2.2.0",
+    "@hideyukimori/nene2-standards": "^2.4.0",
     "@playwright/test": "^1.61.1",
     "@storybook/addon-a11y": "^10.1.4",
     "@storybook/addon-docs": "^10.1.4",
