@@ -66,31 +66,37 @@
   /* ② 枠は一段濃い。deal の `.input` `.select` `.btn-secondary` は揃って legacy
    *    `--line-strong`（契約の --color-border-strong と 1:1）を使う。キット既定は
    *    一段淡い --color-border。⇒ 差の原因は1つなので上書きも1箇所ずつ。 */
-  --color-x-slot-button-secondary-border: var(--line-strong);
+  --color-x-slot-button-neutral-border: var(--line-strong);
   --color-x-slot-control-border: var(--line-strong);
 
-  /* ③ danger ボタンは「塗り」ではなく「輪郭」。
-   *    deal:  background transparent / color danger / border は danger の 40% 混色
-   *    キット: background danger      / color on-accent（白）/ 枠なし
+  /* ③ danger の3行は **0.20.0 で撤去した**（#229）。ここには何も書かない。
    *
-   *    🏁 **決着済み。** 起票時は枠だけ寄せられなかった——キットの `danger` variant は
-   *    border 系クラスを出さず（`bg-…-danger-bg text-…-danger-fg` のみ）、BASE_CLASS の
-   *    `border-transparent` が残るため。艦側では足せないので `fleet-tooling#455` で
-   *    スロットを要求し、**0.18.0 で入った**。下の3行で寄せてある
-   *    （画面側に className の特例は作らない＝受入ゲート③）。
+   *    経緯: 0.19.1 までキットの `danger` は「塗り」しか言えず、deal の「輪郭の danger」を
+   *    出すために `fleet-tooling#455` でスロットを足してもらい、3行で寄せていた
+   *    （bg=transparent / fg=danger / border=40% 混色）。**0.20.0 が variant を
+   *    形(solid|outline|bare|link) × 色(tone) の2軸へ分けた**ので、その意匠は
+   *    `<Button variant="outline" tone="danger">` として**キットの語彙で言える**。
+   *    ⇒ 艦側の上書きは不要になり、スロットは既定へ返した。
    *
-   *    ⚠️ この欄には「入ったらここに1行足す」と書いてあり、**足したあとも残っていた**
-   *    （hub のレビューが発見・2026-08-26）。読む人は「未対応」と読む。
-   *    🔑 **保留のメモは、解消したときに消えない。** 保留を書くこと自体は正しいが、
-   *    解消の手順に「メモを畳む」が入っていないと、**期限も理由も無いまま嘘だけが残る**。
-   *    本 W1 で3度目（バッジの字・冗長行の検査・これ）。
+   *    🔴 **撤去は整理ではなく、罠の除去だった。** 0.20.0 の `tone` の既定は `accent`、
+   *    `variant` の既定は `solid`。3行を残したまま誰かが `<Button tone="danger">` と
+   *    書くと、`solid.danger` が `--color-x-slot-button-danger-bg` を引くので
+   *    **塗りが transparent になる**。`solid` は border 系クラスを出さない
+   *    （BASE_CLASS の `border-transparent` が残る）ため、枠も出ない。
+   *    🔬 撤去前に実測（2026-08-28 16:38・実ブラウザ・#229 の陽性対照つき2枚組）:
+   *      bg `rgba(0,0,0,0)` / border `rgba(0,0,0,0)` / color `oklch(0.54 0.18 25)`
+   *      ⇒ **塗りも枠も無い、ただの赤い文字**。破壊的操作からボタンの手掛かりが消える。
+   *      同じ絵の `<Button>`（既定）はティールで塗れていた＝スタイルシートは効いていた。
+   *    **エラーにはならない。** 型は通り、CI も check も緑のまま。
    *
-   *    🔴 非スケール値2つ（owner-review README §A の「非スケール値」と対応）:
-   *      `transparent` … キットに transparent トークンが無いのでキーワード直書き
-   *      `color-mix(…)` … legacy `.btn-danger` の実測値の写し。契約語彙に対応キーが無い */
-  --color-x-slot-button-danger-bg: transparent;
-  --color-x-slot-button-danger-fg: var(--danger);
-  --color-x-slot-button-danger-border: color-mix(in oklch, var(--danger) 40%, var(--line));
+   *    🔑 **「今は何も塗っていない行」は、版が上がると防波堤から地雷に変わる。**
+   *    周知の原文が3行を「捨てられる」と書けたのは 0.19.1 を測ったからで、
+   *    測っていたのは**現在形**（この行が今何を塗るか）だった。**上げた後に何を塗りうるか**
+   *    ではない。⇒ 版を上げる前の走査は、未使用の上書きにも「新しい版での意味」を問う。
+   *
+   *    ⚠️ 同時に、この3行は**右辺が変わった2本を偶然覆い隠していた**
+   *    （`danger-fg`: `on-accent`→`on-danger` ／ `danger-border`: `danger`→`danger-soft`）。
+   *    撤去で新既定へ落ちるが、**落ちた先が正しい値**なので追従も同時に済んでいる。 */
 
   /* ④ バッジは「原色べた塗り」ではなく「淡色ピル」。
    *    キット既定は bg=原色 / fg=反転色 / border=原色。deal は bg=淡色 / fg=状態色 /

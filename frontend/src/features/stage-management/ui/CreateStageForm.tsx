@@ -81,7 +81,7 @@ export function CreateStageForm({
           <Button type="submit" disabled={pending}>
             {t('stages.create.submit')}
           </Button>
-          <Button type="button" variant="secondary" onClick={onCancel}>
+          <Button type="button" variant="outline" tone="neutral" onClick={onCancel}>
             {t('common.actions.cancel')}
           </Button>
         </Stack>

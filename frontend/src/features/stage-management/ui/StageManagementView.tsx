@@ -174,7 +174,7 @@ function StageReadRow({
 
       {stage.isTerminal ? null : (
         <div className="row gap-2 flex items-center">
-          <Button variant="secondary" size="sm" onClick={onEdit}>
+          <Button variant="outline" tone="neutral" size="sm" onClick={onEdit}>
             {t('common.actions.edit')}
           </Button>
           <button
@@ -254,7 +254,7 @@ function StageEditRow({
           >
             {t('stages.edit.save')}
           </Button>
-          <Button variant="secondary" size="sm" onClick={onCancel}>
+          <Button variant="outline" tone="neutral" size="sm" onClick={onCancel}>
             {t('common.actions.cancel')}
           </Button>
         </div>
