@@ -91,7 +91,7 @@ export function CreateUserForm({ pending, errorMessage, onSubmit, onCancel }: Cr
           <Button type="submit" disabled={pending}>
             {t('users.create.submit')}
           </Button>
-          <Button type="button" variant="secondary" onClick={onCancel}>
+          <Button type="button" variant="outline" tone="neutral" onClick={onCancel}>
             {t('common.actions.cancel')}
           </Button>
         </Stack>

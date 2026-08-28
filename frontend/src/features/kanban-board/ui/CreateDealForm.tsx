@@ -150,7 +150,7 @@ export function CreateDealForm({
           <Button type="submit" disabled={pending}>
             {t('deal.create.submit')}
           </Button>
-          <Button type="button" variant="secondary" onClick={onCancel}>
+          <Button type="button" variant="outline" tone="neutral" onClick={onCancel}>
             {t('common.actions.cancel')}
           </Button>
         </Stack>

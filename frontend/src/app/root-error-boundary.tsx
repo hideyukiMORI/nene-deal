@@ -43,7 +43,7 @@ export class RootErrorBoundary extends Component<RootErrorBoundaryProps, RootErr
                 （R1⑤ 禁止）になる。`.avatar` の 13/18px と同じ「供給待ち」扱い。 */}
             <h1 className="t-h1">Something went wrong / 問題が発生しました</h1>
             <Text tone="muted">An unexpected error occurred. 予期しないエラーが発生しました。</Text>
-            <Button variant="secondary" onClick={this.handleReset}>
+            <Button variant="outline" tone="neutral" onClick={this.handleReset}>
               Reload / 再読み込み
             </Button>
           </Stack>
