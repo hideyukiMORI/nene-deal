@@ -77,6 +77,7 @@ From a disposable demo organization. Japanese UI shown — the admin UI is bilin
 | MCP tool catalog | [`docs/mcp/tools.json`](./docs/mcp/tools.json) |
 | NENE2 inheritance | [`docs/inheritance-from-nene2.md`](./docs/inheritance-from-nene2.md) |
 | Workflow | [`docs/workflow.md`](./docs/workflow.md) |
+| DB backup / restore (production) | [`docs/operations/backup-restore.md`](./docs/operations/backup-restore.md) |
 | Current work | Private mirror `nene-origin/internal-docs/deal/todo/` (operational logs migrated per P3 — see AGENTS.md) |
 | Roadmap | [`docs/roadmap.md`](./docs/roadmap.md) |
 
