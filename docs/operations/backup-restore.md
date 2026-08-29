@@ -12,7 +12,7 @@ attached, so a stale line stays honest rather than becoming a lie.
 |---|---|
 | Script | `~/bin/nene-db-backup.sh <product>` (`contact` / `deal` / `clear` / `invoice` / `vault`) |
 | Wrapper actually scheduled | `~/bin/nene-db-backup-all.sh` — runs all five products in order, one product's failure does not stop the rest, returns `rc=1` if any failed |
-| Schedule | **one** control-panel cron entry, `45 4 * * * bin/nene-db-backup-all.sh` (registered 2026-08-27; the panel's slots are scarce, so five products share one entry) |
+| Schedule | **one** control-panel cron entry, `45 4 * * * ~/bin/nene-db-backup-all.sh` (registered 2026-08-27; the panel's slots are scarce, so five products share one entry). The panel's command field is home-relative, so it is entered there without the `~/` |
 | Dumps | `~/backups/deal-db/daily/deal-<YYYYMMDD>.sql.gz`, and `~/backups/deal-db/weekly/` |
 | Log | `~/site-logs/nene-db-backup-deal-runs.log` |
 | Retention | daily **14** generations, weekly **8** |
@@ -60,12 +60,15 @@ it — this is not hypothetical: a sibling backup on the same host was once prod
 gunzip -t ~/backups/deal-db/daily/deal-<YYYYMMDD>.sql.gz && echo 'gzip ok'
 gunzip -c ~/backups/deal-db/daily/deal-<YYYYMMDD>.sql.gz > ~/dump-check.sql
 
-grep -c 'CREATE TABLE' ~/dump-check.sql          # expect 8
+grep -c 'CREATE TABLE' ~/dump-check.sql          # expect the current table count (8 as of 2026-08-29)
 grep -c 'INSERT INTO `deals`' ~/dump-check.sql   # expect >= 1   (the point of the check)
 grep -c 'INSERT INTO `no_such_table`' ~/dump-check.sql   # negative control: expect 0
 tail -5 ~/dump-check.sql | grep -- '-- Dump completed'   # truncation guard
 rm -f ~/dump-check.sql
 ```
+
+⚠️ `~/dump-check.sql` is **plaintext production data**. The `rm` above only runs if you reach the
+end; if you break out part way through, delete it by hand before doing anything else.
 
 Ask for one table you expect to be populated **and** one that cannot exist. A grep that is silently
 broken returns `0` for both; only the negative control separates "no rows" from "my pattern never
@@ -110,22 +113,34 @@ mv ~/web/domain/ayane_co_jp/deal ~/deal-broken && mv ~/deal-old-<YYYYMMDD> ~/web
 
 # 2. then the database
 gunzip -c ~/backups/deal-db/daily/deal-<YYYYMMDD>.sql.gz \
-  | mysql --defaults-extra-file=~/.deal-restore.cnf <DB_NAME>
-
-rm -f ~/.deal-restore.cnf
+  | mysql --defaults-extra-file="$HOME/.deal-restore.cnf" <DB_NAME>
 ```
+
+🔴 **`$HOME`, not `~`, inside the flag.** The shell expands `~` only at the start of a word or
+just after the `=` of a *variable assignment*; `--defaults-extra-file=~/x` is neither, so `mysql`
+receives a literal `~/x` and fails with `Could not open required defaults file`. The trap is that
+`cat > ~/.deal-restore.cnf` and `rm -f ~/...` are word-initial and *do* work — **the file plainly
+exists while the two commands that need it cannot find it**, which is the worst thing to be
+debugging mid-incident.
 
 **After restoring, verify — do not assume.** A restore that half-applied still exits 0 on the
 last statement:
 
 ```bash
-mysql --defaults-extra-file=~/.deal-restore.cnf <DB_NAME> -e '
+mysql --defaults-extra-file="$HOME/.deal-restore.cnf" <DB_NAME> -e '
   SELECT COUNT(*) AS deals, MAX(amount_cents) AS max_amount FROM deals;
   SELECT COUNT(*) AS migrations FROM phinxlog;'
 ```
 
 Compare the counts against the dump's own `INSERT` census from §3, then open the board in a browser
 and read an amount. Numbers agreeing with numbers is not the same as the screen being right.
+
+Only once the verification is done, remove the credentials file — it is needed by the step above,
+so deleting it with the restore command would leave you re-typing a password mid-incident:
+
+```bash
+rm -f "$HOME/.deal-restore.cnf"
+```
 
 ## 5. What this box does not have
 
