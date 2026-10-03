@@ -85,7 +85,11 @@ CI instead of passing quietly.
 
 ## Current exceptions
 
-**None.** The allowlist has been empty since 2026-08-08.
+| Advisory | Package | Why it does not apply here | Expires |
+| --- | --- | --- | --- |
+| [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) | `braces` (≤ 3.0.3) | **No patched version exists** (advisory `first_patched_version: none`; 3.0.3 is the latest on npm, read 2026-10-03), so neither an update nor an override can take a fix. Reached only through dev tooling (`knip>fast-glob>micromatch>braces`, `stylelint>globby>fast-glob>micromatch>braces`); `npm ls braces --omit=dev --all` is empty, so it ships in nothing and is on no request path. The only patterns it expands are globs committed in this repo; no user- or network-supplied string reaches it. Removed by a patched braces release or by micromatch dropping it. Measured 2026-10-03 (#237). | **2026-11-03** |
+
+The allowlist was empty from 2026-08-08 until this entry was added on 2026-10-03.
 
 ## How the four exceptions died (2026-08-08)
 
